@@ -47,6 +47,25 @@ enum class Sport(
     }
 }
 
+/** Stan ścigania z duchem na żywo (aktualizowany przez GhostEngine w serwisie). */
+data class GhostLive(
+    val segmentUid: String,
+    val segmentName: String,
+    val ghostName: String,
+    /** 0 = dojedź do startu, 1 = trwa ściganie, 2 = ukończono, 3 = przerwano (zjazd z odcinka) */
+    val status: Int,
+    val distToStartM: Double = 0.0,
+    val progressM: Double = 0.0,
+    val lengthM: Double = 0.0,
+    val elapsedSec: Double = 0.0,
+    /** > 0 = za duchem, < 0 = przed duchem */
+    val gapSec: Double = 0.0,
+    val ghostLat: Double = 0.0,
+    val ghostLon: Double = 0.0,
+    val resultSec: Double = 0.0,
+    val ghostTotalSec: Double = 0.0
+)
+
 data class TrackPoint(
     val lat: Double,
     val lon: Double,
@@ -79,7 +98,8 @@ data class LiveState(
     /** pływanie: liczba przepłyniętych długości */
     val lengths: Int = 0,
     /** aktywności bez GPS: czas aktywny (bez pauz) w ms, aktualizowany co sekundę */
-    val activeMs: Long = 0L
+    val activeMs: Long = 0L,
+    val ghost: GhostLive? = null
 )
 
 /** Stan nagrywania współdzielony między serwisem a UI (ten sam proces). */

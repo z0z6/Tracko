@@ -19,6 +19,20 @@ Bez kont, reklam i Google Play Services.
 - **Mapy offline**: pobieranie kafelków (własny serwer kafelków) + import plików MBTiles/GEMF/ZIP
 - Eksport do GPX; interfejs w stylu iOS (kafelki, okienka, przyciski-pigułki, ciemny motyw)
 
+## Odcinki i ściganie z duchem (0.6)
+Ustawienia → *Odcinki i duchy* (albo przycisk w oknie z mapą). Działa dla aktywności z GPS (rower, bieganie, narty).
+- **Tworzenie odcinka**: w szczegółach aktywności lub trasy → *Utwórz odcinek do ścigania z duchem*; suwakami wybierasz
+  początek i koniec (min. 200 m). Z aktywności od razu powstaje pierwszy wynik.
+- **Wyniki zapisują się same**: każdy przejazd przez znany odcinek tej samej aktywności (start ≤ 25 m od początku,
+  meta 20 m przed końcem, zjazd > 40 m od linii przez ~8 s przerywa próbę). Pauzy nie wydłużają czasu.
+- **Ściganie**: wybierasz odcinek i ducha (najlepszy lub dowolny z rankingu). Na mapie widać odcinek (pomarańczowy)
+  i ducha 👻, na ekranie – przewagę lub stratę w sekundach; głosem co 25%, przy zmianie prowadzenia i na mecie
+  („Szybciej od ducha o 12 sekund”, „Nowy rekord odcinka!”).
+- **Udostępnianie**: odcinek z wynikami to plik `.ttseg` (JSON) – wysyłasz go przyciskiem *Udostępnij*, odbiorca importuje
+  go na liście odcinków i może się ścigać z Twoim wynikiem; jego wyniki po wysłaniu pliku z powrotem dołączają do rankingu.
+  Imię w rankingu ustawiasz w Ustawieniach. Nie ma serwera – wymiana plików odbywa się ręcznie (komunikator, e-mail, chmura).
+- Baza Room v5 (nowe tabele `segments`, `segment_efforts`)
+
 ## Rodzaje aktywności (0.5)
 Wybór na górze zakładki *Nagrywaj* (przed startem): **Rower, Bieganie, Pływanie, Siłownia, Bieżnia, Narty biegowe**.
 Każda aktywność zapisuje się z kategorią (migracja bazy do v4, dotychczasowe przejazdy to „Rower”), historia ma filtr

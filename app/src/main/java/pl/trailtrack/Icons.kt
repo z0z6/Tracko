@@ -27,7 +27,7 @@ enum class AppIcon {
     Heart, Bolt, Cadence, Speed, Mountain, Clock, Flame,
     Lap, Pause, Play, Stop, Layers, Sensor, Check,
     ChevronLeft, ChevronRight, Palette, Download, Upload, Sound,
-    Bike, Run, Swim, Dumbbell, Treadmill, Ski
+    Bike, Run, Swim, Dumbbell, Treadmill, Ski, Ghost
 }
 
 val Sport.icon: AppIcon get() = when (this) {
@@ -237,6 +237,14 @@ fun AppIconView(icon: AppIcon, tint: Color, modifier: Modifier = Modifier.size(2
                     drawArc(tint, startAngle = -45f, sweepAngle = 90f, useCenter = false,
                         topLeft = p(14f - r, 12f - r), size = Size(2f * r * s, 2f * r * s), style = stroke)
                 }
+            }
+            AppIcon.Ghost -> {
+                val gp = PB(s).m(5f, 20f).l(5f, 11f).c(5f, 3.5f, 19f, 3.5f, 19f, 11f).l(19f, 20f)
+                    .l(16f, 17.5f).l(12f, 20f).l(8f, 17.5f).z().path
+                drawPath(gp, tint.copy(alpha = 0.18f))
+                drawPath(gp, tint, style = stroke)
+                drawCircle(tint, radius = 1.2f * s, center = p(9.5f, 11f))
+                drawCircle(tint, radius = 1.2f * s, center = p(14.5f, 11f))
             }
             AppIcon.Bike -> {
                 drawCircle(tint, radius = 3.8f * s, center = p(5.5f, 16f), style = stroke)

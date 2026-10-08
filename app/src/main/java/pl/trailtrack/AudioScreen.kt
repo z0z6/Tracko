@@ -150,6 +150,8 @@ fun AudioSettingsScreen(onBack: () -> Unit) {
                 PrefSwitch("Utrata i powrót GPS", Prefs.evGps) { Prefs.evGps = it }
                 IosDivider()
                 PrefSwitch("Zjechanie z trasy do podążania", Prefs.evOffRoute) { Prefs.evOffRoute = it }
+                IosDivider()
+                PrefSwitch("Odcinki i ściganie z duchem", Prefs.evGhost) { Prefs.evGhost = it }
             }
 
             IosGroup(header = "Przesłuchaj sygnały") {

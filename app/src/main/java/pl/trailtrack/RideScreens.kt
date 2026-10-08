@@ -189,7 +189,7 @@ private fun RideCard(r: RideEntity, onClick: () -> Unit) {
 // ---------- szczegóły przejazdu ----------
 
 @Composable
-fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit) {
+fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Long) -> Unit) {
     val ctx = LocalContext.current
     val c = ios()
     val scope = rememberCoroutineScope()
@@ -323,6 +323,11 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit) {
                 SplitsGroup(if (sport == Sport.STRENGTH || sport == Sport.SWIMMING) "Serie" else "Okrążenia", st.laps, sport)
                 if (sport.hasDistance) SplitsGroup(if (sport.splitM >= 1000.0) "Podziały co 1 km" else "Podziały co ${sport.splitM.toInt()} m", st.splits, sport)
 
+                if (sport.gps && st.distanceM >= 300.0) {
+                    IosButton("Utwórz odcinek do ścigania z duchem", c.green, Modifier.fillMaxWidth(), filled = false, icon = AppIcon.Ghost) {
+                        onNewSegment(id)
+                    }
+                }
                 IosButton("Eksportuj TCX (TrainingPeaks)", c.blue, Modifier.fillMaxWidth()) {
                     export("tcx", "application/vnd.garmin.tcx+xml", "Eksportuj TCX")
                 }

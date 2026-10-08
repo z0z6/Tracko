@@ -20,6 +20,9 @@ sealed interface Screen {
     data class Offline(val box: BoundingBox?) : Screen
     object Sensors : Screen
     object Audio : Screen
+    object Segments : Screen
+    data class Segment(val uid: String) : Screen
+    data class NewSegment(val rideId: Long, val routeId: Long) : Screen
 }
 
 @Composable
@@ -32,26 +35,44 @@ fun AppRoot(repo: Repo) {
 
     GpsGate {
         when (top) {
-            is Screen.Ride -> RideDetailScreen(repo, top.id) { stack = stack.dropLast(1) }
+            is Screen.Ride -> RideDetailScreen(
+                repo, top.id,
+                onBack = { stack = stack.dropLast(1) },
+                onNewSegment = { stack = stack + Screen.NewSegment(it, 0L) }
+            )
             is Screen.Route -> RouteDetailScreen(
                 repo, top.id,
                 onBack = { stack = stack.dropLast(1) },
-                onOffline = { box -> stack = stack + Screen.Offline(box) }
+                onOffline = { box -> stack = stack + Screen.Offline(box) },
+                onNewSegment = { stack = stack + Screen.NewSegment(0L, it) }
             )
             is Screen.Offline -> OfflineScreen(top.box) { stack = stack.dropLast(1) }
             is Screen.Sensors -> SensorsScreen { stack = stack.dropLast(1) }
             is Screen.Audio -> AudioSettingsScreen { stack = stack.dropLast(1) }
+            is Screen.Segments -> SegmentsScreen(
+                repo, onBack = { stack = stack.dropLast(1) },
+                onOpen = { stack = stack + Screen.Segment(it) }
+            )
+            is Screen.Segment -> SegmentDetailScreen(
+                repo, top.uid, onBack = { stack = stack.dropLast(1) },
+                onRace = { stack = emptyList(); tab = 0 }
+            )
+            is Screen.NewSegment -> SegmentCreateScreen(
+                repo, top.rideId, top.routeId, onBack = { stack = stack.dropLast(1) },
+                onDone = { uid -> stack = stack.dropLast(1) + Screen.Segment(uid) }
+            )
             null -> Column(Modifier.fillMaxSize()) {
                 Box(Modifier.weight(1f)) {
                     when (tab) {
-                        0 -> RecordScreen(repo)
+                        0 -> RecordScreen(repo, onSegments = { stack = stack + Screen.Segments })
                         1 -> RidesScreen(repo) { stack = stack + Screen.Ride(it) }
                         2 -> RoutesScreen(repo) { stack = stack + Screen.Route(it) }
                         3 -> AnalyticsScreen(repo)
                         else -> SettingsScreen(
                             onOffline = { stack = stack + Screen.Offline(null) },
                             onSensors = { stack = stack + Screen.Sensors },
-                            onAudio = { stack = stack + Screen.Audio }
+                            onAudio = { stack = stack + Screen.Audio },
+                            onSegments = { stack = stack + Screen.Segments }
                         )
                     }
                 }

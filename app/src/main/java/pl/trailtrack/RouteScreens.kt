@@ -97,7 +97,9 @@ fun RoutesScreen(repo: Repo, onOpen: (Long) -> Unit) {
 }
 
 @Composable
-fun RouteDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onOffline: (BoundingBox) -> Unit) {
+fun RouteDetailScreen(
+    repo: Repo, id: Long, onBack: () -> Unit, onOffline: (BoundingBox) -> Unit, onNewSegment: (Long) -> Unit
+) {
     val c = ios()
     val scope = rememberCoroutineScope()
     var data by remember { mutableStateOf<LoadedRoute?>(null) }
@@ -149,6 +151,9 @@ fun RouteDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onOffline: (Boun
                     IosButton("Jedź tą trasą", c.green, Modifier.fillMaxWidth()) {
                         Prefs.selectedRouteId = id; active = true
                     }
+                }
+                IosButton("Utwórz odcinek do ścigania z duchem", c.green, Modifier.fillMaxWidth(), filled = false, icon = AppIcon.Ghost) {
+                    onNewSegment(id)
                 }
                 IosButton("Pobierz mapę offline dla trasy", c.blue, Modifier.fillMaxWidth(), filled = false) {
                     val n = geo.maxOf { it.latitude }

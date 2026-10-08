@@ -101,6 +101,33 @@ data class RoutePointEntity(
     val ele: Double
 )
 
+/** Odcinek do ścigania się z duchem. [geom] = "lat,lon;lat,lon;…" (6 miejsc po przecinku). */
+@Entity(tableName = "segments")
+data class SegmentEntity(
+    @PrimaryKey val uid: String,
+    val name: String,
+    val sport: Int,
+    val lengthM: Double,
+    val geom: String,
+    val createdAt: Long,
+    val author: String
+)
+
+/** Wynik na odcinku. [profile] = 101 czasów (s) w punktach co 1% długości odcinka – to jest „duch”. */
+@Entity(tableName = "segment_efforts", indices = [Index(value = ["segmentUid"])])
+data class EffortEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val segmentUid: String,
+    val athlete: String,
+    val mine: Int,
+    val startedAt: Long,
+    val timeSec: Double,
+    val profile: String,
+    val rideId: Long
+)
+
+data class SegBest(val segmentUid: String, val best: Double, val cnt: Int)
+
 @Dao
 interface RideDao {
     @Insert suspend fun insertRide(r: RideEntity)
@@ -163,6 +190,24 @@ interface RideDao {
 
     @Query("UPDATE rides SET bestKmSec = :v WHERE id = :id")
     suspend fun setBestKm(id: Long, v: Double)
+
+    // ----- odcinki i duchy -----
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE) suspend fun upsertSegment(s: SegmentEntity)
+    @Query("SELECT * FROM segments ORDER BY createdAt DESC") fun observeSegments(): Flow<List<SegmentEntity>>
+    @Query("SELECT * FROM segments WHERE sport = :sport") suspend fun segmentsForSport(sport: Int): List<SegmentEntity>
+    @Query("SELECT * FROM segments WHERE uid = :uid") suspend fun getSegment(uid: String): SegmentEntity?
+    @Query("DELETE FROM segments WHERE uid = :uid") suspend fun deleteSegment(uid: String)
+
+    @Insert suspend fun insertEffort(e: EffortEntity): Long
+    @Query("SELECT * FROM segment_efforts WHERE segmentUid = :uid ORDER BY timeSec ASC") fun observeEfforts(uid: String): Flow<List<EffortEntity>>
+    @Query("SELECT * FROM segment_efforts WHERE segmentUid = :uid ORDER BY timeSec ASC") suspend fun efforts(uid: String): List<EffortEntity>
+    @Query("SELECT * FROM segment_efforts WHERE id = :id") suspend fun getEffort(id: Long): EffortEntity?
+    @Query("DELETE FROM segment_efforts WHERE segmentUid = :uid") suspend fun deleteEfforts(uid: String)
+    @Query("DELETE FROM segment_efforts WHERE id = :id") suspend fun deleteEffort(id: Long)
+    @Query("SELECT COUNT(*) FROM segment_efforts WHERE segmentUid = :uid AND athlete = :athlete AND startedAt = :startedAt")
+    suspend fun effortExists(uid: String, athlete: String, startedAt: Long): Int
+    @Query("SELECT segmentUid, MIN(timeSec) AS best, COUNT(*) AS cnt FROM segment_efforts GROUP BY segmentUid")
+    fun observeSegBest(): Flow<List<SegBest>>
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -191,9 +236,27 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
     }
 }
 
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `segments` (`uid` TEXT NOT NULL, `name` TEXT NOT NULL, `sport` INTEGER NOT NULL, " +
+                "`lengthM` REAL NOT NULL, `geom` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `author` TEXT NOT NULL, PRIMARY KEY(`uid`))"
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `segment_efforts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `segmentUid` TEXT NOT NULL, " +
+                "`athlete` TEXT NOT NULL, `mine` INTEGER NOT NULL, `startedAt` INTEGER NOT NULL, `timeSec` REAL NOT NULL, " +
+                "`profile` TEXT NOT NULL, `rideId` INTEGER NOT NULL)"
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_segment_efforts_segmentUid` ON `segment_efforts` (`segmentUid`)")
+    }
+}
+
 @Database(
-    entities = [RideEntity::class, PointEntity::class, LapEntity::class, RouteEntity::class, RoutePointEntity::class],
-    version = 4,
+    entities = [
+        RideEntity::class, PointEntity::class, LapEntity::class, RouteEntity::class, RoutePointEntity::class,
+        SegmentEntity::class, EffortEntity::class
+    ],
+    version = 5,
     exportSchema = false
 )
 abstract class AppDb : RoomDatabase() {
@@ -203,7 +266,7 @@ abstract class AppDb : RoomDatabase() {
         @Volatile private var inst: AppDb? = null
         fun get(ctx: Context): AppDb = inst ?: synchronized(this) {
             inst ?: Room.databaseBuilder(ctx.applicationContext, AppDb::class.java, "trailtrack.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                 .build().also { inst = it }
         }
     }

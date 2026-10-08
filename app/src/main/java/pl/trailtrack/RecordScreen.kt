@@ -116,6 +116,82 @@ private fun StepControl(title: String, value: String, small: Double, big: Double
     }
 }
 
+private fun fmtGap(sec: Double): String {
+    val a = kotlin.math.abs(sec)
+    return if (a < 60.0) String.format(Locale.getDefault(), "%.0f s", a) else fmtTime(a)
+}
+
+/** Ściganie z duchem: wybór odcinka przed startem, a podczas jazdy – luka do ducha na żywo. */
+@Composable
+private fun GhostCard(
+    sport: Sport, seg: SegmentEntity?, eff: EffortEntity?, live: GhostLive?, recording: Boolean,
+    onChoose: () -> Unit, onClear: () -> Unit
+) {
+    val c = ios()
+    IosCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AppIconView(AppIcon.Ghost, c.blue, Modifier.size(22.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Ściganie z duchem", fontWeight = FontWeight.SemiBold, color = c.label, modifier = Modifier.weight(1f))
+            }
+            if (recording && live != null) {
+                Text("${live.segmentName} · duch: ${live.ghostName} (${fmtTime(live.ghostTotalSec)})", color = c.secondary, fontSize = 13.sp)
+                when (live.status) {
+                    0 -> Text("Dojedź do startu odcinka: ${fmtM(live.distToStartM)}", color = c.label, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                    1 -> {
+                        val ahead = live.gapSec < 0
+                        Text(
+                            if (kotlin.math.abs(live.gapSec) < 1.0) "Równo z duchem"
+                            else if (ahead) "Przed duchem ${fmtGap(live.gapSec)}" else "Za duchem ${fmtGap(live.gapSec)}",
+                            color = if (kotlin.math.abs(live.gapSec) < 1.0) c.label else if (ahead) c.green else c.red,
+                            fontSize = 28.sp, fontWeight = FontWeight.Bold
+                        )
+                        val frac = if (live.lengthM > 0) (live.progressM / live.lengthM).toFloat().coerceIn(0f, 1f) else 0f
+                        Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(c.fill)) {
+                            Box(Modifier.fillMaxWidth(frac).height(8.dp).background(c.blue))
+                        }
+                        Text("${fmtM(live.progressM)} / ${fmtM(live.lengthM)} · czas ${fmtTime(live.elapsedSec)}", color = c.secondary, fontSize = 13.sp)
+                    }
+                    2 -> {
+                        val better = live.gapSec < 0
+                        Text("Ukończono: ${fmtTime(live.resultSec)}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = c.label)
+                        Text(
+                            if (kotlin.math.abs(live.gapSec) < 0.5) "Remis z duchem"
+                            else if (better) "Szybciej od ducha o ${fmtGap(live.gapSec)}" else "Wolniej od ducha o ${fmtGap(live.gapSec)}",
+                            color = if (better) c.green else c.red, fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    else -> Text("Odcinek przerwany – zjechałeś z trasy odcinka. Wróć pod start, żeby spróbować ponownie.", color = c.orange, fontSize = 14.sp)
+                }
+            } else if (seg != null) {
+                Text(seg.name + " · " + fmtKm(seg.lengthM), color = c.label, fontWeight = FontWeight.SemiBold)
+                Text(
+                    if (eff != null) "Duch: ${eff.athlete} · ${fmtTime(eff.timeSec)}" else "Brak wyniku do ścigania – przejedź odcinek pierwszy raz",
+                    color = c.secondary, fontSize = 13.sp
+                )
+                if (seg.sport != sport.id) {
+                    Text("Ten odcinek jest dla aktywności: ${Sport.fromId(seg.sport).label}", color = c.orange, fontSize = 13.sp)
+                } else if (!recording) {
+                    Text("Pomarańczowa linia na mapie to odcinek. Ruszaj – start wykryję automatycznie.", color = c.secondary, fontSize = 13.sp)
+                }
+                if (!recording) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        IosButton("Zmień", c.blue, Modifier.weight(1f), filled = false) { onChoose() }
+                        IosButton("Wyłącz", c.red, Modifier.weight(1f), filled = false) { onClear() }
+                    }
+                }
+            } else if (!recording) {
+                Text(
+                    "Przejedź odcinek trasy, a potem ścigaj się z własnym wynikiem albo z wynikiem znajomego (plik odcinka).",
+                    color = c.secondary, fontSize = 13.sp
+                )
+                IosButton("Odcinki i duchy", c.blue, Modifier.fillMaxWidth(), filled = false) { onChoose() }
+            }
+        }
+    }
+}
+
 private fun sportHint(sport: Sport): String = when (sport) {
     Sport.TREADMILL -> "Bez GPS. Ustaw prędkość i nachylenie tak jak na bieżni – dystans liczy się z prędkości, a przewyższenie z nachylenia."
     Sport.SWIMMING -> "Basen, bez GPS. Dotykaj „+ Długość” po każdej przepłyniętej długości. Telefon trzymaj poza wodą."
@@ -124,7 +200,7 @@ private fun sportHint(sport: Sport): String = when (sport) {
 }
 
 @Composable
-fun RecordScreen(repo: Repo) {
+fun RecordScreen(repo: Repo, onSegments: () -> Unit) {
     val ctx = LocalContext.current
     val c = ios()
     val haptic = LocalHapticFeedback.current
@@ -146,6 +222,23 @@ fun RecordScreen(repo: Repo) {
             Live.setIncline(Prefs.treadIncline.toDouble())
         }
     }
+
+    // odcinek, z którym się ścigamy (wybierany w „Odcinki i duchy”)
+    var ghostUid by remember { mutableStateOf(Prefs.ghostSegmentUid) }
+    var ghostSeg by remember { mutableStateOf<SegmentEntity?>(null) }
+    var ghostEff by remember { mutableStateOf<EffortEntity?>(null) }
+    LaunchedEffect(ghostUid) {
+        ghostSeg = if (ghostUid.isBlank()) null else repo.getSegment(ghostUid)
+        ghostEff = if (ghostSeg == null) null else repo.efforts(ghostUid).let { l ->
+            l.firstOrNull { it.id == Prefs.ghostEffortId } ?: l.firstOrNull()
+        }
+    }
+    val ghostGeo = remember(ghostSeg) {
+        val g = ghostSeg?.let { decodeGeom(it.geom) }
+        if (g == null) emptyList() else (0 until g.n).map { GeoPoint(g.lat[it], g.lon[it]) }
+    }
+    val gl = live.ghost
+    val ghostPos = if (sport.gps && gl != null && gl.status == 1) GeoPoint(gl.ghostLat, gl.ghostLon) else null
 
     // czujniki i analityka na żywo
     val sensorDevices by SensorHub.devices.collectAsState()
@@ -176,16 +269,14 @@ fun RecordScreen(repo: Repo) {
 
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-            SportPicker(sport, enabled = !live.recording) { sp ->
-                Live.setSport(sp)
-                Prefs.sport = sp.id
-            }
-
-            if (sport.gps) {
-                Box(Modifier.fillMaxWidth().height(280.dp)) {
+            // okno z mapą (albo panel wysiłku bez GPS) z wyborem aktywności u góry
+            Box(Modifier.fillMaxWidth().height(if (sport.gps) 300.dp else 200.dp)) {
+                if (sport.gps) {
                     TrackMap(
                         live.points, Modifier.fillMaxSize(), route = routeGeo, follow = live.recording, fit = true,
-                        activeTerrain = if (live.recording) live.terrain else null
+                        activeTerrain = if (live.recording) live.terrain else null,
+                        segment = if (ghostSeg?.sport == sport.id) ghostGeo else emptyList(),
+                        ghostPos = ghostPos, topInset = 52.dp
                     )
                     if (live.recording && live.pause != PauseKind.NONE) {
                         Box(
@@ -202,26 +293,29 @@ fun RecordScreen(repo: Repo) {
                             }
                         }
                     }
+                } else {
+                    Column(
+                        Modifier.fillMaxSize().background(c.card).padding(start = 20.dp, end = 20.dp, top = 56.dp, bottom = 12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        AppIconView(sport.icon, c.blue, Modifier.size(40.dp))
+                        Spacer(Modifier.height(6.dp))
+                        Text("Wysiłek – ${sport.label}", fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = c.label)
+                        Text(sportHint(sport), color = c.secondary, fontSize = 13.sp, textAlign = TextAlign.Center)
+                        if (live.recording && live.pause != PauseKind.NONE) {
+                            Text("Wstrzymano", color = c.orange, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        }
+                    }
+                }
+                SportPicker(sport, enabled = !live.recording, modifier = Modifier.align(Alignment.TopStart)) { sp ->
+                    Live.setSport(sp)
+                    Prefs.sport = sp.id
+                    if (!sp.gps) Prefs.lastNoGpsSport = sp.id
                 }
             }
 
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (!sport.gps) {
-                    IosCard(Modifier.fillMaxWidth()) {
-                        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            AppIconView(sport.icon, c.blue, Modifier.size(34.dp))
-                            Spacer(Modifier.width(12.dp))
-                            Column {
-                                Text(sport.label, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = c.label)
-                                Text(sportHint(sport), color = c.secondary, fontSize = 13.sp)
-                                if (live.recording && live.pause != PauseKind.NONE) {
-                                    Text("Wstrzymano", color = c.orange, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                                }
-                            }
-                        }
-                    }
-                }
-
                 if (sport.gps && route != null) {
                     val r = route
                     IosCard(Modifier.fillMaxWidth()) {
@@ -238,6 +332,14 @@ fun RecordScreen(repo: Repo) {
                             }
                         }
                     }
+                }
+
+                if (sport.gps) {
+                    GhostCard(
+                        sport = sport, seg = ghostSeg, eff = ghostEff, live = gl, recording = live.recording,
+                        onChoose = onSegments,
+                        onClear = { Prefs.ghostSegmentUid = ""; Prefs.ghostEffortId = 0L; ghostUid = "" }
+                    )
                 }
 
                 val tiles: List<Pair<String, String>> = when (sport) {

@@ -79,6 +79,30 @@ object Prefs {
         get() = sp.getInt("accent", 0)
         set(v) = sp.edit().putInt("accent", v).apply()
 
+    // ----- odcinki i duchy -----
+    /** uid odcinka, z którym się ścigamy (pusty = brak) */
+    var ghostSegmentUid: String
+        get() = sp.getString("ghostSegmentUid", "") ?: ""
+        set(v) = sp.edit().putString("ghostSegmentUid", v).apply()
+
+    /** id wyniku-ducha (0 = najlepszy wynik na odcinku) */
+    var ghostEffortId: Long
+        get() = sp.getLong("ghostEffortId", 0L)
+        set(v) = sp.edit().putLong("ghostEffortId", v).apply()
+
+    /** imię w rankingach odcinków (trafia do udostępnianych plików) */
+    var athleteName: String
+        get() = sp.getString("athleteName", null) ?: android.os.Build.MODEL
+        set(v) = sp.edit().putString("athleteName", v.trim().ifBlank { android.os.Build.MODEL }).apply()
+
+    var evGhost: Boolean
+        get() = sp.getBoolean("evGhost", true)
+        set(v) = sp.edit().putBoolean("evGhost", v).apply()
+
+    var lastNoGpsSport: Int
+        get() = sp.getInt("lastNoGpsSport", Sport.TREADMILL.id)
+        set(v) = sp.edit().putInt("lastNoGpsSport", v).apply()
+
     // ----- aktywności -----
     /** ostatnio wybrana aktywność ([Sport.id]) */
     var sport: Int

@@ -124,18 +124,6 @@ fun GpsGate(content: @Composable () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    if (!live.recording) {
-                        // bez tego nie dałoby się wybrać bieżni/basenu/siłowni, gdy GPS jest wyłączony
-                        Text("Wybierz aktywność", fontSize = 15.sp, color = c.secondary)
-                        SportPicker(live.sport, enabled = true) { sp ->
-                            Live.setSport(sp)
-                            Prefs.sport = sp.id
-                        }
-                        Text(
-                            "Bieżnia, basen i siłownia nie wymagają GPS.",
-                            fontSize = 13.sp, color = c.secondary, textAlign = TextAlign.Center
-                        )
-                    }
                     AppIconView(AppIcon.Record, c.red, Modifier.size(56.dp))
                     if (!permOk) {
                         // czy użytkownik zaznaczył „nie pytaj ponownie”? wtedy trzeba wejść w ustawienia aplikacji
@@ -181,6 +169,14 @@ fun GpsGate(content: @Composable () -> Unit) {
                             IosButton("Zakończ przejazd", c.red, Modifier.fillMaxWidth(), filled = false) {
                                 ctx.startService(Intent(ctx, TrackingService::class.java).setAction(TrackingService.ACTION_STOP))
                             }
+                        }
+                    }
+                    if (!live.recording) {
+                        // bieżnia, basen i siłownia nie potrzebują GPS – dalej wybierzesz aktywność w oknie z mapą
+                        IosButton("Trenuję bez GPS (bieżnia, basen, siłownia)", c.secondary, Modifier.fillMaxWidth(), filled = false) {
+                            val sp = Sport.fromId(Prefs.lastNoGpsSport)
+                            Live.setSport(sp)
+                            Prefs.sport = sp.id
                         }
                     }
                 }

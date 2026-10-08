@@ -1,6 +1,8 @@
 package pl.trailtrack
 
+import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Point
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +40,8 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Overlay
+import androidx.compose.ui.unit.Dp
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -146,6 +150,28 @@ private fun TerrainLegend(points: List<TrackPoint>, active: Terrain?, modifier: 
     }
 }
 
+/** „Duch” na mapie: biała kropka z fioletową obwódką i emotikoną. */
+private class GhostOverlay(private val pos: GeoPoint, private val dens: Float) : Overlay() {
+    private val pt = Point()
+    private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xF2FFFFFF.toInt() }
+    private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = 0xFF5856D6.toInt()
+        style = Paint.Style.STROKE
+    }
+    private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
+
+    override fun draw(c: Canvas, mv: MapView, shadow: Boolean) {
+        if (shadow) return
+        mv.projection.toPixels(pos, pt)
+        val r = 14f * dens
+        ring.strokeWidth = 3f * dens
+        c.drawCircle(pt.x.toFloat(), pt.y.toFloat(), r, fill)
+        c.drawCircle(pt.x.toFloat(), pt.y.toFloat(), r, ring)
+        text.textSize = 17f * dens
+        c.drawText("👻", pt.x.toFloat(), pt.y + 6f * dens, text)
+    }
+}
+
 /**
  * Mapa OSM z trasą kolorowaną wg nawierzchni, opcjonalną trasą do podążania (niebieska),
  * śledzeniem pozycji (follow) i jednorazowym dopasowaniem widoku (fit).
@@ -157,7 +183,12 @@ fun TrackMap(
     route: List<GeoPoint> = emptyList(),
     follow: Boolean = false,
     fit: Boolean = false,
-    activeTerrain: Terrain? = null
+    activeTerrain: Terrain? = null,
+    /** odcinek do ścigania (pomarańczowy) i pozycja „ducha” na nim */
+    segment: List<GeoPoint> = emptyList(),
+    ghostPos: GeoPoint? = null,
+    /** miejsce u góry mapy zajęte przez nakładkę (np. wybór aktywności) */
+    topInset: Dp = 0.dp
 ) {
     var mode by remember { mutableIntStateOf(Prefs.mapMode) }
     val zoomedOnce = remember { booleanArrayOf(false) }
@@ -181,6 +212,17 @@ fun TrackMap(
                     })
                 }
                 val dens = mv.resources.displayMetrics.density
+                if (segment.size >= 2) {
+                    for ((col, w) in listOf(0xDDFFFFFF.toInt() to 9f, 0xFFFF9500.toInt() to 6f)) {
+                        mv.overlays.add(Polyline().apply {
+                            outlinePaint.color = col
+                            outlinePaint.strokeWidth = w * dens
+                            outlinePaint.strokeCap = Paint.Cap.ROUND
+                            outlinePaint.strokeJoin = Paint.Join.ROUND
+                            setPoints(segment)
+                        })
+                    }
+                }
                 val runs = splitRuns(points)
                 // najpierw jasne obwódki (czytelność na każdej mapie), potem kolorowe linie na wierzchu
                 for ((_, geo) in runs) {
@@ -201,6 +243,7 @@ fun TrackMap(
                         setPoints(geo)
                     })
                 }
+                if (ghostPos != null) mv.overlays.add(GhostOverlay(ghostPos, dens))
                 val last = points.lastOrNull()
                 if (follow && last != null) {
                     mv.overlays.add(Marker(mv).apply {
@@ -224,7 +267,8 @@ fun TrackMap(
             }
         )
         Box(
-            Modifier.align(Alignment.TopEnd).padding(10.dp).size(38.dp).clip(CircleShape)
+            Modifier.align(Alignment.TopEnd).padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 10.dp + topInset)
+                .size(38.dp).clip(CircleShape)
                 .background(Color(0xCCFFFFFF))
                 .clickable {
                     val hasCustom = Prefs.customTileUrl.isNotBlank()
@@ -237,7 +281,7 @@ fun TrackMap(
                 },
             contentAlignment = Alignment.Center
         ) { AppIconView(AppIcon.Layers, Color(0xFF1C1C1E), Modifier.size(20.dp)) }
-        TerrainLegend(points, activeTerrain, Modifier.align(Alignment.TopStart).padding(10.dp))
+        TerrainLegend(points, activeTerrain, Modifier.align(Alignment.TopStart).padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 10.dp + topInset))
         Text(
             when (mode) {
                 1 -> "© OpenStreetMap contributors, SRTM | © OpenTopoMap (CC-BY-SA)"

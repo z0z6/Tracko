@@ -50,7 +50,7 @@ import java.io.FileOutputStream
 // ---------- ustawienia ----------
 
 @Composable
-fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> Unit) {
+fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> Unit, onSegments: () -> Unit) {
     val ctx = LocalContext.current
     val c = ios()
     val scope = rememberCoroutineScope()
@@ -61,6 +61,8 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
     var weight by remember { mutableFloatStateOf(Prefs.weightKg) }
     var mapMode by remember { mutableIntStateOf(Prefs.mapMode) }
     var url by remember { mutableStateOf(Prefs.customTileUrl) }
+    var athlete by remember { mutableStateOf(Prefs.athleteName) }
+    var showAthlete by remember { mutableStateOf(false) }
 
     val lapOptions = listOf(0, 1, 5, 10)
 
@@ -144,6 +146,15 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
         }
 
         IosGroup(
+            header = "Odcinki i duchy",
+            footer = "Imię trafia do plików odcinków, które wysyłasz innym – widać je w rankingu odcinka."
+        ) {
+            IosRow("Odcinki i duchy", onClick = onSegments, chevron = true, leading = { IconBadge(AppIcon.Ghost, c.blue) })
+            IosDivider()
+            IosRow("Moje imię w rankingach", athlete, onClick = { showAthlete = true })
+        }
+
+        IosGroup(
             header = "Czujniki",
             footer = "Pasy tętna, mierniki mocy, czujniki prędkości i kadencji (Bluetooth LE, także Garmin)."
         ) {
@@ -188,11 +199,19 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
         }
 
         IosGroup(header = "O aplikacji") {
-            IosRow("TrailTrack", "0.5.1")
+            IosRow("TrailTrack", "0.6.0")
             IosDivider()
             IosRow("Dane map", "© OpenStreetMap contributors")
         }
         Spacer(Modifier.height(8.dp))
+    }
+
+    if (showAthlete) {
+        IosInputDialog(
+            title = "Moje imię w rankingach", initial = athlete,
+            onConfirm = { n -> showAthlete = false; Prefs.athleteName = n; athlete = Prefs.athleteName },
+            onDismiss = { showAthlete = false }
+        )
     }
 }
 

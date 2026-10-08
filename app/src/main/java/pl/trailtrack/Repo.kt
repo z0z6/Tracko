@@ -26,6 +26,9 @@ class Repo(private val ctx: Context) {
 
     val rides: Flow<List<RideEntity>> get() = dao.observeRides()
     val routes: Flow<List<RouteEntity>> get() = dao.observeRoutes()
+    val segments: Flow<List<SegmentEntity>> get() = dao.observeSegments()
+    val segBest: Flow<List<SegBest>> get() = dao.observeSegBest()
+    fun observeEfforts(uid: String): Flow<List<EffortEntity>> = dao.observeEfforts(uid)
 
     private fun autoName(startMs: Long, sport: Sport): String {
         val h = Calendar.getInstance().apply { timeInMillis = startMs }.get(Calendar.HOUR_OF_DAY)
@@ -58,6 +61,103 @@ class Repo(private val ctx: Context) {
                 sport = sport.id
             )
         )
+    }
+
+    // ----- odcinki i duchy -----
+
+    suspend fun segmentsFor(sport: Sport): List<SegmentEntity> = withContext(Dispatchers.IO) { dao.segmentsForSport(sport.id) }
+    suspend fun getSegment(uid: String): SegmentEntity? = withContext(Dispatchers.IO) { dao.getSegment(uid) }
+    suspend fun efforts(uid: String): List<EffortEntity> = withContext(Dispatchers.IO) { dao.efforts(uid) }
+    suspend fun getEffort(id: Long): EffortEntity? = withContext(Dispatchers.IO) { dao.getEffort(id) }
+    suspend fun deleteEffort(id: Long) = withContext(Dispatchers.IO) { dao.deleteEffort(id) }
+
+    suspend fun deleteSegment(uid: String) = withContext(Dispatchers.IO) {
+        dao.deleteEfforts(uid)
+        dao.deleteSegment(uid)
+    }
+
+    /** Dodaje wynik (bez duplikatów: ten sam zawodnik i czas rozpoczęcia). Zwraca false, jeśli już był. */
+    suspend fun addEffort(
+        uid: String, athlete: String, mine: Boolean, startedAt: Long, timeSec: Double, profile: String, rideId: Long
+    ): Boolean = withContext(Dispatchers.IO) {
+        if (dao.effortExists(uid, athlete, startedAt) > 0) return@withContext false
+        dao.insertEffort(EffortEntity(0, uid, athlete, if (mine) 1 else 0, startedAt, timeSec, profile, rideId))
+        true
+    }
+
+    /** Tworzy odcinek z geometrii (lat/lon) i opcjonalnie od razu pierwszy wynik. Zwraca uid. */
+    suspend fun createSegment(
+        name: String, sport: Sport, geo: List<Pair<Double, Double>>, effort: NewEffort?
+    ): String? = withContext(Dispatchers.IO) {
+        val thin = thinGeom(geo)
+        val g = decodeGeom(encodeGeom(thin)) ?: return@withContext null
+        if (g.n < 2 || g.length < 100.0) return@withContext null
+        val uid = java.util.UUID.randomUUID().toString()
+        dao.upsertSegment(SegmentEntity(uid, name, sport.id, g.length, encodeGeom(thin), System.currentTimeMillis(), Prefs.athleteName))
+        if (effort != null) {
+            val samples = effort.samples(g)
+            val total = effort.timeSec
+            val profile = buildProfile(samples + (g.length to total), g.length)
+            addEffort(uid, Prefs.athleteName, true, effort.startedAt, total, encodeProfile(profile), effort.rideId)
+        }
+        uid
+    }
+
+    /** Plik .ttseg (JSON) z odcinkiem i najlepszymi wynikami – do wysłania innym użytkownikom. */
+    suspend fun exportSegment(uid: String): File? = withContext(Dispatchers.IO) {
+        val seg = dao.getSegment(uid) ?: return@withContext null
+        val o = org.json.JSONObject()
+        o.put("format", "trailtrack-segment")
+        o.put("v", 1)
+        o.put("uid", seg.uid)
+        o.put("name", seg.name)
+        o.put("sport", seg.sport)
+        o.put("author", seg.author)
+        o.put("geom", seg.geom)
+        val arr = org.json.JSONArray()
+        for (e in dao.efforts(uid).take(30)) {
+            arr.put(
+                org.json.JSONObject()
+                    .put("athlete", e.athlete).put("startedAt", e.startedAt)
+                    .put("timeSec", e.timeSec).put("profile", e.profile)
+            )
+        }
+        o.put("efforts", arr)
+        val safe = seg.name.replace(Regex("[^A-Za-z0-9ĄąĆćĘęŁłŃńÓóŚśŹźŻż_-]+"), "_").take(40)
+        val f = File(exportDir(), "odcinek_$safe.ttseg")
+        f.writeText(o.toString())
+        f
+    }
+
+    /** Import pliku .ttseg. 1 = nowy odcinek, 2 = dołożono wyniki do istniejącego, 0 = błąd. */
+    suspend fun importSegment(uri: Uri): Int = withContext(Dispatchers.IO) {
+        runCatching {
+            val text = ctx.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
+                ?: return@runCatching 0
+            val o = org.json.JSONObject(text)
+            if (o.optString("format") != "trailtrack-segment") return@runCatching 0
+            val uid = o.getString("uid")
+            val geom = o.getString("geom")
+            val g = decodeGeom(geom) ?: return@runCatching 0
+            val isNew = dao.getSegment(uid) == null
+            if (isNew) {
+                dao.upsertSegment(
+                    SegmentEntity(uid, o.optString("name", "Odcinek"), o.optInt("sport", 0), g.length, geom,
+                        System.currentTimeMillis(), o.optString("author", ""))
+                )
+            }
+            val arr = o.optJSONArray("efforts")
+            if (arr != null) {
+                for (i in 0 until arr.length()) {
+                    val e = arr.getJSONObject(i)
+                    val prof = e.getString("profile")
+                    if (decodeProfile(prof) == null) continue
+                    val athlete = e.optString("athlete", "?")
+                    addEffort(uid, athlete, athlete == Prefs.athleteName, e.getLong("startedAt"), e.getDouble("timeSec"), prof, 0L)
+                }
+            }
+            if (isNew) 1 else 2
+        }.getOrDefault(0)
     }
 
     suspend fun history(sport: Sport): RideHistory = withContext(Dispatchers.IO) {

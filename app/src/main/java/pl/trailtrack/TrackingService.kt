@@ -37,6 +37,9 @@ class TrackingService : Service(), LocationListener {
     private val ops = Channel<suspend () -> Unit>(Channel.UNLIMITED)
 
     private lateinit var cues: CueEngine
+    private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var ghost: GhostEngine? = null
+    private var ghostJob: Job? = null
     private var cueJob: Job? = null
     private var gpsLost = false
 
@@ -114,8 +117,17 @@ class TrackingService : Service(), LocationListener {
             recording = true, startTime = start,
             // bez GPS: punkt startowy (dla pływania – początek pierwszej długości)
             points = if (sport.gps) emptyList() else listOf(TrackPoint(0.0, 0.0, 0.0, start, 0.0, Terrain.ASPHALT)),
-            laps = emptyList(), pause = PauseKind.NONE, needBreak = false, lengths = 0, activeMs = 0L
+            laps = emptyList(), pause = PauseKind.NONE, needBreak = false, lengths = 0, activeMs = 0L, ghost = null
         )
+        if (sport.gps) {
+            // odcinki i duch działają na głównym wątku, tak jak zapisy stanu w tym serwisie
+            val ge = GhostEngine(repo, sport, mainScope)
+            ghost = ge
+            ghostJob = mainScope.launch {
+                ge.prepare()
+                Live.state.collect { ge.onState(it) }
+            }
+        }
         if (!sport.gps) {
             lastTick = start
             handler.postDelayed(ticker, 1000L)
@@ -175,8 +187,11 @@ class TrackingService : Service(), LocationListener {
         if (!s.recording) return
         cueJob?.cancel()
         cues.finish()
+        ghostJob?.cancel()
+        ghost?.finish()
+        ghost = null
         Live.state.value = s.copy(
-            recording = false, points = emptyList(), laps = emptyList(), pause = PauseKind.NONE, lengths = 0, activeMs = 0L
+            recording = false, points = emptyList(), laps = emptyList(), pause = PauseKind.NONE, lengths = 0, activeMs = 0L, ghost = null
         )
         flush(s)
         enqueue {

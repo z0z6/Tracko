@@ -26,12 +26,12 @@ import androidx.compose.ui.unit.sp
 
 /** Wybór aktywności; w trakcie nagrywania widoczna tylko aktualna. */
 @Composable
-fun SportPicker(selected: Sport, enabled: Boolean, onSelect: (Sport) -> Unit) {
+fun SportPicker(selected: Sport, enabled: Boolean, modifier: Modifier = Modifier, onSelect: (Sport) -> Unit) {
     val c = ios()
     val onAccent = if (c.blue.luminance() > 0.5f) Color.Black else Color.White
     val list = if (enabled) Sport.values().toList() else listOf(selected)
     Row(
-        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 10.dp),
+        modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         for (sp in list) {
