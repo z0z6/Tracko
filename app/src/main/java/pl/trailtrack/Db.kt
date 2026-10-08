@@ -42,7 +42,9 @@ data class RideEntity(
     /** najszybszy kilometr w sekundach; 0 = brak (przejazd < 1 km), -1 = jeszcze nie policzony (v3) */
     @ColumnInfo(defaultValue = "-1.0") val bestKmSec: Double = -1.0,
     /** [Sport.id]: 0 = rower (domyślnie, także dla przejazdów sprzed v4) */
-    @ColumnInfo(defaultValue = "0") val sport: Int = 0
+    @ColumnInfo(defaultValue = "0") val sport: Int = 0,
+    /** 0 = nawierzchnie jeszcze nie wykryte, 1 = wykryte z mapy (OSM), 2 = ustawione ręcznie / zapisane w starszej wersji */
+    @ColumnInfo(defaultValue = "0") val terrainAuto: Int = 0
 )
 
 @Entity(
@@ -194,6 +196,13 @@ interface RideDao {
     @Query("UPDATE points SET terrain = :terrain WHERE rideId = :rideId AND idx BETWEEN :from AND :to")
     suspend fun setTerrainRange(rideId: Long, from: Int, to: Int, terrain: String)
 
+    /** Wersja blokująca – do użycia wewnątrz transakcji na wątku roboczym. */
+    @Query("UPDATE points SET terrain = :terrain WHERE rideId = :rideId AND idx BETWEEN :from AND :to")
+    fun setTerrainRangeSync(rideId: Long, from: Int, to: Int, terrain: String)
+
+    @Query("UPDATE rides SET terrainAuto = :v WHERE id = :id")
+    suspend fun setTerrainAuto(id: Long, v: Int)
+
     // ----- odcinki i duchy -----
     @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE) suspend fun upsertSegment(s: SegmentEntity)
     @Query("SELECT * FROM segments ORDER BY createdAt DESC") fun observeSegments(): Flow<List<SegmentEntity>>
@@ -254,12 +263,20 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
     }
 }
 
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE rides ADD COLUMN terrainAuto INTEGER NOT NULL DEFAULT 0")
+        // dotychczasowe aktywności mają nawierzchnie zapisane w trakcie jazdy – nie nadpisujemy ich automatem
+        db.execSQL("UPDATE rides SET terrainAuto = 2 WHERE finished = 1")
+    }
+}
+
 @Database(
     entities = [
         RideEntity::class, PointEntity::class, LapEntity::class, RouteEntity::class, RoutePointEntity::class,
         SegmentEntity::class, EffortEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDb : RoomDatabase() {
@@ -269,7 +286,7 @@ abstract class AppDb : RoomDatabase() {
         @Volatile private var inst: AppDb? = null
         fun get(ctx: Context): AppDb = inst ?: synchronized(this) {
             inst ?: Room.databaseBuilder(ctx.applicationContext, AppDb::class.java, "trailtrack.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                 .build().also { inst = it }
         }
     }

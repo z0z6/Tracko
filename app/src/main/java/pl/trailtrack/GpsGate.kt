@@ -135,7 +135,7 @@ fun GpsGate(active: Boolean, onChangeActivity: () -> Unit, content: @Composable 
                             !ActivityCompat.shouldShowRequestPermissionRationale(ctx, Manifest.permission.ACCESS_FINE_LOCATION)
                         Text("Potrzebna zgoda na lokalizację", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = c.label, textAlign = TextAlign.Center)
                         Text(
-                            "TrailTrack musi znać Twoją pozycję, żeby nagrywać trasę. Bez tego przejazd nie zostanie zapisany.",
+                            "Tracko musi znać Twoją pozycję, żeby nagrywać trasę. Bez tego przejazd nie zostanie zapisany.",
                             color = c.secondary, fontSize = 15.sp, textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(4.dp))

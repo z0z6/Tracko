@@ -199,7 +199,7 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
         }
 
         IosGroup(header = "O aplikacji") {
-            IosRow("TrailTrack", "0.7.0")
+            IosRow("Tracko", "0.8.0")
             IosDivider()
             IosRow("Dane map", "© OpenStreetMap contributors")
         }

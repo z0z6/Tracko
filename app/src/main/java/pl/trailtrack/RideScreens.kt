@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.border
+import androidx.compose.material3.CircularProgressIndicator
 import org.osmdroid.util.GeoPoint
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.material3.Slider
@@ -147,7 +148,7 @@ private fun TerrainEditorCard(
 
     IosCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Nawierzchnie", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = c.label)
+            Text("Korekta ręczna", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = c.label)
             Text(
                 "Wybierz nawierzchnię i zastosuj ją do całej aktywności albo do zaznaczonego zakresu (podświetlony na mapie).",
                 fontSize = 13.sp, color = c.secondary
@@ -232,7 +233,7 @@ private fun RideCard(r: RideEntity, onClick: () -> Unit) {
                 if (r.tss > 0) MiniStat(if (r.tssSource == 1) "TSS" else "hrTSS", fmt0(r.tss))
                 else if (sport.hasDistance) MiniStat(if (sport.pace == 0) "Śr." else "Tempo", fmtSpeedFor(sport, if (r.movingSec > 0) r.distanceM / r.movingSec else 0.0))
             }
-            if (sport.gps) {
+            if (sport.gps && r.terrainAuto != 0) {
                 Spacer(Modifier.height(10.dp))
                 TerrainBar(decodeTerrain(r.terrainEnc))
             }
@@ -254,6 +255,11 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
     var showDelete by remember { mutableStateOf(false) }
     var showRename by remember { mutableStateOf(false) }
     var reload by remember { mutableIntStateOf(0) }
+    var detecting by remember { mutableStateOf(false) }
+    var detectProgress by remember { mutableStateOf(0 to 0) }
+    var detectMsg by remember { mutableStateOf<String?>(null) }
+    var autoTried by remember(id) { mutableStateOf(false) }
+    var showEditor by remember { mutableStateOf(false) }
     // zakres zaznaczony w edytorze nawierzchni (podświetlany na mapie)
     var hlA by remember { mutableIntStateOf(0) }
     var hlB by remember { mutableIntStateOf(0) }
@@ -265,6 +271,32 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
             name = d.ride.name
             stats = withContext(Dispatchers.Default) { computeStats(d.points, Prefs.weightKg.toDouble(), d.laps, Sport.fromId(d.ride.sport)) }
             an = withContext(Dispatchers.Default) { computeAnalytics(d.points, Prefs.thresholds()) }
+        }
+    }
+
+    /** Wykrywa nawierzchnie z danych mapy (OSM) i przeładowuje podsumowanie. */
+    fun detectTerrain() {
+        if (detecting) return
+        detecting = true
+        detectMsg = null
+        detectProgress = 0 to 0
+        scope.launch {
+            val r = repo.autoDetectTerrain(id) { a, b -> detectProgress = a to b }
+            detecting = false
+            when (r) {
+                Repo.AutoTerrain.OK -> reload++
+                Repo.AutoTerrain.FAILED -> detectMsg = "Nie udało się pobrać danych mapy (potrzebny internet albo brak danych OSM w tym miejscu)."
+                Repo.AutoTerrain.SKIPPED -> {}
+            }
+        }
+    }
+
+    // po zapisie aktywności nawierzchnie wykrywają się same (raz)
+    LaunchedEffect(data) {
+        val dd = data
+        if (dd != null && !autoTried && Sport.fromId(dd.ride.sport).gps && dd.ride.terrainAuto == 0) {
+            autoTried = true
+            detectTerrain()
         }
     }
 
@@ -305,7 +337,7 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                     }
                     TrackMap(
                         d.points, Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(14.dp)), fit = true,
-                        segment = hl
+                        segment = hl, colorByTerrain = d.ride.terrainAuto != 0 && !detecting
                     )
                 }
 
@@ -367,20 +399,63 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                 }
 
                 if (sport.gps) {
-                    TerrainEditorCard(
-                        points = d.points,
-                        onRange = { a, b -> hlA = a; hlB = b },
-                        onApply = { a, b, t ->
-                            scope.launch {
-                                repo.setTerrainRange(id, a, b, t)
-                                reload++
+                    IosCard(Modifier.fillMaxWidth()) {
+                        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Text("Nawierzchnie", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = c.label)
+                            when {
+                                detecting -> {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        CircularProgressIndicator(Modifier.size(22.dp), color = c.blue, strokeWidth = 2.5.dp)
+                                        Spacer(Modifier.width(12.dp))
+                                        Text(
+                                            "Wykrywam nawierzchnie na podstawie mapy…" +
+                                                (if (detectProgress.second > 0) " (${detectProgress.first}/${detectProgress.second})" else ""),
+                                            color = c.secondary, fontSize = 14.sp
+                                        )
+                                    }
+                                }
+                                d.ride.terrainAuto == 0 -> {
+                                    Text(
+                                        detectMsg ?: "Nawierzchnie zostaną wykryte automatycznie z danych mapy (OpenStreetMap).",
+                                        color = if (detectMsg != null) c.orange else c.secondary, fontSize = 14.sp
+                                    )
+                                    IosButton("Wykryj nawierzchnie z mapy", c.blue, Modifier.fillMaxWidth()) { detectTerrain() }
+                                }
+                                else -> {
+                                    Text(
+                                        if (d.ride.terrainAuto == 1) "Wykryte automatycznie z danych mapy (OpenStreetMap). Kolory trasy na mapie odpowiadają nawierzchni."
+                                        else "Nawierzchnie zapisane ręcznie lub w starszej wersji aplikacji.",
+                                        color = c.secondary, fontSize = 14.sp
+                                    )
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        IosButton(
+                                            "Wykryj z mapy", c.blue, Modifier.weight(1f), filled = false
+                                        ) { detectTerrain() }
+                                        IosButton(
+                                            if (showEditor) "Ukryj korektę" else "Popraw ręcznie", c.blue, Modifier.weight(1f), filled = false
+                                        ) { showEditor = !showEditor }
+                                    }
+                                }
                             }
+                            if (detectMsg != null && d.ride.terrainAuto != 0) Text(detectMsg ?: "", color = c.orange, fontSize = 13.sp)
                         }
-                    )
+                    }
+                    if (showEditor && d.ride.terrainAuto != 0) {
+                        TerrainEditorCard(
+                            points = d.points,
+                            onRange = { a, b -> hlA = a; hlB = b },
+                            onApply = { a, b, t ->
+                                scope.launch {
+                                    repo.setTerrainRange(id, a, b, t)
+                                    reload++
+                                }
+                            }
+                        )
+                    }
                 }
                 if (sport.gps || (sport == Sport.TREADMILL && st.ascentM > 1.0)) ElevationChartCard(st.series)
                 if (sport.hasDistance) SpeedChartCard(st.series)
-                if (sport.gps) TerrainSpeedCard(st)
+                if (sport.gps && d.ride.terrainAuto != 0) TerrainSpeedCard(st)
 
                 IosGroup(header = "Więcej statystyk") {
                     IosRow("Czas całkowity", fmtTime(st.elapsedSec)); IosDivider()

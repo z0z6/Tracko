@@ -22,7 +22,8 @@ data class RideHistory(val baselineSpeedMs: Double, val bestKmSec: Double, val m
 data class LoadedRoute(val route: RouteEntity, val points: List<GpxPoint>)
 
 class Repo(private val ctx: Context) {
-    val dao: RideDao = AppDb.get(ctx).dao()
+    private val appDb: AppDb = AppDb.get(ctx)
+    val dao: RideDao = appDb.dao()
 
     val rides: Flow<List<RideEntity>> get() = dao.observeRides()
     val routes: Flow<List<RouteEntity>> get() = dao.observeRoutes()
@@ -58,7 +59,7 @@ class Repo(private val ctx: Context) {
                 pointCount = points.size, terrainEnc = encodeTerrain(st.terrainDist),
                 avgHr = an.avgHr, maxHr = an.maxHr, avgPower = an.avgPower, normPower = an.np,
                 tss = an.tss, tssSource = an.tssSource, bestKmSec = st.bestKmSec,
-                sport = sport.id
+                sport = sport.id, terrainAuto = existing?.terrainAuto ?: 0
             )
         )
     }
@@ -69,9 +70,49 @@ class Repo(private val ctx: Context) {
     /** Podsumowanie: przypisuje nawierzchnię do punktów [from]..[to] i przelicza statystyki aktywności. */
     suspend fun setTerrainRange(id: Long, from: Int, to: Int, terrain: Terrain) = withContext(Dispatchers.IO) {
         dao.setTerrainRange(id, from, to, terrain.name)
+        // ręczna korekta włącza kolorowanie trasy i chroni dane przed nadpisaniem przez automat
+        if ((dao.getRide(id)?.terrainAuto ?: 0) == 0) dao.setTerrainAuto(id, 2)
         val d = loadRide(id) ?: return@withContext
         finalizeRide(id, d.points, d.laps)
     }
+
+    enum class AutoTerrain { OK, FAILED, SKIPPED }
+
+    /**
+     * Wykrywa nawierzchnie z danych mapy OSM (narty: cały ślad = śnieg, bez internetu), zapisuje je w punktach
+     * i przelicza statystyki. [onProgress]: (ukończone zapytania, wszystkie).
+     */
+    suspend fun autoDetectTerrain(id: Long, onProgress: (Int, Int) -> Unit = { _, _ -> }): AutoTerrain =
+        withContext(Dispatchers.IO) {
+            val d = loadRide(id) ?: return@withContext AutoTerrain.SKIPPED
+            val sport = Sport.fromId(d.ride.sport)
+            if (!sport.gps || d.points.size < 2) return@withContext AutoTerrain.SKIPPED
+
+            val terrains: Array<Terrain> = if (sport == Sport.SKIING) {
+                Array(d.points.size) { Terrain.SNOW }
+            } else {
+                val det = SurfaceDetector.detect(d.points, onProgress)
+                if (det == null || det.matchedRatio < 0.2) return@withContext AutoTerrain.FAILED
+                det.terrains
+            }
+
+            // zapis seriami o tej samej nawierzchni, w jednej transakcji
+            val runs = ArrayList<Triple<Int, Int, Terrain>>()
+            var a = 0
+            for (i in 1..terrains.size) {
+                if (i == terrains.size || terrains[i] != terrains[a]) {
+                    runs.add(Triple(a, i - 1, terrains[a]))
+                    a = i
+                }
+            }
+            appDb.runInTransaction(Runnable {
+                for ((r0, r1, t) in runs) dao.setTerrainRangeSync(id, r0, r1, t.name)
+            })
+            dao.setTerrainAuto(id, 1)
+            val updated = d.points.mapIndexed { i, p -> p.copy(terrain = terrains[i]) }
+            finalizeRide(id, updated, d.laps)
+            AutoTerrain.OK
+        }
 
     // ----- odcinki i duchy -----
 
@@ -206,7 +247,7 @@ class Repo(private val ctx: Context) {
     /** format: "tcx", "gpx" lub "csv" */
     suspend fun exportRide(id: Long, format: String): File? = withContext(Dispatchers.IO) {
         val d = loadRide(id) ?: return@withContext null
-        val f = File(exportDir(), "trailtrack_${stamp(id)}.$format")
+        val f = File(exportDir(), "tracko_${stamp(id)}.$format")
         when (format) {
             "tcx" -> f.writeText(buildTcx(id, d.points, d.laps, d.ride.kcal, Sport.fromId(d.ride.sport)))
             "gpx" -> f.writeText(buildGpx(id, d.points, Sport.fromId(d.ride.sport)))
@@ -219,13 +260,13 @@ class Repo(private val ctx: Context) {
     suspend fun exportZip(sinceMs: Long): File? = withContext(Dispatchers.IO) {
         val list = dao.getFinished().filter { it.id >= sinceMs }
         if (list.isEmpty()) return@withContext null
-        val f = File(exportDir(), "trailtrack_tcx_${stamp(System.currentTimeMillis())}.zip")
+        val f = File(exportDir(), "tracko_tcx_${stamp(System.currentTimeMillis())}.zip")
         ZipOutputStream(FileOutputStream(f)).use { zip ->
             for (r in list) {
                 val pts = dao.getPoints(r.id).map { it.toTrackPoint() }
                 if (pts.size < 2) continue
                 val laps = dao.getLaps(r.id).map { it.pointIdx }
-                zip.putNextEntry(ZipEntry("trailtrack_${stamp(r.id)}.tcx"))
+                zip.putNextEntry(ZipEntry("tracko_${stamp(r.id)}.tcx"))
                 zip.write(buildTcx(r.id, pts, laps, r.kcal).toByteArray(Charsets.UTF_8))
                 zip.closeEntry()
             }
@@ -236,7 +277,7 @@ class Repo(private val ctx: Context) {
     suspend fun exportSummaryCsv(): File? = withContext(Dispatchers.IO) {
         val list = dao.getFinished()
         if (list.isEmpty()) return@withContext null
-        val f = File(exportDir(), "trailtrack_summary_${stamp(System.currentTimeMillis())}.csv")
+        val f = File(exportDir(), "tracko_summary_${stamp(System.currentTimeMillis())}.csv")
         f.writeText(buildSummaryCsv(list))
         f
     }

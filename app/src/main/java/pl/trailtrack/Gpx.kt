@@ -66,9 +66,9 @@ fun buildGpx(rideId: Long, points: List<TrackPoint>, sport: Sport = Sport.CYCLIN
     }
     val sb = StringBuilder()
     sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-    sb.append("<gpx version=\"1.1\" creator=\"TrailTrack\" xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:tt=\"https://github.com/trailtrack/ns\" xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\">\n")
+    sb.append("<gpx version=\"1.1\" creator=\"Tracko\" xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:tt=\"https://github.com/trailtrack/ns\" xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\">\n")
     sb.append("<metadata><time>${iso.format(Date(rideId))}</time></metadata>\n")
-    sb.append("<trk><name>TrailTrack ${iso.format(Date(rideId))}</name><type>${gpxType(sport)}</type><trkseg>\n")
+    sb.append("<trk><name>Tracko ${iso.format(Date(rideId))}</name><type>${gpxType(sport)}</type><trkseg>\n")
     points.forEachIndexed { i, p ->
         if (p.brk && i > 0) sb.append("</trkseg><trkseg>\n")
         sb.append("<trkpt lat=\"${String.format(Locale.US, "%.7f", p.lat)}\" lon=\"${String.format(Locale.US, "%.7f", p.lon)}\">")

@@ -188,7 +188,9 @@ fun TrackMap(
     segment: List<GeoPoint> = emptyList(),
     ghostPos: GeoPoint? = null,
     /** miejsce u góry mapy zajęte przez nakładkę (np. wybór aktywności) */
-    topInset: Dp = 0.dp
+    topInset: Dp = 0.dp,
+    /** true: ślad kolorowany wg nawierzchni + legenda (podsumowanie); false: jeden kolor (w trakcie nagrywania) */
+    colorByTerrain: Boolean = true
 ) {
     var mode by remember { mutableIntStateOf(Prefs.mapMode) }
     val zoomedOnce = remember { booleanArrayOf(false) }
@@ -236,7 +238,7 @@ fun TrackMap(
                 }
                 for ((t, geo) in runs) {
                     mv.overlays.add(Polyline().apply {
-                        outlinePaint.color = t.color
+                        outlinePaint.color = if (colorByTerrain) t.color else 0xFF0A84FF.toInt()
                         outlinePaint.strokeWidth = 4.5f * dens
                         outlinePaint.strokeCap = Paint.Cap.ROUND
                         outlinePaint.strokeJoin = Paint.Join.ROUND
@@ -281,7 +283,7 @@ fun TrackMap(
                 },
             contentAlignment = Alignment.Center
         ) { AppIconView(AppIcon.Layers, Color(0xFF1C1C1E), Modifier.size(20.dp)) }
-        TerrainLegend(points, activeTerrain, Modifier.align(Alignment.TopStart).padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 10.dp + topInset))
+        if (colorByTerrain) TerrainLegend(points, activeTerrain, Modifier.align(Alignment.TopStart).padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 10.dp + topInset))
         Text(
             when (mode) {
                 1 -> "© OpenStreetMap contributors, SRTM | © OpenTopoMap (CC-BY-SA)"

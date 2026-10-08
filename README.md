@@ -1,4 +1,4 @@
-# TrailTrack 0.3
+# Tracko 0.8
 
 Darmowa, open-source'owa aplikacja na Androida do nagrywania przejazdów rowerowych
 (odpowiednik podstawowych funkcji Stravy) – z naciskiem na jazdę w różnym terenie.
@@ -18,6 +18,17 @@ Bez kont, reklam i Google Play Services.
 - **Import GPX** i podążanie za trasą (niebieska linia, odległość do końca, ostrzeżenie o zjechaniu z trasy)
 - **Mapy offline**: pobieranie kafelków (własny serwer kafelków) + import plików MBTiles/GEMF/ZIP
 - Eksport do GPX; interfejs w stylu iOS (kafelki, okienka, przyciski-pigułki, ciemny motyw)
+
+## Tracko 0.8
+- **Nazwa aplikacji: Tracko.** Wewnętrzny identyfikator pakietu (`pl.trailtrack`), nazwa bazy i plik ustawień zostały
+  bez zmian, żeby aktualizacja zachowała dane i ustawienia.
+- **Nawierzchnie wykrywają się automatycznie** po zapisie aktywności: każdy punkt trasy jest dopasowywany do najbliższej
+  drogi lub ścieżki z OpenStreetMap (tagi `surface`, `tracktype`, `highway`; Overpass API, wymaga internetu).
+  Narty biegowe = śnieg (bez internetu). W trakcie nagrywania nie ma wyboru nawierzchni, ślad jest jednokolorowy.
+  Kolorowanie trasy wg nawierzchni (z legendą) pojawia się dopiero w podsumowaniu zapisanej aktywności; można ponowić
+  wykrywanie albo poprawić nawierzchnię ręcznie dla zakresu trasy. Starsze aktywności zachowują dotychczasowe dane.
+- **Duch** to kwadratowy kafelek przy prawej krawędzi: na mapie podczas jazdy (luka do ducha na żywo) i obok karty
+  gotowości przed startem.
 
 ## Nowy przepływ i warstwa graficzna (0.7)
 - **Animacja startowa** (~2 s): ślad rysuje się gradientową linią, za nim podąża przerywany „duch”, potem wjeżdża nazwa.
@@ -103,7 +114,7 @@ Masz więc trzy drogi:
 ## Budowanie na GitHubie
 1. Wypchnij projekt do repozytorium (gałąź `main`).
 2. **Actions → Build APK** uruchomi się sam (albo *Run workflow*).
-3. Pobierz artefakt **TrailTrack-debug-apk**, rozpakuj, zainstaluj `app-debug.apk`.
+3. Pobierz artefakt **Tracko-debug-apk**, rozpakuj, zainstaluj `app-debug.apk`.
 4. Release z APK: `git tag v0.2.0 && git push origin v0.2.0`.
 
 Lokalnie: Android Studio → *Open*, albo `gradle assembleDebug` (Gradle 8.7, JDK 17).

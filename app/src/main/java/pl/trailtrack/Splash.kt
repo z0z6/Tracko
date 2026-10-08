@@ -139,7 +139,7 @@ fun SplashScreen(onFinished: () -> Unit) {
 
             Spacer(Modifier.height(18.dp))
             Text(
-                "TrailTrack",
+                "Tracko",
                 fontSize = 34.sp, fontWeight = FontWeight.Light, color = c.label,
                 letterSpacing = (2f + 9f * (1f - title.value)).sp,
                 modifier = Modifier.graphicsLayer {

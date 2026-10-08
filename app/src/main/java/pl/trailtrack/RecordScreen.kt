@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
@@ -130,95 +131,96 @@ private fun fmtGap(sec: Double): String {
     return if (a < 60.0) String.format(Locale.getDefault(), "%.0f s", a) else fmtTime(a)
 }
 
+private fun fmtClock(sec: Double): String {
+    val t = sec.toLong().coerceAtLeast(0)
+    return if (t >= 3600) String.format(Locale.getDefault(), "%d:%02d:%02d", t / 3600, (t % 3600) / 60, t % 60)
+    else String.format(Locale.getDefault(), "%d:%02d", t / 60, t % 60)
+}
+
 /**
- * Zminimalizowany kafelek ducha – zawsze widoczny pod oknem mapy / na górze ekranu.
- * Przed startem: wybór odcinka (dotknięcie) i szybkie wyłączenie (✕). W trakcie: luka do ducha na żywo.
+ * Kwadratowy kafelek ducha przy prawej krawędzi (na mapie podczas jazdy, obok karty gotowości przed startem).
+ * Przed startem: dotknięcie wybiera odcinek, ✕ wyłącza ściganie. W trakcie: luka do ducha na żywo.
  */
 @Composable
-private fun GhostTile(
+private fun GhostSquare(
     sport: Sport, seg: SegmentEntity?, eff: EffortEntity?, live: GhostLive?, recording: Boolean,
-    onChoose: () -> Unit, onClear: () -> Unit
+    onChoose: () -> Unit, onClear: () -> Unit, modifier: Modifier = Modifier
 ) {
     val c = ios()
     val accent = Color(0xFF5E5CE6)
-    val shape = RoundedCornerShape(20.dp)
+    val shape = RoundedCornerShape(22.dp)
     val racing = recording && live != null && seg != null
     val gap = live?.gapSec ?: 0.0
     val near = kotlin.math.abs(gap) < 1.0
 
-    Column(
-        Modifier.fillMaxWidth().clip(shape)
-            .background(Brush.horizontalGradient(listOf(accent.copy(alpha = 0.20f), c.card)))
-            .border(1.dp, accent.copy(alpha = 0.35f), shape)
+    Box(
+        modifier.size(92.dp).clip(shape)
+            .background(Brush.linearGradient(listOf(accent.copy(alpha = 0.30f), c.card)))
+            .border(1.dp, accent.copy(alpha = 0.45f), shape)
             .clickable(enabled = !recording) { onChoose() }
-            .padding(horizontal = 14.dp, vertical = 12.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(46.dp).clip(CircleShape).background(accent.copy(alpha = 0.20f)), contentAlignment = Alignment.Center) {
-                AppIconView(AppIcon.Ghost, accent, Modifier.size(28.dp))
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                when {
-                    racing && live != null && live.status == 0 -> {
-                        Text("Dojedź do startu odcinka", fontWeight = FontWeight.SemiBold, color = c.label, fontSize = 16.sp)
-                        Text("${fmtM(live.distToStartM)} · duch: ${live.ghostName} ${fmtTime(live.ghostTotalSec)}", color = c.secondary, fontSize = 12.sp, maxLines = 1)
-                    }
-                    racing && live != null && live.status == 1 -> {
-                        Text("Duch: ${live.ghostName}", fontWeight = FontWeight.SemiBold, color = c.label, fontSize = 15.sp, maxLines = 1)
-                        Text("${fmtM(live.progressM)} / ${fmtM(live.lengthM)} · ${fmtTime(live.elapsedSec)}", color = c.secondary, fontSize = 12.sp, maxLines = 1)
-                    }
-                    racing && live != null && live.status == 2 -> {
-                        Text("Ukończono: ${fmtTime(live.resultSec)}", fontWeight = FontWeight.SemiBold, color = c.label, fontSize = 16.sp)
+        Column(
+            Modifier.fillMaxSize().padding(horizontal = 6.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            when {
+                racing && live != null && live.status == 1 -> {
+                    AppIconView(AppIcon.Ghost, accent, Modifier.size(18.dp))
+                    Text(
+                        (if (near) "=" else if (gap < 0) "−" else "+") + fmtGap(gap),
+                        color = if (near) c.label else if (gap < 0) c.green else c.red,
+                        fontSize = 21.sp, fontWeight = FontWeight.Bold, maxLines = 1
+                    )
+                    Text(if (near) "równo" else if (gap < 0) "przed" else "za duchem", color = c.secondary, fontSize = 10.sp, maxLines = 1)
+                }
+                racing && live != null && live.status == 0 -> {
+                    AppIconView(AppIcon.Ghost, accent, Modifier.size(20.dp))
+                    Text("do startu", color = c.secondary, fontSize = 10.sp)
+                    Text(fmtM(live.distToStartM), color = c.label, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                }
+                racing && live != null && live.status == 2 -> {
+                    Text("✓", color = if (gap < 0) c.green else c.red, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(fmtClock(live.resultSec), color = c.label, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                    Text(
+                        (if (gap < 0) "−" else "+") + fmtGap(gap), color = if (gap < 0) c.green else c.red,
+                        fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1
+                    )
+                }
+                racing && live != null -> {
+                    Text("⚠", color = c.orange, fontSize = 18.sp)
+                    Text("przerwano", color = c.orange, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                }
+                seg != null -> {
+                    AppIconView(AppIcon.Ghost, accent, Modifier.size(24.dp))
+                    if (seg.sport != sport.id) {
+                        Text("inna aktywność", color = c.orange, fontSize = 10.sp, textAlign = TextAlign.Center, maxLines = 2)
+                    } else {
+                        Text("Duch", color = c.secondary, fontSize = 10.sp)
                         Text(
-                            if (kotlin.math.abs(gap) < 0.5) "Remis z duchem"
-                            else if (gap < 0) "Szybciej od ducha o ${fmtGap(gap)}" else "Wolniej od ducha o ${fmtGap(gap)}",
-                            color = if (gap < 0) c.green else c.red, fontSize = 12.sp, fontWeight = FontWeight.SemiBold
+                            if (eff != null) fmtClock(eff.timeSec) else "brak wyniku",
+                            color = c.label, fontSize = if (eff != null) 16.sp else 11.sp, fontWeight = FontWeight.Bold, maxLines = 1
                         )
-                    }
-                    racing && live != null -> {
-                        Text("Odcinek przerwany", fontWeight = FontWeight.SemiBold, color = c.orange, fontSize = 16.sp)
-                        Text("Wróć pod start, żeby spróbować ponownie", color = c.secondary, fontSize = 12.sp, maxLines = 1)
-                    }
-                    seg != null -> {
-                        Text(seg.name, fontWeight = FontWeight.SemiBold, color = c.label, fontSize = 16.sp, maxLines = 1)
-                        Text(
-                            when {
-                                seg.sport != sport.id -> "Odcinek dla aktywności: ${Sport.fromId(seg.sport).label}"
-                                eff != null -> "Duch: ${eff.athlete} · ${fmtTime(eff.timeSec)} · ${fmtKm(seg.lengthM)}"
-                                else -> "Brak wyniku – przejedź odcinek, by go zapisać"
-                            },
-                            color = if (seg.sport != sport.id) c.orange else c.secondary, fontSize = 12.sp, maxLines = 1
-                        )
-                    }
-                    else -> {
-                        Text("Ściganie z duchem", fontWeight = FontWeight.SemiBold, color = c.label, fontSize = 16.sp)
-                        Text("Wybierz odcinek i ścigaj się z własnym wynikiem", color = c.secondary, fontSize = 12.sp, maxLines = 1)
                     }
                 }
-            }
-            // prawa strona: luka na żywo / ✕ / strzałka
-            if (racing && live != null && live.status == 1) {
-                Text(
-                    (if (near) "=" else if (gap < 0) "−" else "+") + fmtGap(gap),
-                    color = if (near) c.label else if (gap < 0) c.green else c.red,
-                    fontSize = 28.sp, fontWeight = FontWeight.Bold
-                )
-            } else if (!recording && seg != null) {
-                Box(
-                    Modifier.size(34.dp).clip(CircleShape).background(c.fill).clickable { onClear() },
-                    contentAlignment = Alignment.Center
-                ) { Text("✕", color = c.secondary, fontSize = 14.sp) }
-            } else if (!recording) {
-                AppIconView(AppIcon.ChevronRight, c.secondary, Modifier.size(20.dp))
+                else -> {
+                    AppIconView(AppIcon.Ghost, accent, Modifier.size(30.dp))
+                    Text("Duch", color = c.label, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text("wybierz odcinek", color = c.secondary, fontSize = 9.sp, textAlign = TextAlign.Center, maxLines = 2)
+                }
             }
         }
         if (racing && live != null && live.status == 1 && live.lengthM > 0) {
             val frac = (live.progressM / live.lengthM).toFloat().coerceIn(0f, 1f)
-            Spacer(Modifier.height(8.dp))
-            Box(Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(3.dp)).background(c.fill)) {
-                Box(Modifier.fillMaxWidth(frac).height(5.dp).background(accent))
+            Box(Modifier.align(Alignment.BottomCenter).padding(horizontal = 12.dp, vertical = 6.dp).fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(c.fill)) {
+                Box(Modifier.fillMaxWidth(frac).height(4.dp).background(accent))
             }
+        }
+        if (!recording && seg != null) {
+            Box(
+                Modifier.align(Alignment.TopEnd).padding(5.dp).size(22.dp).clip(CircleShape).background(c.fill).clickable { onClear() },
+                contentAlignment = Alignment.Center
+            ) { Text("✕", color = c.secondary, fontSize = 10.sp) }
         }
     }
 }
@@ -244,7 +246,6 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
     val activeSec = live.activeMs / 1000.0
     var confirmStop by remember { mutableStateOf(false) }
     var saving by remember { mutableStateOf(false) }
-    var showTerrain by remember { mutableStateOf(false) }
     var showPoolInput by remember { mutableStateOf(false) }
     var poolM by remember { mutableIntStateOf(Prefs.poolM) }
     val onAccent = if (c.blue.luminance() > 0.5f) Color.Black else Color.White
@@ -315,7 +316,7 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
                     Box(Modifier.fillMaxWidth().height(290.dp)) {
                         TrackMap(
                             live.points, Modifier.fillMaxSize(), route = routeGeo, follow = true, fit = true,
-                            activeTerrain = live.terrain,
+                            colorByTerrain = false,
                             segment = if (ghostSeg?.sport == sport.id) ghostGeo else emptyList(),
                             ghostPos = ghostPos
                         )
@@ -334,47 +335,43 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
                                 }
                             }
                         }
-                        // bieżąca nawierzchnia – pełny wybór dopiero na żądanie (i w podsumowaniu)
-                        Row(
-                            Modifier.align(Alignment.BottomEnd).padding(bottom = 26.dp, end = 10.dp)
-                                .clip(RoundedCornerShape(50)).background(Color(0xE6FFFFFF))
-                                .clickable { showTerrain = true }.padding(horizontal = 12.dp, vertical = 7.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(Modifier.size(10.dp).background(Color(live.terrain.color), CircleShape))
-                            Spacer(Modifier.width(6.dp))
-                            Text(live.terrain.label, color = Color.Black, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                            Text("  ▾", color = Color.Black, fontSize = 12.sp)
+                        // duch: kwadratowy kafelek przy prawej krawędzi mapy
+                        if (ghostSeg != null) {
+                            GhostSquare(
+                                sport = sport, seg = ghostSeg, eff = ghostEff, live = gl, recording = true,
+                                onChoose = onSegments, onClear = {},
+                                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 10.dp)
+                            )
                         }
                     }
                 }
 
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // duch – zawsze na wierzchu, tuż pod mapą / nagłówkiem
-                    if (sport.gps) {
-                        GhostTile(
-                            sport = sport, seg = ghostSeg, eff = ghostEff, live = gl, recording = live.recording,
-                            onChoose = onSegments,
-                            onClear = { Prefs.ghostSegmentUid = ""; Prefs.ghostEffortId = 0L; ghostUid = "" }
-                        )
-                    }
-
                     if (!live.recording) {
-                        // przed startem: bez mapy – tylko gotowość i ustawienia aktywności
-                        IosCard(Modifier.fillMaxWidth()) {
-                            Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                AppIconView(sport.icon, sportAccent(sport), Modifier.size(40.dp))
-                                Spacer(Modifier.width(14.dp))
-                                Column {
-                                    Text(
-                                        if (sport.gps) "Gotowy do startu" else "Wysiłek – ${sport.label}",
-                                        fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = c.label
-                                    )
-                                    Text(
-                                        if (sport.gps) "Mapa i nagrywanie trasy uruchomią się po naciśnięciu Start." else sportHint(sport),
-                                        color = c.secondary, fontSize = 13.sp
-                                    )
+                        // przed startem: karta gotowości (bez mapy) i kwadratowy duch przy prawej krawędzi
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            IosCard(Modifier.weight(1f).heightIn(min = 92.dp)) {
+                                Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    AppIconView(sport.icon, sportAccent(sport), Modifier.size(36.dp))
+                                    Spacer(Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            if (sport.gps) "Gotowy do startu" else sport.label,
+                                            fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = c.label
+                                        )
+                                        Text(
+                                            if (sport.gps) "Mapa uruchomi się po Start." else sportHint(sport),
+                                            color = c.secondary, fontSize = 13.sp
+                                        )
+                                    }
                                 }
+                            }
+                            if (sport.gps) {
+                                GhostSquare(
+                                    sport = sport, seg = ghostSeg, eff = ghostEff, live = gl, recording = false,
+                                    onChoose = onSegments,
+                                    onClear = { Prefs.ghostSegmentUid = ""; Prefs.ghostEffortId = 0L; ghostUid = "" }
+                                )
                             }
                         }
                     } else if (!sport.gps) {
@@ -650,30 +647,5 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
             },
             onDismiss = { showPoolInput = false }
         )
-    }
-    if (showTerrain) {
-        Dialog(onDismissRequest = { showTerrain = false }) {
-            Column(
-                Modifier.clip(RoundedCornerShape(22.dp)).background(c.card).padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Text("Nawierzchnia", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = c.label)
-                Text(
-                    "Obowiązuje od teraz do kolejnej zmiany. Całą trasę możesz też poprawić w podsumowaniu po zakończeniu.",
-                    fontSize = 12.sp, color = c.secondary
-                )
-                Terrain.values().toList().chunked(4).forEach { row ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        row.forEach { t ->
-                            TerrainTile(t, live.terrain == t, Modifier.weight(1f)) {
-                                Live.setTerrain(t)
-                                showTerrain = false
-                            }
-                        }
-                        repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
-                    }
-                }
-            }
-        }
     }
 }
