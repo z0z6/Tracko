@@ -38,7 +38,9 @@ data class RideEntity(
     @ColumnInfo(defaultValue = "0") val normPower: Int = 0,
     @ColumnInfo(defaultValue = "0.0") val tss: Double = 0.0,
     /** 0 = brak, 1 = z mocy, 2 = z tętna (hrTSS) */
-    @ColumnInfo(defaultValue = "0") val tssSource: Int = 0
+    @ColumnInfo(defaultValue = "0") val tssSource: Int = 0,
+    /** najszybszy kilometr w sekundach; 0 = brak (przejazd < 1 km), -1 = jeszcze nie policzony (v3) */
+    @ColumnInfo(defaultValue = "-1.0") val bestKmSec: Double = -1.0
 )
 
 @Entity(
@@ -143,6 +145,22 @@ interface RideDao {
 
     @Query("DELETE FROM routes WHERE id = :id")
     suspend fun deleteRoute(id: Long)
+
+    // historia do komunikatów głosowych (rekordy, „tempo jak zazwyczaj”)
+    @Query("SELECT * FROM rides WHERE finished = 1 AND distanceM > 2000 AND movingSec > 300 ORDER BY id DESC LIMIT 10")
+    suspend fun recentForBaseline(): List<RideEntity>
+
+    @Query("SELECT MIN(bestKmSec) FROM rides WHERE finished = 1 AND bestKmSec > 0")
+    suspend fun bestKmEver(): Double?
+
+    @Query("SELECT MAX(distanceM) FROM rides WHERE finished = 1")
+    suspend fun maxDistance(): Double?
+
+    @Query("SELECT id FROM rides WHERE finished = 1 AND bestKmSec < 0")
+    suspend fun idsNeedingBestKm(): List<Long>
+
+    @Query("UPDATE rides SET bestKmSec = :v WHERE id = :id")
+    suspend fun setBestKm(id: Long, v: Double)
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -159,9 +177,15 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE rides ADD COLUMN bestKmSec REAL NOT NULL DEFAULT -1.0")
+    }
+}
+
 @Database(
     entities = [RideEntity::class, PointEntity::class, LapEntity::class, RouteEntity::class, RoutePointEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDb : RoomDatabase() {
@@ -171,7 +195,7 @@ abstract class AppDb : RoomDatabase() {
         @Volatile private var inst: AppDb? = null
         fun get(ctx: Context): AppDb = inst ?: synchronized(this) {
             inst ?: Room.databaseBuilder(ctx.applicationContext, AppDb::class.java, "trailtrack.db")
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build().also { inst = it }
         }
     }

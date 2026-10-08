@@ -122,7 +122,8 @@ fun RecordScreen(repo: Repo) {
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Box(Modifier.fillMaxWidth().height(280.dp)) {
-                TrackMap(live.points, Modifier.fillMaxSize(), route = routeGeo, follow = live.recording, fit = true)
+                TrackMap(live.points, Modifier.fillMaxSize(), route = routeGeo, follow = live.recording, fit = true,
+                    activeTerrain = if (live.recording) live.terrain else null)
                 if (live.recording && live.pause != PauseKind.NONE) {
                     Box(
                         Modifier.align(Alignment.BottomStart).padding(bottom = 18.dp, start = 10.dp)
@@ -169,6 +170,30 @@ fun RecordScreen(repo: Repo) {
                         "Kalorie (szac.)" to fmtKcal(stats.kcal)
                     )
                 )
+
+                if (live.recording && Prefs.goalType != 0 && Prefs.goalValue > 0f) {
+                    val gt = Prefs.goalType
+                    val goal = Prefs.goalValue.toDouble()
+                    val cur = when (gt) {
+                        1 -> stats.distanceM / 1000.0
+                        2 -> stats.movingSec / 60.0
+                        else -> stats.ascentM
+                    }
+                    val unit = when (gt) { 1 -> "km"; 2 -> "min"; else -> "m" }
+                    val frac = (cur / goal).toFloat().coerceIn(0f, 1f)
+                    IosCard(Modifier.fillMaxWidth()) {
+                        Column(Modifier.padding(12.dp)) {
+                            Row {
+                                Text(if (cur >= goal) "Cel osiągnięty ✓" else "Cel", fontWeight = FontWeight.SemiBold, color = c.label, modifier = Modifier.weight(1f))
+                                Text("${fmt1(cur)} / ${fmt1(goal)} $unit", color = c.secondary, fontSize = 14.sp)
+                            }
+                            Spacer(Modifier.height(8.dp))
+                            Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(c.fill)) {
+                                Box(Modifier.fillMaxWidth(frac).height(8.dp).background(if (cur >= goal) c.green else c.blue))
+                            }
+                        }
+                    }
+                }
 
                 if (sensorsOn) {
                     val hrColor = if (hrNow > 0) androidx.compose.ui.graphics.Color(HR_ZONE_COLORS[hrZoneIndex(hrNow, Prefs.lthr)]) else null

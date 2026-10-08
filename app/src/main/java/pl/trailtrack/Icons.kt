@@ -26,7 +26,7 @@ enum class AppIcon {
     Record, Rides, Routes, Analytics, Settings,
     Heart, Bolt, Cadence, Speed, Mountain, Clock, Flame,
     Lap, Pause, Play, Stop, Layers, Sensor, Check,
-    ChevronLeft, ChevronRight, Palette, Download, Upload
+    ChevronLeft, ChevronRight, Palette, Download, Upload, Sound
 }
 
 fun SensorKind.appIcon(): AppIcon = when (this) {
@@ -218,6 +218,15 @@ fun AppIconView(icon: AppIcon, tint: Color, modifier: Modifier = Modifier.size(2
                 drawLine(tint, p(12f, 4f), p(12f, 15f), strokeWidth = sw, cap = cap)
                 drawPath(PB(s).m(7f, 10f).l(12f, 15f).l(17f, 10f).path, tint, style = stroke)
                 drawLine(tint, p(5f, 20f), p(19f, 20f), strokeWidth = sw, cap = cap)
+            }
+            AppIcon.Sound -> {
+                val b = PB(s).m(4f, 9.5f).l(8f, 9.5f).l(13f, 5f).l(13f, 19f).l(8f, 14.5f).l(4f, 14.5f).z().path
+                drawPath(b, tint.copy(alpha = 0.18f))
+                drawPath(b, tint, style = stroke)
+                for (r in listOf(4f, 8f)) {
+                    drawArc(tint, startAngle = -45f, sweepAngle = 90f, useCenter = false,
+                        topLeft = p(14f - r, 12f - r), size = Size(2f * r * s, 2f * r * s), style = stroke)
+                }
             }
             AppIcon.Upload -> {
                 drawLine(tint, p(12f, 16f), p(12f, 5f), strokeWidth = sw, cap = cap)

@@ -50,7 +50,7 @@ import java.io.FileOutputStream
 // ---------- ustawienia ----------
 
 @Composable
-fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit) {
+fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> Unit) {
     val ctx = LocalContext.current
     val c = ios()
     val scope = rememberCoroutineScope()
@@ -137,6 +137,13 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit) {
         }
 
         IosGroup(
+            header = "Dźwięki i głos",
+            footer = "Sygnały i komunikaty głosowe: cel treningowy, najlepszy wynik, tempo, zwiększony wysiłek, GPS, zjazd z trasy."
+        ) {
+            IosRow("Dźwięki i komunikaty głosowe", onClick = onAudio, chevron = true, leading = { IconBadge(AppIcon.Sound, c.orange) })
+        }
+
+        IosGroup(
             header = "Czujniki",
             footer = "Pasy tętna, mierniki mocy, czujniki prędkości i kadencji (Bluetooth LE, także Garmin)."
         ) {
@@ -181,7 +188,7 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit) {
         }
 
         IosGroup(header = "O aplikacji") {
-            IosRow("TrailTrack", "0.4.0")
+            IosRow("TrailTrack", "0.5.0")
             IosDivider()
             IosRow("Dane map", "© OpenStreetMap contributors")
         }

@@ -17,6 +17,8 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 data class LoadedRide(val ride: RideEntity, val points: List<TrackPoint>, val laps: List<Int>)
+/** Dane historyczne do komunikatów głosowych. 0 = brak danych. */
+data class RideHistory(val baselineSpeedMs: Double, val bestKmSec: Double, val maxDistanceM: Double)
 data class LoadedRoute(val route: RouteEntity, val points: List<GpxPoint>)
 
 class Repo(private val ctx: Context) {
@@ -50,9 +52,27 @@ class Repo(private val ctx: Context) {
                 kcal = if (an.hasPower) an.kj else st.kcal,
                 pointCount = points.size, terrainEnc = encodeTerrain(st.terrainDist),
                 avgHr = an.avgHr, maxHr = an.maxHr, avgPower = an.avgPower, normPower = an.np,
-                tss = an.tss, tssSource = an.tssSource
+                tss = an.tss, tssSource = an.tssSource, bestKmSec = st.bestKmSec
             )
         )
+    }
+
+    suspend fun history(): RideHistory = withContext(Dispatchers.IO) {
+        val recent = dao.recentForBaseline()
+        val d = recent.sumOf { it.distanceM }
+        val t = recent.sumOf { it.movingSec }
+        RideHistory(if (t > 0) d / t else 0.0, dao.bestKmEver() ?: 0.0, dao.maxDistance() ?: 0.0)
+    }
+
+    /** Jednorazowo uzupełnia „najszybszy km” dla przejazdów zapisanych przed wersją 0.5. */
+    suspend fun backfillBestKm() = withContext(Dispatchers.IO) {
+        for (id in dao.idsNeedingBestKm()) {
+            val best = runCatching {
+                val pts = dao.getPoints(id).map { it.toTrackPoint() }
+                if (pts.size >= 2) computeStats(pts, 75.0).bestKmSec else 0.0
+            }.getOrDefault(0.0)
+            dao.setBestKm(id, best)
+        }
     }
 
     suspend fun loadRide(id: Long): LoadedRide? = withContext(Dispatchers.IO) {

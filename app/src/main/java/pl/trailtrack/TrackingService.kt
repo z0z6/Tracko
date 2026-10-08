@@ -18,7 +18,9 @@ import androidx.core.app.ServiceCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /** Foreground service nagrywający trasę przez GPS (bez Google Play Services). */
@@ -31,6 +33,10 @@ class TrackingService : Service(), LocationListener {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val ops = Channel<suspend () -> Unit>(Channel.UNLIMITED)
 
+    private lateinit var cues: CueEngine
+    private var cueJob: Job? = null
+    private var gpsLost = false
+
     private var flushedPoints = 0
     private var flushedLaps = 0
     private var stationary = 0
@@ -42,7 +48,11 @@ class TrackingService : Service(), LocationListener {
         lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         repo = Repo(applicationContext)
         val ch = NotificationChannel(CHANNEL, "Nagrywanie trasy", NotificationManager.IMPORTANCE_LOW)
-        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(ch)
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nm.createNotificationChannel(ch)
+        nm.createNotificationChannel(
+            NotificationChannel(CHANNEL_ALERT, "Ostrzeżenia o GPS", NotificationManager.IMPORTANCE_HIGH)
+        )
         scope.launch { for (op in ops) runCatching { op() } }
     }
 
@@ -73,13 +83,20 @@ class TrackingService : Service(), LocationListener {
             return
         }
         SensorHub.connectSaved()
+        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) showGpsAlert()
         val start = System.currentTimeMillis()
         flushedPoints = 0
         flushedLaps = 0
         stationary = 0
         totalDist = 0.0
         nextAutoLap = Prefs.autoLapKm * 1000.0
+        gpsLost = !lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        cues = CueEngine(repo)
         Live.state.value = LiveState(recording = true, startTime = start, terrain = Live.state.value.terrain)
+        cueJob = scope.launch {
+            cues.prepare()
+            Live.state.collect { cues.onState(it) }
+        }
         enqueue { repo.dao.insertRide(RideEntity(id = start)) }
     }
 
@@ -99,8 +116,11 @@ class TrackingService : Service(), LocationListener {
 
     private fun finish() {
         lm.removeUpdates(this)
+        cancelGpsAlert()
         val s = Live.state.value
         if (!s.recording) return
+        cueJob?.cancel()
+        cues.finish()
         Live.state.value = s.copy(recording = false, points = emptyList(), laps = emptyList(), pause = PauseKind.NONE)
         flush(s)
         enqueue {
@@ -119,6 +139,7 @@ class TrackingService : Service(), LocationListener {
 
     override fun onDestroy() {
         if (Live.state.value.recording) finish()
+        Sound.scheduleRelease()
         super.onDestroy()
     }
 
@@ -181,8 +202,46 @@ class TrackingService : Service(), LocationListener {
 
     @Suppress("OVERRIDE_DEPRECATION")
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-    override fun onProviderEnabled(provider: String) {}
-    override fun onProviderDisabled(provider: String) {}
+
+    override fun onProviderEnabled(provider: String) {
+        if (provider != LocationManager.GPS_PROVIDER) return
+        cancelGpsAlert()
+        if (gpsLost && Live.state.value.recording) {
+            gpsLost = false
+            if (Prefs.evGps) Sound.cue(Beep.OK, "GPS włączony. Nagrywanie trwa.")
+        }
+    }
+
+    override fun onProviderDisabled(provider: String) {
+        if (provider != LocationManager.GPS_PROVIDER || !Live.state.value.recording) return
+        // po powrocie GPS nie łączymy punktów linią przez „dziurę” i nie doliczamy jej do dystansu
+        Live.state.update { if (it.recording) it.copy(needBreak = true) else it }
+        gpsLost = true
+        showGpsAlert()
+        if (Prefs.evGps) Sound.cue(Beep.ALARM, "Uwaga! GPS wyłączony. Trasa nie jest nagrywana.", urgent = true)
+    }
+
+    private fun showGpsAlert() {
+        val pi = PendingIntent.getActivity(
+            this, 1, Intent(this, MainActivity::class.java),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val n = NotificationCompat.Builder(this, CHANNEL_ALERT)
+            .setContentTitle("GPS wyłączony!")
+            .setContentText("Trasa NIE jest nagrywana. Dotknij, aby włączyć GPS.")
+            .setSmallIcon(R.drawable.ic_stat_track)
+            .setContentIntent(pi)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setOnlyAlertOnce(false)
+            .setAutoCancel(true)
+            .build()
+        runCatching { (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).notify(ALERT_ID, n) }
+    }
+
+    private fun cancelGpsAlert() {
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(ALERT_ID)
+    }
 
     private fun buildNotification(): Notification {
         val pi = PendingIntent.getActivity(
@@ -202,7 +261,9 @@ class TrackingService : Service(), LocationListener {
         const val ACTION_START = "pl.trailtrack.START"
         const val ACTION_STOP = "pl.trailtrack.STOP"
         private const val CHANNEL = "tracking"
+        private const val CHANNEL_ALERT = "gps_alert"
         private const val NOTIF_ID = 1
+        private const val ALERT_ID = 2
         private const val STOP_SPEED = 0.8f     // m/s
         private const val RESUME_SPEED = 1.5f   // m/s
         private const val STOP_FIXES = 4        // kolejne odczyty "stoi" zanim włączy się auto-pauza

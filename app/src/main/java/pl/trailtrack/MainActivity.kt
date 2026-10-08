@@ -17,6 +17,7 @@ class MainActivity : ComponentActivity() {
             lifecycleScope.launch {
                 runCatching { repo.importLegacyJson() }
                 runCatching { repo.recoverUnfinished() }
+                runCatching { repo.backfillBestKm() }
             }
         }
         setContent {

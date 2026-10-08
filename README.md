@@ -7,7 +7,9 @@ Bez kont, reklam i Google Play Services.
 ## Funkcje
 - **Nagrywanie GPS w tle**, pauza ręczna, **auto-pauza**, **okrążenia** (ręczne i automatyczne co 1/5/10 km)
 - **Nawierzchnie** przełączane w trakcie jazdy (asfalt, bruk, szuter, droga leśna, singletrack, błoto, piasek, śnieg),
-  trasa na mapie kolorowana wg nawierzchni
+  trasa na mapie kolorowana wg nawierzchni (białe obwódki dla czytelności, legenda kolorów, bez łączenia linii przez pauzy)
+- **Wymuszony GPS**: po uruchomieniu aplikacja wymaga zgody na lokalizację i włączonego GPS (pełnoekranowa blokada z przyciskiem
+  do ustawień); jeśli GPS zgaśnie w trakcie nagrywania – blokada + głośne powiadomienie, a luka nie wlicza się do dystansu
 - **Room (SQLite)** zamiast plików JSON; punkty zapisują się na bieżąco, więc przerwany przejazd jest odzyskiwany
   (przejazdy z wersji 0.1 migrują się automatycznie)
 - **Wykresy**: profil wysokości, prędkość wzdłuż trasy, prędkość (średnia i maks.) wg nawierzchni, podziały co 1 km
@@ -16,6 +18,19 @@ Bez kont, reklam i Google Play Services.
 - **Import GPX** i podążanie za trasą (niebieska linia, odległość do końca, ostrzeżenie o zjechaniu z trasy)
 - **Mapy offline**: pobieranie kafelków (własny serwer kafelków) + import plików MBTiles/GEMF/ZIP
 - Eksport do GPX; interfejs w stylu iOS (kafelki, okienka, przyciski-pigułki, ciemny motyw)
+
+## Dźwięki i komunikaty głosowe (0.5)
+Ustawienia → *Dźwięki i głos*. Wszystko działa w serwisie nagrywania, więc słychać to także przy wygaszonym ekranie
+(muzyka z innych aplikacji jest na chwilę ściszana). Sygnały są generowane w kodzie, głos to wbudowany w Androida
+syntezator mowy (offline, bez Google Play Services; wymaga zainstalowanego polskiego głosu).
+- **Cel treningowy** na jeden przejazd: dystans (km), czas w ruchu (min) lub przewyższenie (m); komunikat po osiągnięciu
+  celu (opcjonalnie także w połowie), pasek postępu na ekranie nagrywania
+- **Najlepszy wynik**: najszybszy kilometr i najdłuższy przejazd w historii
+- **Tempo lepsze / słabsze niż zazwyczaj** (średnia z 10 ostatnich przejazdów, czułość ±5/10/15%, sprawdzane co kilometr)
+- **Zwiększony wysiłek**: tętno lub moc w wybranej strefie (Z3–Z5) przez 20 s (wymaga czujnika, progi LTHR/FTP w Analizie)
+- Start/pauza/okrążenia/koniec, podsumowanie każdego km, utrata i powrót GPS, zjechanie z trasy do podążania
+- Każdy rodzaj komunikatu można osobno włączyć lub wyłączyć, plus główne przełączniki *Sygnały* i *Głos* i trzy poziomy głośności
+- Baza Room v3: przy pierwszym uruchomieniu 0.5 aplikacja jednorazowo uzupełnia „najszybszy km” starszych przejazdów
 
 ## Wygląd (0.3)
 - Adaptacyjna ikona aplikacji (gradient + góry i szlak) z wersją monochromatyczną dla motywowanych ikon Androida 13+

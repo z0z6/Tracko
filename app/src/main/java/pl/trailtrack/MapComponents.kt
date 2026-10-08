@@ -1,8 +1,16 @@
 package pl.trailtrack
 
+import android.graphics.Paint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -86,25 +94,56 @@ fun rememberMapView(): MapView {
     return mapView
 }
 
-private fun splitRuns(points: List<TrackPoint>): List<Pair<Terrain, List<GeoPoint>>> {
+/**
+ * Dzieli trasę na odcinki o jednej nawierzchni. Zgodnie ze statystykami (Stats.kt) odcinek
+ * poprzedni→bieżący punkt ma nawierzchnię bieżącego punktu. Po pauzie (brk) linia nie łączy
+ * punktów przez „dziurę”.
+ */
+internal fun splitRuns(points: List<TrackPoint>): List<Pair<Terrain, List<GeoPoint>>> {
     val out = ArrayList<Pair<Terrain, List<GeoPoint>>>()
     var cur = ArrayList<GeoPoint>()
     var curT: Terrain? = null
-    for (p in points) {
+    for ((i, p) in points.withIndex()) {
         val g = GeoPoint(p.lat, p.lon)
-        if (p.brk && cur.size > 1 && curT != null) {
-            out.add(curT to cur)
-            cur = ArrayList()
-            curT = null
-        } else if (curT != null && p.terrain != curT) {
-            out.add(curT to cur)
-            cur = arrayListOf(cur.last())
+        val t = curT
+        if (i == 0 || p.brk || t == null) {
+            if (t != null && cur.size > 1) out.add(t to cur)
+            cur = arrayListOf(g)
+            curT = p.terrain
+        } else if (p.terrain != t) {
+            if (cur.size > 1) out.add(t to cur)
+            cur = arrayListOf(GeoPoint(points[i - 1].lat, points[i - 1].lon), g)
+            curT = p.terrain
+        } else {
+            cur.add(g)
         }
-        curT = p.terrain
-        cur.add(g)
     }
-    if (curT != null && cur.size > 1) out.add(curT to cur)
+    val t = curT
+    if (t != null && cur.size > 1) out.add(t to cur)
     return out
+}
+
+/** Legenda kolorów nawierzchni na mapie (tylko nawierzchnie użyte na trasie + aktywna). */
+@Composable
+private fun TerrainLegend(points: List<TrackPoint>, active: Terrain?, modifier: Modifier = Modifier) {
+    val used = remember(points.size) { points.map { it.terrain }.toSet() }
+    val shown = Terrain.values().filter { it in used || it == active }
+    if (shown.isEmpty()) return
+    Column(
+        modifier.clip(RoundedCornerShape(8.dp)).background(Color(0xCCFFFFFF)).padding(horizontal = 6.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        for (t in shown) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(10.dp).background(Color(t.color), CircleShape))
+                Spacer(Modifier.width(5.dp))
+                Text(
+                    t.label, fontSize = 11.sp, color = Color.Black,
+                    fontWeight = if (t == active) FontWeight.Bold else FontWeight.Normal
+                )
+            }
+        }
+    }
 }
 
 /**
@@ -117,7 +156,8 @@ fun TrackMap(
     modifier: Modifier = Modifier,
     route: List<GeoPoint> = emptyList(),
     follow: Boolean = false,
-    fit: Boolean = false
+    fit: Boolean = false,
+    activeTerrain: Terrain? = null
 ) {
     var mode by remember { mutableIntStateOf(Prefs.mapMode) }
     val zoomedOnce = remember { booleanArrayOf(false) }
@@ -136,14 +176,28 @@ fun TrackMap(
                 if (route.size >= 2) {
                     mv.overlays.add(Polyline().apply {
                         outlinePaint.color = 0xAA007AFF.toInt()
-                        outlinePaint.strokeWidth = 14f
+                        outlinePaint.strokeWidth = 6f * mv.resources.displayMetrics.density
                         setPoints(route)
                     })
                 }
-                for ((t, geo) in splitRuns(points)) {
+                val dens = mv.resources.displayMetrics.density
+                val runs = splitRuns(points)
+                // najpierw jasne obwódki (czytelność na każdej mapie), potem kolorowe linie na wierzchu
+                for ((_, geo) in runs) {
+                    mv.overlays.add(Polyline().apply {
+                        outlinePaint.color = 0xDDFFFFFF.toInt()
+                        outlinePaint.strokeWidth = 7f * dens
+                        outlinePaint.strokeCap = Paint.Cap.ROUND
+                        outlinePaint.strokeJoin = Paint.Join.ROUND
+                        setPoints(geo)
+                    })
+                }
+                for ((t, geo) in runs) {
                     mv.overlays.add(Polyline().apply {
                         outlinePaint.color = t.color
-                        outlinePaint.strokeWidth = 9f
+                        outlinePaint.strokeWidth = 4.5f * dens
+                        outlinePaint.strokeCap = Paint.Cap.ROUND
+                        outlinePaint.strokeJoin = Paint.Join.ROUND
                         setPoints(geo)
                     })
                 }
@@ -183,6 +237,7 @@ fun TrackMap(
                 },
             contentAlignment = Alignment.Center
         ) { AppIconView(AppIcon.Layers, Color(0xFF1C1C1E), Modifier.size(20.dp)) }
+        TerrainLegend(points, activeTerrain, Modifier.align(Alignment.TopStart).padding(10.dp))
         Text(
             when (mode) {
                 1 -> "© OpenStreetMap contributors, SRTM | © OpenTopoMap (CC-BY-SA)"
