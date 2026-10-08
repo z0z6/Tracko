@@ -98,35 +98,6 @@ private fun nearestOnRoute(route: List<GeoPoint>, cum: DoubleArray, lat: Double,
 private fun fmtStep(x: Double): String =
     if (x >= 1.0) String.format(Locale.getDefault(), "%.0f", x) else String.format(Locale.getDefault(), "%.1f", x)
 
-/** Wybór aktywności; w trakcie nagrywania widoczna tylko aktualna. */
-@Composable
-private fun SportPicker(selected: Sport, enabled: Boolean, onSelect: (Sport) -> Unit) {
-    val c = ios()
-    val onAccent = if (c.blue.luminance() > 0.5f) Color.Black else Color.White
-    val list = if (enabled) Sport.values().toList() else listOf(selected)
-    Row(
-        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        for (sp in list) {
-            val sel = sp == selected
-            val shape = RoundedCornerShape(50)
-            Row(
-                Modifier.clip(shape)
-                    .background(if (sel) c.blue else c.card)
-                    .border(1.dp, if (sel) c.blue else c.separator, shape)
-                    .clickable(enabled = enabled) { onSelect(sp) }
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AppIconView(sp.icon, if (sel) onAccent else c.label, Modifier.size(18.dp))
-                Spacer(Modifier.width(6.dp))
-                Text(sp.label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (sel) onAccent else c.label, maxLines = 1)
-            }
-        }
-    }
-}
-
 /** [−duży][−mały] wartość [+mały][+duży] – ręczna zmiana wartości (prędkość i nachylenie bieżni). */
 @Composable
 private fun StepControl(title: String, value: String, small: Double, big: Double, onDelta: (Double) -> Unit) {
