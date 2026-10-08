@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -114,9 +115,25 @@ fun ActivityPickerScreen(last: Sport, onPick: (Sport) -> Unit) {
                 }
             }
             Text(
-                if (editing) "Dotknij kafelka, aby go pokazać lub ukryć." else "Co dziś robimy?",
+                if (editing) "Zaznacz aktywności, które chcesz widzieć. Niezaznaczone zostaną ukryte – możesz je przywrócić w każdej chwili."
+                else "Co dziś robimy?",
                 color = c.secondary, fontSize = 15.sp
             )
+            if (editing) {
+                Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(
+                        "Zaznacz wszystkie", color = c.blue, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clip(RoundedCornerShape(50)).clickable {
+                            hidden = emptySet()
+                            Prefs.hiddenSports = emptySet()
+                        }.padding(vertical = 6.dp)
+                    )
+                    Text(
+                        "Widoczne: ${all.size - hidden.size} z ${all.size}", color = c.secondary, fontSize = 15.sp,
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
+                }
+            }
         }
         Spacer(Modifier.height(16.dp))
 
@@ -151,6 +168,13 @@ fun ActivityPickerScreen(last: Sport, onPick: (Sport) -> Unit) {
                 if (pair.size == 1) Spacer(Modifier.weight(1f))
             }
         }
+        if (!editing && hidden.isNotEmpty()) {
+            Text(
+                "Ukryte aktywności: ${hidden.size}. Dotknij, aby przywrócić.",
+                color = c.blue, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clip(RoundedCornerShape(50)).clickable { editing = true }.padding(vertical = 8.dp, horizontal = 4.dp)
+            )
+        }
         Spacer(Modifier.height(8.dp))
     }
 }
@@ -165,6 +189,12 @@ private fun ActivityTile(
     val accent = sportAccent(sport)
     val haptic = LocalHapticFeedback.current
     val shape = RoundedCornerShape(26.dp)
+
+    // pointerInput(Unit) działa w jednej korutynie od pierwszej kompozycji – bez tego widziałby stary stan
+    // (np. editing = false) i dotknięcie w trybie edycji nie przełączałoby kafelka
+    val editingNow by rememberUpdatedState(editing)
+    val toggleNow by rememberUpdatedState(onToggle)
+    val clickNow by rememberUpdatedState(onClick)
 
     // wjazd kaskadowy
     val appear = remember { Animatable(0f) }
@@ -240,7 +270,7 @@ private fun ActivityTile(
                     },
                     onTap = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        if (editing) onToggle() else onClick()
+                        if (editingNow) toggleNow() else clickNow()
                     }
                 )
             }
