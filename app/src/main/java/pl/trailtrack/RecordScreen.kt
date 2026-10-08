@@ -408,7 +408,7 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
                     // ----- statystyki na żywo (po starcie) -----
                     if (live.recording) {
                         val tiles: List<Pair<String, String>> = when (sport) {
-                            Sport.CYCLING, Sport.RUNNING, Sport.SKIING -> listOf(
+                            Sport.CYCLING, Sport.RUNNING, Sport.SKIING, Sport.WALKING, Sport.KAYAKING, Sport.INLINE -> listOf(
                                 "Dystans" to fmtKm(stats.distanceM),
                                 "Czas w ruchu" to fmtTime(stats.movingSec),
                                 speedLabel(sport) to fmtSpeedFor(sport, if (live.pause == PauseKind.NONE) (last?.speed ?: 0.0) else 0.0),

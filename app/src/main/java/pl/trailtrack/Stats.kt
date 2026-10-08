@@ -111,6 +111,34 @@ private fun metFor(sport: Sport, vMs: Double): Double = when (sport) {
         else -> 9.8
     }
     Sport.STRENGTH -> 5.0
+    Sport.WALKING -> {
+        val k = vMs * 3.6
+        when {
+            k < 3.2 -> 2.5
+            k < 4.8 -> 3.5
+            k < 5.6 -> 4.3
+            k < 6.4 -> 5.0
+            else -> 7.0
+        }
+    }
+    Sport.KAYAKING -> {
+        val k = vMs * 3.6
+        when {
+            k < 4.0 -> 3.0
+            k < 6.5 -> 5.0
+            k < 9.0 -> 6.5
+            else -> 8.0
+        }
+    }
+    Sport.INLINE -> {
+        val k = vMs * 3.6
+        when {
+            k < 10.0 -> 6.0
+            k < 16.0 -> 7.5
+            k < 22.0 -> 9.8
+            else -> 12.5
+        }
+    }
     Sport.SKIING -> {
         val k = vMs * 3.6
         when {

@@ -181,7 +181,10 @@ fun parseFit(b: ByteArray): FitResult {
     // FIT: 1 = bieganie, 2 = rower, 12 = narty biegowe; reszta traktowana jak rower (Edge)
     val sport = when (fitSport) {
         1L -> Sport.RUNNING
+        11L, 17L -> Sport.WALKING            // chód, turystyka
         12L -> Sport.SKIING
+        19L, 37L, 41L, 42L -> Sport.KAYAKING // wiosłowanie, SUP, kajak, rafting
+        30L -> Sport.INLINE
         else -> Sport.CYCLING
     }
     return FitResult(pts, laps, sport)

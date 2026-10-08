@@ -86,7 +86,11 @@ class Repo(private val ctx: Context) {
         withContext(Dispatchers.IO) {
             val d = loadRide(id) ?: return@withContext AutoTerrain.SKIPPED
             val sport = Sport.fromId(d.ride.sport)
-            if (!sport.gps || d.points.size < 2) return@withContext AutoTerrain.SKIPPED
+            if (!sport.usesTerrain || d.points.size < 2) {
+                // kajak: nawierzchnie nie mają sensu – oznaczamy jako „obsłużone”, żeby nic nie próbowało ich wykrywać
+                if (sport.gps && d.ride.terrainAuto == 0) dao.setTerrainAuto(id, 2)
+                return@withContext AutoTerrain.SKIPPED
+            }
 
             val terrains: Array<Terrain> = if (sport == Sport.SKIING) {
                 Array(d.points.size) { Terrain.SNOW }

@@ -37,10 +37,16 @@ enum class Sport(
     SWIMMING(2, "Pływanie", "trening pływacki", false, true, 2, 0.2, 400.0, 100.0),
     STRENGTH(3, "Siłownia", "trening siłowy", false, false, 0, 0.0, 0.0, 1000.0),
     TREADMILL(4, "Bieżnia", "bieg na bieżni", false, true, 1, 0.3, 60.0, 1000.0),
-    SKIING(5, "Narty biegowe", "przejazd na nartach", true, true, 0, 0.8, 60.0, 1000.0);
+    SKIING(5, "Narty biegowe", "przejazd na nartach", true, true, 0, 0.8, 60.0, 1000.0),
+    WALKING(6, "Spacer", "spacer", true, true, 1, 0.4, 90.0, 1000.0),
+    KAYAKING(7, "Kajakarstwo", "spływ kajakowy", true, true, 0, 0.5, 90.0, 1000.0),
+    INLINE(8, "Rolki", "przejazd na rolkach", true, true, 0, 0.8, 60.0, 1000.0);
 
     /** bez dystansu (siłownia) cały czas aktywny liczymy jako „w ruchu” */
     val timeIsMoving: Boolean get() = !hasDistance
+
+    /** czy nawierzchnie z mapy mają sens (kajak płynie po wodzie, nie po drogach) */
+    val usesTerrain: Boolean get() = gps && this != KAYAKING
 
     companion object {
         fun fromId(id: Int): Sport = values().firstOrNull { it.id == id } ?: CYCLING

@@ -19,6 +19,13 @@ Bez kont, reklam i Google Play Services.
 - **Mapy offline**: pobieranie kafelków (własny serwer kafelków) + import plików MBTiles/GEMF/ZIP
 - Eksport do GPX; interfejs w stylu iOS (kafelki, okienka, przyciski-pigułki, ciemny motyw)
 
+## Tracko 0.9
+- **Nowe aktywności:** Spacer (tempo min/km), Kajakarstwo (km/h, bez nawierzchni – woda) i Rolki (km/h, nawierzchnie z mapy),
+  wszystkie z GPS, mapą, odcinkami z duchem, komunikatami głosowymi i eksportem. Import FIT rozpoznaje też chód/turystykę,
+  wiosłowanie/kajak/SUP/rafting i jazdę na rolkach.
+- **Dostosowanie ekranu wyboru:** przycisk *Dostosuj* → dotknij kafelków, żeby je pokazać lub ukryć (zostaje co najmniej
+  jeden); wybór jest zapamiętywany.
+
 ## Tracko 0.8
 - **Nazwa aplikacji: Tracko.** Wewnętrzny identyfikator pakietu (`pl.trailtrack`), nazwa bazy i plik ustawień zostały
   bez zmian, żeby aktualizacja zachowała dane i ustawienia.
@@ -111,12 +118,35 @@ Masz więc trzy drogi:
 2. Zaimportuj gotowy plik MBTiles/GEMF/ZIP (*Ustawienia → Importuj plik mapy*), po czym zrestartuj aplikację.
 3. Kafelki oglądane online zapisują się same w pamięci podręcznej (do 2 GB) i są dostępne offline.
 
-## Budowanie na GitHubie
-1. Wypchnij projekt do repozytorium (gałąź `main`).
-2. **Actions → Build APK** uruchomi się sam (albo *Run workflow*).
-3. Pobierz artefakt **Tracko-debug-apk**, rozpakuj, zainstaluj `app-debug.apk`.
-4. Release z APK: `git tag v0.2.0 && git push origin v0.2.0`.
+## Wydania (GitHub Releases + Obtainium)
+Aplikacja jest rozdawana jako **podpisany APK z GitHub Releases**; użytkownicy mogą ją aktualizować automatycznie przez
+[Obtainium](https://github.com/ImranR98/Obtainium). Repozytorium musi być **publiczne**, żeby inni mogli pobierać wydania.
 
+**Jednorazowa konfiguracja (właściciel repozytorium):**
+1. Uruchom `scripts/generate-keystore.sh` (wymaga JDK z `keytool`). Skrypt tworzy plik `tracko-release.jks` i wypisuje
+   cztery wartości sekretów. **Zrób kopię pliku `.jks`** – bez niego nie wydasz aktualizacji, a plik nie może trafić do repo.
+2. W repozytorium: *Settings → Secrets and variables → Actions → New repository secret*, dodaj:
+   `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+
+**Nowe wydanie:**
+```
+git tag v0.8.1
+git push origin v0.8.1
+```
+Workflow zbuduje i podpisze `Tracko-0.8.1.apk`, sprawdzi podpis (`apksigner`), doliczy sumę SHA-256 i opublikuje wydanie
+z notatkami. Wersja i `versionCode` biorą się z tagu (`vX.Y.Z` → kod `X*10000 + Y*100 + Z`), więc każdy kolejny tag musi
+być wyższy od poprzedniego.
+
+**Instalacja i aktualizacje u użytkownika:**
+- ręcznie: pobierz `Tracko-X.Y.Z.apk` z [Releases](https://github.com/z0z6/Tracko/releases/latest) i zainstaluj, albo
+- przez Obtainium: [dodaj Tracko](obtainium://add/https://github.com/z0z6/Tracko) (lub *Dodaj aplikację* → wklej
+  `https://github.com/z0z6/Tracko`). Obtainium sprawdza nowe wydania i aktualizuje aplikację.
+
+**Pierwsza instalacja podpisanej wersji:** dotychczasowe buildy debug były podpisane innym kluczem, więc Android nie pozwoli
+zainstalować wydania „nad” nimi. Przed odinstalowaniem wyeksportuj dane (TCX/GPX/CSV, odcinki `.ttseg`). Wersja debug ma teraz
+identyfikator `pl.trailtrack.debug`, więc może stać obok wydania.
+
+**Testowe buildy** (każdy push/PR): *Actions → Build APK → artefakt* **Tracko-debug-apk**.
 Lokalnie: Android Studio → *Open*, albo `gradle assembleDebug` (Gradle 8.7, JDK 17).
 
 ## Uwagi

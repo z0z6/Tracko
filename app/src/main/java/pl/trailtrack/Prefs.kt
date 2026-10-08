@@ -104,6 +104,11 @@ object Prefs {
         set(v) = sp.edit().putInt("lastNoGpsSport", v).apply()
 
     // ----- aktywności -----
+    /** id aktywności ukrytych na ekranie wyboru (kafelki, których użytkownik nie potrzebuje) */
+    var hiddenSports: Set<Int>
+        get() = (sp.getString("hiddenSports", "") ?: "").split(',').mapNotNull { it.trim().toIntOrNull() }.toSet()
+        set(v) = sp.edit().putString("hiddenSports", v.joinToString(",")).apply()
+
     /** ostatnio wybrana aktywność ([Sport.id]) */
     var sport: Int
         get() = sp.getInt("sport", 0)

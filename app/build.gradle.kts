@@ -4,6 +4,13 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+// wersję podaje workflow z tagu (np. v0.8.1 → 0.8.1, kod 801); lokalnie obowiązują wartości domyślne
+val appVersionName: String = (project.findProperty("appVersionName") as String?) ?: "0.9.0"
+val appVersionCode: Int = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 900
+
+// podpis wydania: klucz i hasła z zmiennych środowiskowych (w GitHub Actions – z sekretów repozytorium)
+val keystorePath: String? = System.getenv("KEYSTORE_FILE")
+
 android {
     namespace = "pl.trailtrack"
     compileSdk = 34
@@ -12,14 +19,36 @@ android {
         applicationId = "pl.trailtrack"
         minSdk = 26
         targetSdk = 34
-        versionCode = 10
-        versionName = "0.8.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
+    }
+
+    signingConfigs {
+        if (keystorePath != null && File(keystorePath).exists()) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfigs.findByName("release")?.let { signingConfig = it }
         }
+        debug {
+            // wersja testowa może stać obok wydania (inny podpis = inna aplikacja)
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

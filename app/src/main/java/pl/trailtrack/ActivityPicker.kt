@@ -1,6 +1,11 @@
 package pl.trailtrack
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.key
+import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.LinearEasing
+import android.widget.Toast
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -62,6 +67,9 @@ fun sportAccent(s: Sport): Color = when (s) {
     Sport.STRENGTH -> Color(0xFFFF375F)
     Sport.TREADMILL -> Color(0xFF30D158)
     Sport.SKIING -> Color(0xFF5E5CE6)
+    Sport.WALKING -> Color(0xFF00C7BE)
+    Sport.KAYAKING -> Color(0xFF30B0C7)
+    Sport.INLINE -> Color(0xFFAF52DE)
 }
 
 /**
@@ -69,14 +77,21 @@ fun sportAccent(s: Sport): Color = when (s) {
  * Animacje: kaskadowe wjeżdżanie kafelków (sprężyna), delikatne „oddychanie” ikon,
  * przechylenie kafelka w stronę dotyku i sprężyste dociśnięcie; po wyborze kafelek się powiększa,
  * a pozostałe wygasają, zanim otworzy się ekran nagrywania.
+ * „Dostosuj” przełącza tryb edycji: kafelki lekko drżą, a dotknięcie pokazuje lub ukrywa aktywność.
  */
 @Composable
 fun ActivityPickerScreen(last: Sport, onPick: (Sport) -> Unit) {
     val c = ios()
+    val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     var chosen by remember { mutableStateOf<Sport?>(null) }
+    var editing by remember { mutableStateOf(false) }
+    var hidden by remember { mutableStateOf(Prefs.hiddenSports) }
     val head = remember { Animatable(0f) }
     LaunchedEffect(Unit) { head.animateTo(1f, tween(450, easing = FastOutSlowInEasing)) }
+
+    val all = Sport.values().toList()
+    val shown = if (editing) all else all.filter { it.id !in hidden }
 
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
@@ -87,23 +102,48 @@ fun ActivityPickerScreen(last: Sport, onPick: (Sport) -> Unit) {
                 translationY = (1f - head.value) * -16.dp.toPx()
             }
         ) {
-            LargeTitle("Wybierz aktywność")
-            Text("Co dziś robimy?", color = c.secondary, fontSize = 15.sp)
+            Row(verticalAlignment = Alignment.Bottom) {
+                Box(Modifier.weight(1f)) { LargeTitle(if (editing) "Dostosuj aktywności" else "Wybierz aktywność") }
+                if (chosen == null) {
+                    Text(
+                        if (editing) "Gotowe" else "Dostosuj",
+                        color = c.blue, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clip(RoundedCornerShape(50)).clickable { editing = !editing }
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    )
+                }
+            }
+            Text(
+                if (editing) "Dotknij kafelka, aby go pokazać lub ukryć." else "Co dziś robimy?",
+                color = c.secondary, fontSize = 15.sp
+            )
         }
         Spacer(Modifier.height(16.dp))
 
-        Sport.values().toList().chunked(2).forEachIndexed { row, pair ->
+        shown.chunked(2).forEachIndexed { row, pair ->
             Row(Modifier.padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 pair.forEachIndexed { col, sp ->
-                    ActivityTile(
-                        sport = sp, index = row * 2 + col, isLast = sp == last, chosen = chosen,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        if (chosen == null) {
-                            chosen = sp
-                            scope.launch {
-                                delay(280)
-                                onPick(sp)
+                    key(sp.id) {
+                        ActivityTile(
+                            sport = sp, index = row * 2 + col, isLast = sp == last, chosen = chosen,
+                            editing = editing, hidden = sp.id in hidden,
+                            modifier = Modifier.weight(1f),
+                            onToggle = {
+                                val next = if (sp.id in hidden) hidden - sp.id else hidden + sp.id
+                                if (all.all { it.id in next }) {
+                                    Toast.makeText(ctx, "Zostaw co najmniej jedną aktywność", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    hidden = next
+                                    Prefs.hiddenSports = next
+                                }
+                            }
+                        ) {
+                            if (chosen == null) {
+                                chosen = sp
+                                scope.launch {
+                                    delay(280)
+                                    onPick(sp)
+                                }
                             }
                         }
                     }
@@ -118,7 +158,8 @@ fun ActivityPickerScreen(last: Sport, onPick: (Sport) -> Unit) {
 @Composable
 private fun ActivityTile(
     sport: Sport, index: Int, isLast: Boolean, chosen: Sport?,
-    modifier: Modifier, onClick: () -> Unit
+    editing: Boolean, hidden: Boolean,
+    modifier: Modifier, onToggle: () -> Unit, onClick: () -> Unit
 ) {
     val c = ios()
     val accent = sportAccent(sport)
@@ -136,7 +177,6 @@ private fun ActivityTile(
     var press by remember { mutableStateOf<Offset?>(null) }
     var size by remember { mutableStateOf(IntSize.Zero) }
     val isChosen = chosen == sport
-    val dimmed = chosen != null && !isChosen
     val scale by animateFloatAsState(
         when {
             isChosen -> 1.07f
@@ -145,7 +185,12 @@ private fun ActivityTile(
         },
         spring(dampingRatio = 0.55f, stiffness = 380f), label = "scale"
     )
-    val dim by animateFloatAsState(if (dimmed) 0.30f else 1f, tween(240), label = "dim")
+    val dimTarget = when {
+        chosen != null && !isChosen -> 0.30f
+        editing && hidden -> 0.38f
+        else -> 1f
+    }
+    val dim by animateFloatAsState(dimTarget, tween(240), label = "dim")
     val rotY by animateFloatAsState(
         press?.let { if (size.width > 0) ((it.x / size.width) - 0.5f) * 18f else 0f } ?: 0f,
         spring(stiffness = 300f), label = "ry"
@@ -159,6 +204,10 @@ private fun ActivityTile(
     val inf = rememberInfiniteTransition(label = "idle")
     val bob by inf.animateFloat(
         0f, 1f, infiniteRepeatable(tween(2300 + index * 260, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "bob"
+    )
+    // tryb edycji: delikatne drżenie kafelków
+    val wob by inf.animateFloat(
+        -1.3f, 1.3f, infiniteRepeatable(tween(120 + (index % 3) * 18, easing = LinearEasing), RepeatMode.Reverse), label = "wob"
     )
     val glow by inf.animateFloat(
         0.5f, 1f, infiniteRepeatable(tween(1900 + index * 210, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "glow"
@@ -176,11 +225,12 @@ private fun ActivityTile(
                 translationY = (1f - a) * 56.dp.toPx()
                 rotationX = rotX
                 rotationY = rotY
+                rotationZ = if (editing) wob else 0f
                 cameraDistance = 14f * density
             }
             .clip(shape)
             .background(Brush.linearGradient(listOf(accent.copy(alpha = 0.26f), c.card, c.card)))
-            .border(1.5.dp, accent.copy(alpha = if (isLast || isChosen) 0.85f else 0.22f), shape)
+            .border(1.5.dp, accent.copy(alpha = if (isLast || isChosen || (editing && !hidden)) 0.85f else 0.22f), shape)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = { o ->
@@ -190,7 +240,7 @@ private fun ActivityTile(
                     },
                     onTap = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onClick()
+                        if (editing) onToggle() else onClick()
                     }
                 )
             }
@@ -222,7 +272,16 @@ private fun ActivityTile(
             Text(if (sport.gps) "GPS · mapa" else "bez GPS", fontSize = 11.sp, color = c.secondary)
         }
 
-        if (isLast) {
+        if (editing) {
+            Box(
+                Modifier.align(Alignment.TopStart).padding(10.dp).size(26.dp).clip(CircleShape)
+                    .background(if (!hidden) accent else c.fill)
+                    .border(1.5.dp, accent.copy(alpha = 0.6f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) { if (!hidden) Text("✓", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+        }
+
+        if (isLast && !editing) {
             Box(
                 Modifier.align(Alignment.TopEnd).padding(10.dp).clip(RoundedCornerShape(50))
                     .background(accent.copy(alpha = 0.18f)).padding(horizontal = 8.dp, vertical = 3.dp)

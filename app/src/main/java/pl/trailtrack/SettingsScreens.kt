@@ -1,5 +1,6 @@
 package pl.trailtrack
 
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.widget.Toast
@@ -199,7 +200,22 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
         }
 
         IosGroup(header = "O aplikacji") {
-            IosRow("Tracko", "0.8.0")
+            val appVersion = remember {
+                runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "?" }.getOrDefault("?")
+            }
+            IosRow("Tracko", appVersion)
+            IosDivider()
+            IosRow(
+                "Aktualizacje", "GitHub Releases",
+                onClick = {
+                    runCatching {
+                        ctx.startActivity(
+                            Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/z0z6/Tracko/releases/latest"))
+                        )
+                    }
+                },
+                chevron = true
+            )
             IosDivider()
             IosRow("Dane map", "© OpenStreetMap contributors")
         }

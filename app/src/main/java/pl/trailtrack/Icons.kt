@@ -27,7 +27,7 @@ enum class AppIcon {
     Heart, Bolt, Cadence, Speed, Mountain, Clock, Flame,
     Lap, Pause, Play, Stop, Layers, Sensor, Check,
     ChevronLeft, ChevronRight, Palette, Download, Upload, Sound,
-    Bike, Run, Swim, Dumbbell, Treadmill, Ski, Ghost
+    Bike, Run, Swim, Dumbbell, Treadmill, Ski, Ghost, Walk, Kayak, Skate
 }
 
 val Sport.icon: AppIcon get() = when (this) {
@@ -37,6 +37,9 @@ val Sport.icon: AppIcon get() = when (this) {
     Sport.STRENGTH -> AppIcon.Dumbbell
     Sport.TREADMILL -> AppIcon.Treadmill
     Sport.SKIING -> AppIcon.Ski
+    Sport.WALKING -> AppIcon.Walk
+    Sport.KAYAKING -> AppIcon.Kayak
+    Sport.INLINE -> AppIcon.Skate
 }
 
 fun SensorKind.appIcon(): AppIcon = when (this) {
@@ -237,6 +240,32 @@ fun AppIconView(icon: AppIcon, tint: Color, modifier: Modifier = Modifier.size(2
                     drawArc(tint, startAngle = -45f, sweepAngle = 90f, useCenter = false,
                         topLeft = p(14f - r, 12f - r), size = Size(2f * r * s, 2f * r * s), style = stroke)
                 }
+            }
+            AppIcon.Walk -> {
+                drawCircle(tint, radius = 2f * s, center = p(11f, 4.5f))
+                drawLine(tint, p(11f, 8f), p(11f, 14f), strokeWidth = sw, cap = cap)
+                drawPath(PB(s).m(11f, 14f).l(8.5f, 20f).path, tint, style = stroke)
+                drawPath(PB(s).m(11f, 14f).l(14f, 20f).path, tint, style = stroke)
+                drawPath(PB(s).m(11f, 9f).l(8f, 12.5f).path, tint, style = stroke)
+                drawPath(PB(s).m(11f, 9f).l(14.5f, 11.5f).path, tint, style = stroke)
+                drawLine(tint, p(17.5f, 7f), p(16f, 20.5f), strokeWidth = sw, cap = cap)
+            }
+            AppIcon.Kayak -> {
+                val hull = PB(s).m(2f, 15f).l(22f, 15f).c(19f, 19.5f, 5f, 19.5f, 2f, 15f).z().path
+                drawPath(hull, tint.copy(alpha = 0.18f))
+                drawPath(hull, tint, style = stroke)
+                drawCircle(tint, radius = 1.8f * s, center = p(12f, 7f))
+                drawLine(tint, p(12f, 9f), p(12f, 14f), strokeWidth = sw, cap = cap)
+                drawLine(tint, p(5f, 5f), p(19f, 13f), strokeWidth = sw, cap = cap)
+                drawLine(tint, p(3.8f, 6.8f), p(6.4f, 3.4f), strokeWidth = sw, cap = cap)
+                drawLine(tint, p(17.6f, 14.6f), p(20.4f, 11.2f), strokeWidth = sw, cap = cap)
+            }
+            AppIcon.Skate -> {
+                val boot = PB(s).m(5f, 4f).l(5f, 13.5f).l(18.5f, 13.5f).l(18.5f, 10.5f).l(11f, 8.5f).l(11f, 4f).z().path
+                drawPath(boot, tint.copy(alpha = 0.18f))
+                drawPath(boot, tint, style = stroke)
+                drawLine(tint, p(4f, 16f), p(19.5f, 16f), strokeWidth = sw, cap = cap)
+                for (x in listOf(6f, 9.8f, 13.6f, 17.4f)) drawCircle(tint, radius = 1.6f * s, center = p(x, 19f))
             }
             AppIcon.Ghost -> {
                 val gp = PB(s).m(5f, 20f).l(5f, 11f).c(5f, 3.5f, 19f, 3.5f, 19f, 11f).l(19f, 20f)

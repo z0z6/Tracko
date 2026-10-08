@@ -57,6 +57,9 @@ private fun gpxType(sport: Sport): String = when (sport) {
     Sport.CYCLING -> "cycling"
     Sport.RUNNING -> "running"
     Sport.SKIING -> "skiing"
+    Sport.WALKING -> "walking"
+    Sport.KAYAKING -> "kayaking"
+    Sport.INLINE -> "inline_skating"
     else -> "other"
 }
 

@@ -233,7 +233,7 @@ private fun RideCard(r: RideEntity, onClick: () -> Unit) {
                 if (r.tss > 0) MiniStat(if (r.tssSource == 1) "TSS" else "hrTSS", fmt0(r.tss))
                 else if (sport.hasDistance) MiniStat(if (sport.pace == 0) "Śr." else "Tempo", fmtSpeedFor(sport, if (r.movingSec > 0) r.distanceM / r.movingSec else 0.0))
             }
-            if (sport.gps && r.terrainAuto != 0) {
+            if (sport.usesTerrain && r.terrainAuto != 0) {
                 Spacer(Modifier.height(10.dp))
                 TerrainBar(decodeTerrain(r.terrainEnc))
             }
@@ -294,7 +294,7 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
     // po zapisie aktywności nawierzchnie wykrywają się same (raz)
     LaunchedEffect(data) {
         val dd = data
-        if (dd != null && !autoTried && Sport.fromId(dd.ride.sport).gps && dd.ride.terrainAuto == 0) {
+        if (dd != null && !autoTried && Sport.fromId(dd.ride.sport).usesTerrain && dd.ride.terrainAuto == 0) {
             autoTried = true
             detectTerrain()
         }
@@ -337,7 +337,7 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                     }
                     TrackMap(
                         d.points, Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(14.dp)), fit = true,
-                        segment = hl, colorByTerrain = d.ride.terrainAuto != 0 && !detecting
+                        segment = hl, colorByTerrain = sport.usesTerrain && d.ride.terrainAuto != 0 && !detecting
                     )
                 }
 
@@ -398,7 +398,7 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                     }
                 }
 
-                if (sport.gps) {
+                if (sport.usesTerrain) {
                     IosCard(Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             Text("Nawierzchnie", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = c.label)
@@ -455,7 +455,7 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                 }
                 if (sport.gps || (sport == Sport.TREADMILL && st.ascentM > 1.0)) ElevationChartCard(st.series)
                 if (sport.hasDistance) SpeedChartCard(st.series)
-                if (sport.gps && d.ride.terrainAuto != 0) TerrainSpeedCard(st)
+                if (sport.usesTerrain && d.ride.terrainAuto != 0) TerrainSpeedCard(st)
 
                 IosGroup(header = "Więcej statystyk") {
                     IosRow("Czas całkowity", fmtTime(st.elapsedSec)); IosDivider()
