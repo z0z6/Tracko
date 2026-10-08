@@ -7,6 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.border
+import org.osmdroid.util.GeoPoint
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.material3.Slider
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.runtime.mutableIntStateOf
@@ -115,6 +118,57 @@ fun RidesScreen(repo: Repo, onOpen: (Long) -> Unit) {
 }
 
 /** Chipy kategorii: Wszystkie + aktywności, które mają zapisane wpisy. */
+/**
+ * Podsumowanie: kafelki nawierzchni do poprawienia opisu trasy – cała aktywność albo wybrany zakres
+ * (suwaki od/do, zaznaczenie widać na mapie). Zmiana zapisuje się w danych i przelicza statystyki.
+ */
+@Composable
+private fun TerrainEditorCard(
+    points: List<TrackPoint>,
+    onRange: (Int, Int) -> Unit,
+    onApply: (Int, Int, Terrain) -> Unit
+) {
+    val c = ios()
+    val cum = remember(points) {
+        val a = DoubleArray(points.size)
+        for (i in 1 until points.size) {
+            a[i] = a[i - 1] + if (points[i].brk) 0.0 else haversine(points[i - 1].lat, points[i - 1].lon, points[i].lat, points[i].lon)
+        }
+        a
+    }
+    val total = (cum.lastOrNull() ?: 0.0).toFloat()
+    if (total < 50f) return
+    var chosen by remember { mutableStateOf(Terrain.ASPHALT) }
+    var rFrom by remember(total) { mutableFloatStateOf(0f) }
+    var rTo by remember(total) { mutableFloatStateOf(total) }
+    val iA = remember(rFrom, cum) { cum.indexOfFirst { it >= rFrom }.coerceAtLeast(0) }
+    val iB = remember(rTo, cum) { cum.indexOfLast { it <= rTo }.coerceAtLeast(0) }
+    LaunchedEffect(iA, iB) { onRange(iA, iB) }
+
+    IosCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Nawierzchnie", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = c.label)
+            Text(
+                "Wybierz nawierzchnię i zastosuj ją do całej aktywności albo do zaznaczonego zakresu (podświetlony na mapie).",
+                fontSize = 13.sp, color = c.secondary
+            )
+            Terrain.values().toList().chunked(4).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    row.forEach { t -> TerrainTile(t, chosen == t, Modifier.weight(1f)) { chosen = t } }
+                    repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
+                }
+            }
+            Text("Zakres: ${fmtKm(rFrom.toDouble())} – ${fmtKm(rTo.toDouble())}", fontSize = 13.sp, color = c.secondary)
+            Slider(value = rFrom, valueRange = 0f..total, onValueChange = { rFrom = minOf(it, rTo - 20f).coerceAtLeast(0f) })
+            Slider(value = rTo, valueRange = 0f..total, onValueChange = { rTo = maxOf(it, rFrom + 20f).coerceAtMost(total) })
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                IosButton("Do zakresu", c.blue, Modifier.weight(1f), filled = false) { onApply(iA, iB, chosen) }
+                IosButton("Do całej aktywności", c.blue, Modifier.weight(1f)) { onApply(0, points.lastIndex, chosen) }
+            }
+        }
+    }
+}
+
 @Composable
 private fun SportFilter(total: Int, present: Set<Int>, selected: Int, onSelect: (Int) -> Unit) {
     val c = ios()
@@ -199,8 +253,12 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
     var name by remember { mutableStateOf("") }
     var showDelete by remember { mutableStateOf(false) }
     var showRename by remember { mutableStateOf(false) }
+    var reload by remember { mutableIntStateOf(0) }
+    // zakres zaznaczony w edytorze nawierzchni (podświetlany na mapie)
+    var hlA by remember { mutableIntStateOf(0) }
+    var hlB by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(id) {
+    LaunchedEffect(id, reload) {
         val d = repo.loadRide(id)
         data = d
         if (d != null) {
@@ -241,8 +299,13 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                 }
 
                 if (sport.gps) {
+                    val partial = hlB > hlA && (hlA > 0 || hlB < d.points.lastIndex)
+                    val hl = remember(hlA, hlB, d.points) {
+                        if (partial) (hlA..hlB).map { GeoPoint(d.points[it].lat, d.points[it].lon) } else emptyList()
+                    }
                     TrackMap(
-                        d.points, Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(14.dp)), fit = true
+                        d.points, Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(14.dp)), fit = true,
+                        segment = hl
                     )
                 }
 
@@ -303,6 +366,18 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                     }
                 }
 
+                if (sport.gps) {
+                    TerrainEditorCard(
+                        points = d.points,
+                        onRange = { a, b -> hlA = a; hlB = b },
+                        onApply = { a, b, t ->
+                            scope.launch {
+                                repo.setTerrainRange(id, a, b, t)
+                                reload++
+                            }
+                        }
+                    )
+                }
                 if (sport.gps || (sport == Sport.TREADMILL && st.ascentM > 1.0)) ElevationChartCard(st.series)
                 if (sport.hasDistance) SpeedChartCard(st.series)
                 if (sport.gps) TerrainSpeedCard(st)

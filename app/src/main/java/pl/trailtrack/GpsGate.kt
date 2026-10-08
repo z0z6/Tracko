@@ -46,6 +46,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 private fun hasFineLocation(ctx: Context) =
     ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -64,10 +66,12 @@ private fun isGpsOn(ctx: Context): Boolean {
  * otworzyć systemowe ustawienia lokalizacji, co robi przycisk na ekranie.
  */
 @Composable
-fun GpsGate(content: @Composable () -> Unit) {
+fun GpsGate(active: Boolean, onChangeActivity: () -> Unit, content: @Composable () -> Unit) {
     val ctx = LocalContext.current
     val c = ios()
-    val live by Live.state.collectAsState()
+    // obserwujemy tylko flagę nagrywania – bez przebudowy co sekundę
+    val recording by remember { Live.state.map { it.recording }.distinctUntilChanged() }
+        .collectAsState(initial = Live.state.value.recording)
 
     // urządzenia bez GPS (np. część tabletów) nie mogą spełnić wymogu – nie blokujemy ich
     val hasGpsHw = remember { ctx.packageManager.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS) }
@@ -108,7 +112,7 @@ fun GpsGate(content: @Composable () -> Unit) {
     }
 
     // GPS wymuszamy tylko dla aktywności z mapą (rower, bieganie, narty); bieżnia/basen/siłownia go nie potrzebują
-    val blocked = hasGpsHw && live.sport.gps && (!permOk || !gpsOn)
+    val blocked = active && hasGpsHw && (!permOk || !gpsOn)
 
     Box(Modifier.fillMaxSize()) {
         content()
@@ -154,7 +158,7 @@ fun GpsGate(content: @Composable () -> Unit) {
                     } else {
                         Text("GPS jest wyłączony", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = c.label, textAlign = TextAlign.Center)
                         Text(
-                            if (live.recording)
+                            if (recording)
                                 "Trwa nagrywanie, ale bez GPS trasa NIE jest zapisywana. Włącz lokalizację, aby kontynuować."
                             else
                                 "Włącz GPS (lokalizację) w telefonie, żeby trasa była nagrywana od pierwszego metra.",
@@ -164,19 +168,17 @@ fun GpsGate(content: @Composable () -> Unit) {
                         IosButton("Włącz GPS", c.blue, Modifier.fillMaxWidth()) {
                             runCatching { ctx.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }
                         }
-                        if (live.recording) {
+                        if (recording) {
                             // wyjście awaryjne, żeby nie dało się „uwięzić” trwającego nagrania
                             IosButton("Zakończ przejazd", c.red, Modifier.fillMaxWidth(), filled = false) {
                                 ctx.startService(Intent(ctx, TrackingService::class.java).setAction(TrackingService.ACTION_STOP))
                             }
                         }
                     }
-                    if (!live.recording) {
-                        // bieżnia, basen i siłownia nie potrzebują GPS – dalej wybierzesz aktywność w oknie z mapą
-                        IosButton("Trenuję bez GPS (bieżnia, basen, siłownia)", c.secondary, Modifier.fillMaxWidth(), filled = false) {
-                            val sp = Sport.fromId(Prefs.lastNoGpsSport)
-                            Live.setSport(sp)
-                            Prefs.sport = sp.id
+                    if (!recording) {
+                        // bieżnia, basen i siłownia nie potrzebują GPS – wróć do wyboru aktywności
+                        IosButton("Wybierz inną aktywność", c.secondary, Modifier.fillMaxWidth(), filled = false) {
+                            onChangeActivity()
                         }
                     }
                 }

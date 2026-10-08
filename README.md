@@ -19,6 +19,17 @@ Bez kont, reklam i Google Play Services.
 - **Mapy offline**: pobieranie kafelków (własny serwer kafelków) + import plików MBTiles/GEMF/ZIP
 - Eksport do GPX; interfejs w stylu iOS (kafelki, okienka, przyciski-pigułki, ciemny motyw)
 
+## Nowy przepływ i warstwa graficzna (0.7)
+- **Animacja startowa** (~2 s): ślad rysuje się gradientową linią, za nim podąża przerywany „duch”, potem wjeżdża nazwa.
+- **Wybór aktywności** to osobny ekran między startem a nagrywaniem: siatka kafelków (ikona + nazwa na dole) z kaskadowym
+  wjazdem, „oddychającymi” ikonami, przechyłem w stronę dotyku i sprężystym dociśnięciem; po wyborze kafelek się powiększa.
+- **Mapa ładuje się dopiero po Start** – przed startem ekran nagrywania pokazuje gotowość i ustawienia aktywności.
+- **GPS jest wymuszany po wybraniu aktywności z GPS** (rower, bieganie, narty) oraz w trakcie ich nagrywania.
+- **Duch** to zminimalizowany, ale większy kafelek tuż pod mapą (luka do ducha na żywo, pasek postępu, szybkie ✕).
+- **Nawierzchnie**: w trakcie jazdy tylko mały znacznik bieżącej nawierzchni na mapie (dotknięcie otwiera wybór);
+  pełne kafelki i poprawianie nawierzchni dla całej trasy lub zakresu są w **podsumowaniu** po zapisie aktywności.
+- Po **Stop** aplikacja zapisuje aktywność i otwiera jej podsumowanie.
+
 ## Odcinki i ściganie z duchem (0.6)
 Ustawienia → *Odcinki i duchy* (albo przycisk w oknie z mapą). Działa dla aktywności z GPS (rower, bieganie, narty).
 - **Tworzenie odcinka**: w szczegółach aktywności lub trasy → *Utwórz odcinek do ścigania z duchem*; suwakami wybierasz

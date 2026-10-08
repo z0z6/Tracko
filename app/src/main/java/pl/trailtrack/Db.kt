@@ -191,6 +191,9 @@ interface RideDao {
     @Query("UPDATE rides SET bestKmSec = :v WHERE id = :id")
     suspend fun setBestKm(id: Long, v: Double)
 
+    @Query("UPDATE points SET terrain = :terrain WHERE rideId = :rideId AND idx BETWEEN :from AND :to")
+    suspend fun setTerrainRange(rideId: Long, from: Int, to: Int, terrain: String)
+
     // ----- odcinki i duchy -----
     @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE) suspend fun upsertSegment(s: SegmentEntity)
     @Query("SELECT * FROM segments ORDER BY createdAt DESC") fun observeSegments(): Flow<List<SegmentEntity>>

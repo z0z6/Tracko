@@ -63,6 +63,16 @@ class Repo(private val ctx: Context) {
         )
     }
 
+    /** Czy aktywność jest już zapisana (serwis kończy zapis chwilę po Stop). */
+    suspend fun rideFinished(id: Long): Boolean = withContext(Dispatchers.IO) { dao.getRide(id)?.finished == true }
+
+    /** Podsumowanie: przypisuje nawierzchnię do punktów [from]..[to] i przelicza statystyki aktywności. */
+    suspend fun setTerrainRange(id: Long, from: Int, to: Int, terrain: Terrain) = withContext(Dispatchers.IO) {
+        dao.setTerrainRange(id, from, to, terrain.name)
+        val d = loadRide(id) ?: return@withContext
+        finalizeRide(id, d.points, d.laps)
+    }
+
     // ----- odcinki i duchy -----
 
     suspend fun segmentsFor(sport: Sport): List<SegmentEntity> = withContext(Dispatchers.IO) { dao.segmentsForSport(sport.id) }
