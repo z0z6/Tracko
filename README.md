@@ -1,24 +1,3 @@
-# Tracko 0.8
-
-Darmowa, open-source'owa aplikacja na Androida do nagrywania przejazdów rowerowych
-(odpowiednik podstawowych funkcji Stravy) – z naciskiem na jazdę w różnym terenie.
-Bez kont, reklam i Google Play Services.
-
-## Funkcje
-- **Nagrywanie GPS w tle**, pauza ręczna, **auto-pauza**, **okrążenia** (ręczne i automatyczne co 1/5/10 km)
-- **Nawierzchnie** przełączane w trakcie jazdy (asfalt, bruk, szuter, droga leśna, singletrack, błoto, piasek, śnieg),
-  trasa na mapie kolorowana wg nawierzchni (białe obwódki dla czytelności, legenda kolorów, bez łączenia linii przez pauzy)
-- **Wymuszony GPS**: po uruchomieniu aplikacja wymaga zgody na lokalizację i włączonego GPS (pełnoekranowa blokada z przyciskiem
-  do ustawień); jeśli GPS zgaśnie w trakcie nagrywania – blokada + głośne powiadomienie, a luka nie wlicza się do dystansu
-- **Room (SQLite)** zamiast plików JSON; punkty zapisują się na bieżąco, więc przerwany przejazd jest odzyskiwany
-  (przejazdy z wersji 0.1 migrują się automatycznie)
-- **Wykresy**: profil wysokości, prędkość wzdłuż trasy, prędkość (średnia i maks.) wg nawierzchni, podziały co 1 km
-- **Statystyki**: dystans, czas w ruchu/całkowity/postoju/pauzy, średnia i maks. prędkość, podjazd, zjazd,
-  wysokość min/maks., maks. nachylenie podjazdu i zjazdu, przewyższenie na km, najszybszy km, kalorie (szacunek)
-- **Import GPX** i podążanie za trasą (niebieska linia, odległość do końca, ostrzeżenie o zjechaniu z trasy)
-- **Mapy offline**: pobieranie kafelków (własny serwer kafelków) + import plików MBTiles/GEMF/ZIP
-- Eksport do GPX; interfejs w stylu iOS (kafelki, okienka, przyciski-pigułki, ciemny motyw)
-
 ## Strona www (folder `web/`)
 Statyczna strona na GitHub Pages: animacja startowa jak w aplikacji, **wyniki z aplikacji**, ranking i **wyścig duchów** na mapie,
 aktywności (z rozkładem nawierzchni), **planer tras** (routing po drogach, profil wysokości, zapis do konta i eksport GPX) oraz
