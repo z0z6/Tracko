@@ -17,6 +17,8 @@ jobs:
           KEY: ${{ secrets.TRACKO_CLOUD_ANON_KEY }}
         run: |
           if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "Brak sekretów – pomijam."; exit 0; fi
-          code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/segment_overview?select=uid&limit=1" -H "apikey: $KEY" -H "Authorization: Bearer $KEY")
+          AUTH=""
+          case "$KEY" in eyJ*) AUTH="Authorization: Bearer $KEY" ;; esac   # klucze sb_publishable_… nie są JWT
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/segment_overview?select=uid&limit=1" -H "apikey: $KEY" ${AUTH:+-H "$AUTH"})
           echo "HTTP $code"
           [ "$code" = "200" ]

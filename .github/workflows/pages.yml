@@ -1,0 +1,54 @@
+name: Pages
+
+# Publikuje stronę z folderu web/ na GitHub Pages. Wymaga: Settings → Pages → Source: „GitHub Actions”.
+# Adres projektu Supabase i klucz publiczny trafiają do web/assets/config.js z sekretów TRACKO_CLOUD_URL / TRACKO_CLOUD_ANON_KEY
+# (te same, co w buildzie aplikacji). Bez nich strona działa w trybie demonstracyjnym z danymi przykładowymi.
+on:
+  push:
+    branches: [main, master]
+    paths: ['web/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate config.js
+        env:
+          CLOUD_URL: ${{ secrets.TRACKO_CLOUD_URL }}
+          CLOUD_KEY: ${{ secrets.TRACKO_CLOUD_ANON_KEY }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          cfg = {
+              "url": os.environ.get("CLOUD_URL", "").strip().rstrip("/"),
+              "key": os.environ.get("CLOUD_KEY", "").strip(),
+              "releasesUrl": "https://github.com/%s/releases/latest" % os.environ["REPO"],
+              "repoUrl": "https://github.com/%s" % os.environ["REPO"],
+          }
+          with open("web/assets/config.js", "w") as f:
+              f.write("window.TRACKO_CONFIG = " + json.dumps(cfg) + ";\n")
+          print("config.js: tryb", "produkcyjny" if cfg["url"] and cfg["key"] else "demonstracyjny (brak sekretów)")
+          PY
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: deployment
+        uses: actions/deploy-pages@v4
