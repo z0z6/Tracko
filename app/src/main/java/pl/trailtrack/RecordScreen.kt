@@ -263,6 +263,7 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
     var ghostSeg by remember { mutableStateOf<SegmentEntity?>(null) }
     var ghostEff by remember { mutableStateOf<EffortEntity?>(null) }
     LaunchedEffect(ghostUid) {
+        Cloud.autoPull(repo, ghostUid)   // świeże wyniki innych zawodników do ścigania (w tle, tylko gdy online włączone)
         ghostSeg = if (ghostUid.isBlank()) null else repo.getSegment(ghostUid)
         ghostEff = if (ghostSeg == null) null else repo.efforts(ghostUid).let { l ->
             l.firstOrNull { it.id == Prefs.ghostEffortId } ?: l.firstOrNull()

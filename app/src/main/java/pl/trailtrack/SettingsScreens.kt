@@ -51,7 +51,7 @@ import java.io.FileOutputStream
 // ---------- ustawienia ----------
 
 @Composable
-fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> Unit, onSegments: () -> Unit) {
+fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> Unit, onSegments: () -> Unit, onCloud: () -> Unit) {
     val ctx = LocalContext.current
     val c = ios()
     val scope = rememberCoroutineScope()
@@ -153,6 +153,11 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
             IosRow("Odcinki i duchy", onClick = onSegments, chevron = true, leading = { IconBadge(AppIcon.Ghost, c.blue) })
             IosDivider()
             IosRow("Moje imię w rankingach", athlete, onClick = { showAthlete = true })
+            IosDivider()
+            IosRow(
+                "Rywalizacja online", if (Cloud.active) "włączona" else "wyłączona",
+                onClick = onCloud, chevron = true, leading = { IconBadge(AppIcon.Ghost, c.green) }
+            )
         }
 
         IosGroup(

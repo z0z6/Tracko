@@ -369,7 +369,10 @@ class GhostEngine(
         val profile = encodeProfile(buildProfile(run.samples, g.length))
         val rideId = Live.state.value.startTime
         val startedAt = run.startTime
-        scope.launch { repo.addEffort(uid, Prefs.athleteName, true, startedAt, total, profile, rideId) }
+        scope.launch {
+            repo.addEffort(uid, Prefs.athleteName, true, startedAt, total, profile, rideId)
+            Cloud.autoEfforts(repo, uid)   // jeśli włączone udostępnianie – wyślij wynik do rankingu w tle
+        }
 
         val prevBest = bestTimes[uid]
         val isRecord = prevBest == null || total < prevBest

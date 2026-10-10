@@ -152,6 +152,19 @@ fun RouteDetailScreen(
                         Prefs.selectedRouteId = id; active = true
                     }
                 }
+                if (Cloud.active) {
+                    var routeMsg by remember { mutableStateOf("") }
+                    IosButton(
+                        if (routeMsg.isBlank()) "Wyślij trasę online" else routeMsg,
+                        c.green, Modifier.fillMaxWidth(), filled = false
+                    ) {
+                        scope.launch {
+                            routeMsg = "Wysyłam…"
+                            val r = Cloud.uploadRoute(repo, id)
+                            routeMsg = if (r.ok) "Wysłano ✓" else "Błąd: ${r.error}"
+                        }
+                    }
+                }
                 IosButton("Utwórz odcinek do ścigania z duchem", c.green, Modifier.fillMaxWidth(), filled = false, icon = AppIcon.Ghost) {
                     onNewSegment(id)
                 }

@@ -12,6 +12,7 @@ class TrailApp : Application() {
         initOsmdroid(this)
         SensorHub.init(this)
         Sound.init(this)
+        Cloud.init(this)
     }
 }
 

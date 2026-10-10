@@ -260,6 +260,7 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
     var detectMsg by remember { mutableStateOf<String?>(null) }
     var autoTried by remember(id) { mutableStateOf(false) }
     var showEditor by remember { mutableStateOf(false) }
+    var cloudMsg by remember { mutableStateOf("") }
     // zakres zaznaczony w edytorze nawierzchni (podświetlany na mapie)
     var hlA by remember { mutableIntStateOf(0) }
     var hlB by remember { mutableIntStateOf(0) }
@@ -288,6 +289,15 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                 Repo.AutoTerrain.FAILED -> detectMsg = "Nie udało się pobrać danych mapy (potrzebny internet albo brak danych OSM w tym miejscu)."
                 Repo.AutoTerrain.SKIPPED -> {}
             }
+        }
+    }
+
+    // po zapisie (i po wykryciu nawierzchni) aktywność trafia na serwer, jeśli włączono udostępnianie aktywności
+    LaunchedEffect(data) {
+        val dd = data
+        if (dd != null) {
+            val sp = Sport.fromId(dd.ride.sport)
+            if (dd.ride.terrainAuto != 0 || !sp.usesTerrain) Cloud.autoRide(repo, dd.ride.id)
         }
     }
 
@@ -473,6 +483,18 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                 SplitsGroup(if (sport == Sport.STRENGTH || sport == Sport.SWIMMING) "Serie" else "Okrążenia", st.laps, sport)
                 if (sport.hasDistance) SplitsGroup(if (sport.splitM >= 1000.0) "Podziały co 1 km" else "Podziały co ${sport.splitM.toInt()} m", st.splits, sport)
 
+                if (Cloud.active) {
+                    IosButton(
+                        if (cloudMsg.isBlank()) "Udostępnij online" else cloudMsg,
+                        c.green, Modifier.fillMaxWidth(), filled = false
+                    ) {
+                        scope.launch {
+                            cloudMsg = "Wysyłam…"
+                            val r = Cloud.uploadRide(repo, id)
+                            cloudMsg = if (r.ok) "Wysłano ✓" else "Błąd: ${r.error}"
+                        }
+                    }
+                }
                 if (sport.gps && st.distanceM >= 300.0) {
                     IosButton("Utwórz odcinek do ścigania z duchem", c.green, Modifier.fillMaxWidth(), filled = false, icon = AppIcon.Ghost) {
                         onNewSegment(id)

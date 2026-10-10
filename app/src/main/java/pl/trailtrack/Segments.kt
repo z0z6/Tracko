@@ -53,7 +53,7 @@ private fun fmtShortDate(t: Long): String = SimpleDateFormat("dd.MM.yyyy", Local
 // =====================================================================================================
 
 @Composable
-fun SegmentsScreen(repo: Repo, onBack: () -> Unit, onOpen: (String) -> Unit) {
+fun SegmentsScreen(repo: Repo, onBack: () -> Unit, onOpen: (String) -> Unit, onOnline: () -> Unit) {
     val ctx = LocalContext.current
     val c = ios()
     val scope = rememberCoroutineScope()
@@ -91,8 +91,13 @@ fun SegmentsScreen(repo: Repo, onBack: () -> Unit, onOpen: (String) -> Unit) {
                     )
                 }
             }
+            if (Cloud.active) {
+                item {
+                    IosButton("Przeglądaj odcinki online", c.green, Modifier.fillMaxWidth()) { onOnline() }
+                }
+            }
             item {
-                IosButton("Importuj odcinek (plik .ttseg)", c.blue, Modifier.fillMaxWidth()) { picker.launch(arrayOf("*/*")) }
+                IosButton("Importuj odcinek (plik .ttseg)", c.blue, Modifier.fillMaxWidth(), filled = false) { picker.launch(arrayOf("*/*")) }
             }
             if (segs.isEmpty()) {
                 item {
@@ -134,7 +139,11 @@ fun SegmentDetailScreen(repo: Repo, uid: String, onBack: () -> Unit, onRace: () 
     var showDelete by remember { mutableStateOf(false) }
     var active by remember { mutableStateOf(Prefs.ghostSegmentUid == uid) }
 
-    LaunchedEffect(uid) { seg = repo.getSegment(uid) }
+    var online by remember { mutableStateOf("") }
+    LaunchedEffect(uid) {
+        seg = repo.getSegment(uid)
+        Cloud.autoPull(repo, uid)   // odśwież ranking z serwera w tle
+    }
     val sel = efforts.firstOrNull { it.id == selected } ?: efforts.firstOrNull()
 
     Column(Modifier.fillMaxSize()) {
@@ -208,6 +217,20 @@ fun SegmentDetailScreen(repo: Repo, uid: String, onBack: () -> Unit, onRace: () 
                         Prefs.ghostSegmentUid = ""
                         Prefs.ghostEffortId = 0L
                         active = false
+                    }
+                }
+                if (Cloud.active) {
+                    IosButton(
+                        if (online.isBlank()) "Wyślij do rankingu online i odśwież" else online,
+                        c.green, Modifier.fillMaxWidth(), filled = false
+                    ) {
+                        scope.launch {
+                            online = "Synchronizuję…"
+                            val up = Cloud.uploadSegment(repo, uid)
+                            val (sent, err) = if (up.ok) Cloud.uploadEfforts(repo, uid) else 0 to up.error
+                            val pulled = Cloud.pullEfforts(repo, uid)
+                            online = if (err != null) "Błąd: $err" else "Wysłano $sent wyn., pobrano $pulled nowych"
+                        }
                     }
                 }
                 IosButton("Udostępnij odcinek (plik .ttseg)", c.blue, Modifier.fillMaxWidth(), filled = false) {
@@ -397,7 +420,10 @@ fun SegmentCreateScreen(repo: Repo, rideId: Long, routeId: Long, onBack: () -> U
                             val uid = repo.createSegment(name.ifBlank { "Odcinek" }, s.sport, geo, effort)
                             busy = false
                             if (uid == null) Toast.makeText(ctx, "Odcinek jest za krótki", Toast.LENGTH_LONG).show()
-                            else onDone(uid)
+                            else {
+                                Cloud.autoSegment(repo, uid)   // jeśli włączone udostępnianie – wyślij w tle
+                                onDone(uid)
+                            }
                         }
                     }
                 }

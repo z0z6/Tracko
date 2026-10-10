@@ -215,6 +215,33 @@ class Repo(private val ctx: Context) {
         }.getOrDefault(0)
     }
 
+    // ----- wymiana z zapleczem online -----
+
+    suspend fun allSegments(): List<SegmentEntity> = withContext(Dispatchers.IO) { dao.allSegments() }
+    suspend fun finishedRideIds(): List<Long> = withContext(Dispatchers.IO) { dao.finishedRideIds() }
+    suspend fun allRoutes(): List<RouteEntity> = withContext(Dispatchers.IO) { dao.allRoutes() }
+
+    /** Zapisuje odcinek pobrany z internetu (jeśli go jeszcze nie ma). Zwraca true, gdy dodano nowy. */
+    suspend fun saveRemoteSegment(uid: String, name: String, sport: Int, lengthM: Double, geom: String, author: String): Boolean =
+        withContext(Dispatchers.IO) {
+            if (dao.getSegment(uid) != null) return@withContext false
+            if (decodeGeom(geom) == null) return@withContext false
+            dao.upsertSegment(SegmentEntity(uid, name, sport, lengthM, geom, System.currentTimeMillis(), author))
+            true
+        }
+
+    /** Tworzy trasę z punktów (np. pobraną ze strony www). */
+    suspend fun createRoute(name: String, pts: List<GpxPoint>): Long? = withContext(Dispatchers.IO) {
+        if (pts.size < 2) return@withContext null
+        val tps = pts.mapIndexed { i, p -> TrackPoint(p.lat, p.lon, p.ele, i * 1000L, 0.0, Terrain.ASPHALT) }
+        val st = computeStats(tps, 75.0)
+        val id = dao.insertRoute(
+            RouteEntity(name = name, createdAt = System.currentTimeMillis(), distanceM = st.distanceM, ascentM = st.ascentM, pointCount = tps.size)
+        )
+        dao.insertRoutePoints(pts.mapIndexed { i, p -> RoutePointEntity(routeId = id, idx = i, lat = p.lat, lon = p.lon, ele = p.ele) })
+        id
+    }
+
     suspend fun history(sport: Sport): RideHistory = withContext(Dispatchers.IO) {
         val recent = dao.recentForBaseline(sport.id)
         val d = recent.sumOf { it.distanceM }

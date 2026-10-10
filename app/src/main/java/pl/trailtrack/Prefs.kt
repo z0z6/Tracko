@@ -79,6 +79,90 @@ object Prefs {
         get() = sp.getInt("accent", 0)
         set(v) = sp.edit().putInt("accent", v).apply()
 
+    // ----- zaplecze online (rywalizacja, strona www) -----
+    var cloudEnabled: Boolean
+        get() = sp.getBoolean("cloudEnabled", false)
+        set(v) = sp.edit().putBoolean("cloudEnabled", v).apply()
+
+    /** zgoda na wysyłanie danych (okno z opisem pokazywane przy pierwszym włączeniu) */
+    var cloudConsent: Boolean
+        get() = sp.getBoolean("cloudConsent", false)
+        set(v) = sp.edit().putBoolean("cloudConsent", v).apply()
+
+    var cloudUrl: String
+        get() = sp.getString("cloudUrl", null) ?: BuildConfig.CLOUD_URL
+        set(v) = sp.edit().putString("cloudUrl", v.trim()).apply()
+
+    var cloudKey: String
+        get() = sp.getString("cloudKey", null) ?: BuildConfig.CLOUD_ANON_KEY
+        set(v) = sp.edit().putString("cloudKey", v.trim()).apply()
+
+    var cloudAccess: String
+        get() = sp.getString("cloudAccess", "") ?: ""
+        set(v) = sp.edit().putString("cloudAccess", v).apply()
+
+    var cloudRefresh: String
+        get() = sp.getString("cloudRefresh", "") ?: ""
+        set(v) = sp.edit().putString("cloudRefresh", v).apply()
+
+    /** wygaśnięcie tokenu dostępu (sekundy od 1970) */
+    var cloudExpiresAt: Long
+        get() = sp.getLong("cloudExpiresAt", 0L)
+        set(v) = sp.edit().putLong("cloudExpiresAt", v).apply()
+
+    var cloudUserId: String
+        get() = sp.getString("cloudUserId", "") ?: ""
+        set(v) = sp.edit().putString("cloudUserId", v).apply()
+
+    var cloudEmail: String
+        get() = sp.getString("cloudEmail", "") ?: ""
+        set(v) = sp.edit().putString("cloudEmail", v).apply()
+
+    var shareSegments: Boolean
+        get() = sp.getBoolean("shareSegments", true)
+        set(v) = sp.edit().putBoolean("shareSegments", v).apply()
+
+    var shareRides: Boolean
+        get() = sp.getBoolean("shareRides", false)
+        set(v) = sp.edit().putBoolean("shareRides", v).apply()
+
+    var shareRoutes: Boolean
+        get() = sp.getBoolean("shareRoutes", false)
+        set(v) = sp.edit().putBoolean("shareRoutes", v).apply()
+
+    /** wysyłane aktywności i trasy są widoczne dla innych (false = tylko dla właściciela konta na stronie) */
+    var sharePublic: Boolean
+        get() = sp.getBoolean("sharePublic", false)
+        set(v) = sp.edit().putBoolean("sharePublic", v).apply()
+
+    /** ile metrów od początku i końca śladu wycinamy przed wysłaniem (ochrona miejsca zamieszkania) */
+    var privacyTrimM: Int
+        get() = sp.getInt("privacyTrimM", 200)
+        set(v) = sp.edit().putInt("privacyTrimM", v).apply()
+
+    var cloudWifiOnly: Boolean
+        get() = sp.getBoolean("cloudWifiOnly", true)
+        set(v) = sp.edit().putBoolean("cloudWifiOnly", v).apply()
+
+    var cloudLastSync: Long
+        get() = sp.getLong("cloudLastSync", 0L)
+        set(v) = sp.edit().putLong("cloudLastSync", v).apply()
+
+    /** zbiory już wysłanych / pobranych elementów (żeby nie powtarzać), osobno dla rodzaju: segments, efforts, rides, routes */
+    fun syncedSet(kind: String): Set<String> = sp.getStringSet("cloudSynced_$kind", emptySet()) ?: emptySet()
+
+    fun markSynced(kind: String, v: String) {
+        val s = HashSet(syncedSet(kind))
+        s.add(v)
+        sp.edit().putStringSet("cloudSynced_$kind", s).apply()
+    }
+
+    fun clearSynced() {
+        val e = sp.edit()
+        for (k in listOf("segments", "efforts", "rides", "routes")) e.remove("cloudSynced_$k")
+        e.apply()
+    }
+
     // ----- odcinki i duchy -----
     /** uid odcinka, z którym się ścigamy (pusty = brak) */
     var ghostSegmentUid: String

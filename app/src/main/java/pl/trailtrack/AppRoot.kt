@@ -25,6 +25,9 @@ sealed interface Screen {
     object Sensors : Screen
     object Audio : Screen
     object Segments : Screen
+    object Cloud : Screen
+    object OnlineSegments : Screen
+    object OnlineRoutes : Screen
     data class Segment(val uid: String) : Screen
     data class NewSegment(val rideId: Long, val routeId: Long) : Screen
 }
@@ -79,8 +82,19 @@ fun AppRoot(repo: Repo) {
                 is Screen.Audio -> AudioSettingsScreen { stack = stack.dropLast(1) }
                 is Screen.Segments -> SegmentsScreen(
                     repo, onBack = { stack = stack.dropLast(1) },
-                    onOpen = { stack = stack + Screen.Segment(it) }
+                    onOpen = { stack = stack + Screen.Segment(it) },
+                    onOnline = { stack = stack + Screen.OnlineSegments }
                 )
+                is Screen.Cloud -> CloudScreen(
+                    repo, onBack = { stack = stack.dropLast(1) },
+                    onSegments = { stack = stack + Screen.OnlineSegments },
+                    onRoutes = { stack = stack + Screen.OnlineRoutes }
+                )
+                is Screen.OnlineSegments -> OnlineSegmentsScreen(
+                    repo, onBack = { stack = stack.dropLast(1) },
+                    onOpen = { uid -> stack = stack.dropLast(1) + Screen.Segment(uid) }
+                )
+                is Screen.OnlineRoutes -> OnlineRoutesScreen(repo) { stack = stack.dropLast(1) }
                 is Screen.Segment -> SegmentDetailScreen(
                     repo, top.uid, onBack = { stack = stack.dropLast(1) },
                     onRace = { stack = emptyList(); tab = 0; recStage = 1 }
@@ -114,7 +128,8 @@ fun AppRoot(repo: Repo) {
                                 onOffline = { stack = stack + Screen.Offline(null) },
                                 onSensors = { stack = stack + Screen.Sensors },
                                 onAudio = { stack = stack + Screen.Audio },
-                                onSegments = { stack = stack + Screen.Segments }
+                                onSegments = { stack = stack + Screen.Segments },
+                                onCloud = { stack = stack + Screen.Cloud }
                             )
                         }
                     }

@@ -19,6 +19,19 @@ Bez kont, reklam i Google Play Services.
 - **Mapy offline**: pobieranie kafelków (własny serwer kafelków) + import plików MBTiles/GEMF/ZIP
 - Eksport do GPX; interfejs w stylu iOS (kafelki, okienka, przyciski-pigułki, ciemny motyw)
 
+## Tracko 0.10 – rywalizacja online
+Moduł wymiany danych z internetem: rekordy, duchy, przejechane aktywności i trasy trafiają na serwer, a ze strony www
+(np. na GitHub Pages) – z powrotem do aplikacji. **GitHub Pages jest hostingiem statycznym i nie przyjmuje danych**, więc
+zapleczem jest bezpłatny projekt Supabase (baza + REST + logowanie), z którym rozmawiają i aplikacja, i strona.
+- Ustawienia → **Rywalizacja online**: zgoda, konto (anonimowe lub e-mail), zakres udostępniania, **przycinanie początku
+  i końca śladu** (ochrona miejsca zamieszkania), tylko Wi-Fi, ręczna synchronizacja, usunięcie konta i danych.
+- **Odcinki i wyniki** wysyłają się same po utworzeniu odcinka i po każdym przejeździe; ranking odcinka (duchy innych)
+  pobiera się przed ściganiem. **Przeglądaj odcinki online** pozwala pobrać cudzy odcinek razem z rankingiem.
+- **Aktywności i trasy** wysyłają się opcjonalnie (domyślnie prywatne). **Trasy online** pobierają trasy zaplanowane na
+  stronie www albo opublikowane przez innych.
+- Konfiguracja i kontrakt danych: [`docs/CLOUD_API.md`](docs/CLOUD_API.md), schemat bazy: `backend/supabase/schema.sql`
+  (z politykami RLS, limitami i kontrolą wiarygodności wyników; sprawdzony testami na PostgreSQL 16).
+
 ## Tracko 0.9
 - **Nowe aktywności:** Spacer (tempo min/km), Kajakarstwo (km/h, bez nawierzchni – woda) i Rolki (km/h, nawierzchnie z mapy),
   wszystkie z GPS, mapą, odcinkami z duchem, komunikatami głosowymi i eksportem. Import FIT rozpoznaje też chód/turystykę,

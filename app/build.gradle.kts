@@ -5,8 +5,13 @@ plugins {
 }
 
 // wersję podaje workflow z tagu (np. v0.8.1 → 0.8.1, kod 801); lokalnie obowiązują wartości domyślne
-val appVersionName: String = (project.findProperty("appVersionName") as String?) ?: "0.9.0"
-val appVersionCode: Int = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 900
+val appVersionName: String = (project.findProperty("appVersionName") as String?) ?: "0.10.0"
+val appVersionCode: Int = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 1000
+
+// zaplecze online (Supabase): adres projektu i publiczny klucz „anon” – z -PcloudUrl / -PcloudAnonKey albo ze zmiennych
+// środowiskowych TRACKO_CLOUD_URL / TRACKO_CLOUD_ANON_KEY (w GitHub Actions z sekretów). Puste = ustawiane w aplikacji.
+val cloudUrl: String = ((project.findProperty("cloudUrl") as String?) ?: System.getenv("TRACKO_CLOUD_URL") ?: "").replace("\"", "")
+val cloudAnonKey: String = ((project.findProperty("cloudAnonKey") as String?) ?: System.getenv("TRACKO_CLOUD_ANON_KEY") ?: "").replace("\"", "")
 
 // podpis wydania: klucz i hasła z zmiennych środowiskowych (w GitHub Actions – z sekretów repozytorium)
 val keystorePath: String? = System.getenv("KEYSTORE_FILE")
@@ -21,6 +26,8 @@ android {
         targetSdk = 34
         versionCode = appVersionCode
         versionName = appVersionName
+        buildConfigField("String", "CLOUD_URL", "\"$cloudUrl\"")
+        buildConfigField("String", "CLOUD_ANON_KEY", "\"$cloudAnonKey\"")
     }
 
     signingConfigs {
@@ -59,6 +66,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"

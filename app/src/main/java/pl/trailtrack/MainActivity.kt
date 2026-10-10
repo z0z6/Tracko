@@ -21,6 +21,7 @@ class MainActivity : ComponentActivity() {
                 runCatching { repo.backfillBestKm() }
             }
         }
+        Cloud.autoSyncOnStart(repo)
         setContent {
             IosTheme { AppRoot(repo) }
         }
