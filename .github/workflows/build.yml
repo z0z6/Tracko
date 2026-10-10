@@ -13,6 +13,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # adres projektu Supabase i publiczny klucz anon wbudowywane w aplikację (opcjonalnie; można też wpisać w Ustawieniach)
+      TRACKO_CLOUD_URL: ${{ secrets.TRACKO_CLOUD_URL }}
+      TRACKO_CLOUD_ANON_KEY: ${{ secrets.TRACKO_CLOUD_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -25,16 +29,65 @@ jobs:
         with:
           gradle-version: '8.7'
 
+      # --- wersja testowa (każdy push / PR) ---
       - name: Build debug APK
         run: gradle assembleDebug --stacktrace
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TrailTrack-debug-apk
+          name: Tracko-debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
-      - name: Publish GitHub Release (tags v*)
+      # --- wydanie: tylko dla tagów v* (np. v0.8.1) ---
+      - name: Check signing secrets
+        id: sign
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::Brak sekretów podpisu (KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD). Zobacz README → Wydania."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/tracko-release.jks"
+          echo "KEYSTORE_FILE=$RUNNER_TEMP/tracko-release.jks" >> "$GITHUB_ENV"
+
+      - name: Compute version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          CORE="${V%%-*}"
+          IFS='.' read -r MA MI PA <<< "$CORE"
+          CODE=$(( ${MA:-0} * 10000 + ${MI:-0} * 100 + ${PA:-0} ))
+          echo "VER=$V" >> "$GITHUB_ENV"
+          echo "CODE=$CODE" >> "$GITHUB_ENV"
+          echo "Wersja $V, versionCode $CODE"
+
+      - name: Build signed release APK
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          gradle assembleRelease --stacktrace -PappVersionName="$VER" -PappVersionCode="$CODE"
+          cp app/build/outputs/apk/release/app-release.apk "Tracko-$VER.apk"
+
+      - name: Verify signature and checksum
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --print-certs "Tracko-$VER.apk"
+          sha256sum "Tracko-$VER.apk" | tee "Tracko-$VER.apk.sha256"
+
+      - name: Publish GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/debug/*.apk
+          files: |
+            Tracko-${{ env.VER }}.apk
+            Tracko-${{ env.VER }}.apk.sha256
+          generate_release_notes: true

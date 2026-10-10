@@ -1,0 +1,22 @@
+name: Supabase keepalive
+
+# Darmowy projekt Supabase usypia się po okresie bezczynności. To lekkie zapytanie odczytu budzi go dwa razy w tygodniu.
+# Wymaga sekretów TRACKO_CLOUD_URL i TRACKO_CLOUD_ANON_KEY (bez nich workflow kończy się bez błędu).
+on:
+  schedule:
+    - cron: '17 6 * * 2,5'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping REST API
+        env:
+          URL: ${{ secrets.TRACKO_CLOUD_URL }}
+          KEY: ${{ secrets.TRACKO_CLOUD_ANON_KEY }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "Brak sekretów – pomijam."; exit 0; fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/segment_overview?select=uid&limit=1" -H "apikey: $KEY" -H "Authorization: Bearer $KEY")
+          echo "HTTP $code"
+          [ "$code" = "200" ]
