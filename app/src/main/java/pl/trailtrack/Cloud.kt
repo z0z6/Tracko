@@ -95,8 +95,18 @@ object Cloud {
         }
     }
 
-    private fun headers(token: String?): Map<String, String> =
-        mapOf("apikey" to Prefs.cloudKey, "Authorization" to "Bearer ${token ?: Prefs.cloudKey}")
+    /**
+     * Nagłówki żądania. Klucz w formacie JWT (`eyJ…`, „anon”) wysyłamy też jako Bearer; nowe klucze publishable
+     * (`sb_publishable_…`) nie są JWT, więc idą wyłącznie w `apikey`.
+     */
+    private fun headers(token: String?): Map<String, String> {
+        val key = Prefs.cloudKey
+        val m = HashMap<String, String>()
+        m["apikey"] = key
+        val bearer = token ?: key.takeIf { it.startsWith("eyJ") }
+        if (bearer != null) m["Authorization"] = "Bearer $bearer"
+        return m
+    }
 
     /** Żądanie z uwierzytelnieniem; przy 401 odświeża token i próbuje jeszcze raz. */
     private fun request(

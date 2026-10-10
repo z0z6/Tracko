@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tracko – wyniki, duchy i planer tras</title>
+  <meta name="description" content="Tracko: rankingi odcinków, wyścigi duchów, aktywności z aplikacji i planer tras.">
+  <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <script>
+    // motyw ustawiany przed pierwszym rysowaniem (bez błysku): zapisany wybór albo ustawienie systemu
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('tracko.theme'); } catch (e) {}
+      if (!t) t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <noscript><style>#splash { display: none !important; }</style></noscript>
+</head>
+<body>
+  <div id="splash" class="on" role="presentation"></div>
+  <div id="demo"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#/" aria-label="Tracko – strona główna">
+      <svg viewBox="0 0 34 22" fill="none" aria-hidden="true"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#0A84FF"/><stop offset=".5" stop-color="#5E5CE6"/><stop offset="1" stop-color="#30D158"/></linearGradient></defs><path d="M2 17c4 5 7-9 12-5s8-11 18-8" stroke="url(#lg)" stroke-width="3.2" stroke-linecap="round"/><circle cx="2.5" cy="17" r="2.2" fill="#0A84FF"/></svg>
+      Tracko
+    </a>
+    <nav class="nav" aria-label="Główna nawigacja">
+      <a href="#/" data-route="/">Wyniki</a>
+      <a href="#/odcinki" data-route="/odcink">Odcinki i duchy</a>
+      <a href="#/aktywnosci" data-route="/aktywnosc">Aktywności</a>
+      <a href="#/planer" data-route="/planer">Planer tras</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="theme-btn" aria-label="Przełącz motyw jasny/ciemny" title="Motyw"></button>
+      <button class="btn sm" id="account-btn">Zaloguj</button>
+    </div>
+  </header>
+
+  <main id="view" aria-live="polite"></main>
+
+  <footer>
+    <span>Tracko · wyniki, duchy i planer tras</span>
+    <span>Mapa © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com/attributions" rel="noopener">CARTO</a> · wysokości: Open-Meteo · trasy: FOSSGIS</span>
+    <span><a id="foot-app" href="#" rel="noopener">Pobierz aplikację</a> · <a id="foot-repo" href="#" rel="noopener">GitHub</a></span>
+  </footer>
+
+  <nav class="tabbar" aria-label="Nawigacja">
+    <a href="#/" data-route="/"><svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Wyniki</a>
+    <a href="#/odcinki" data-route="/odcink"><svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V11c0-7.5 14-7.5 14 0v9l-3-2.5-4 2.5-4-2.5z"/><circle cx="9.5" cy="11" r="1.2" fill="currentColor"/><circle cx="14.5" cy="11" r="1.2" fill="currentColor"/></svg>Duchy</a>
+    <a href="#/aktywnosci" data-route="/aktywnosc"><svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Aktywności</a>
+    <a href="#/planer" data-route="/planer"><svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg>Planer</a>
+  </nav>
+
+  <div class="toast-wrap" id="toasts" role="status"></div>
+
+  <dialog class="modal" id="auth" aria-label="Konto"></dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/config.js"></script>
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>

@@ -18,7 +18,10 @@ Aplikacja i strona rozmawiają z tą samą bazą przez REST (PostgREST). Strona 
 2. **SQL Editor** → wklej `backend/supabase/schema.sql` → Run (można uruchamiać wielokrotnie).
 3. **Authentication → Sign In / Providers → Allow anonymous sign-ins: włącz** (aplikacja loguje się anonimowo, bez rejestracji).
 4. Opcjonalnie **Authentication → Providers → Email → wyłącz „Confirm email”** – wtedy założenie konta z e-mailem w aplikacji działa od razu.
-5. **Project Settings → API**: skopiuj *Project URL* i klucz *anon public*.
+5. Skopiuj dwie wartości (to są właśnie `TRACKO_CLOUD_URL` i `TRACKO_CLOUD_ANON_KEY`):
+   - **Project URL** – `https://<ref>.supabase.co` (Project Settings → API albo przycisk *Connect*); bez końcowego `/` i bez `/rest/v1`.
+   - **Klucz publiczny** – Project Settings → **API Keys**: *Publishable key* (`sb_publishable_…`) albo, w zakładce *Legacy API Keys*,
+     klucz **anon** (`eyJ…`). Aplikacja obsługuje oba rodzaje. **Nigdy** nie wpisuj kluczy *secret* / *service_role* – omijają zabezpieczenia.
 6. W repozytorium GitHub: *Settings → Secrets and variables → Actions* → dodaj `TRACKO_CLOUD_URL` oraz `TRACKO_CLOUD_ANON_KEY`.
    Następne wydanie (tag `v*`) będzie miało adres wbudowany w aplikację. Bez sekretów adres i klucz można wpisać w aplikacji:
    Ustawienia → Rywalizacja online → Zaawansowane.
@@ -66,7 +69,10 @@ Nagłówki: `apikey: <anon>`, `Authorization: Bearer <access_token>` (albo klucz
 | wysłanie / pobranie tras | `POST /rest/v1/routes?on_conflict=owner,client_uid`, `GET /rest/v1/routes?order=created_at.desc` |
 | usunięcie konta i danych | `POST /rest/v1/rpc/delete_my_account` |
 
-## 4. Strona www (GitHub Pages) – przykłady z `supabase-js`
+## 4. Strona www (GitHub Pages)
+
+Gotowa strona jest w folderze [`web/`](../web/README.md) (wdrażana workflowem `Pages`): ranking, wyścigi duchów, aktywności i planer
+tras. Poniżej przykłady zapytań z `supabase-js`, na których się opiera.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

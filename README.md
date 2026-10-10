@@ -19,6 +19,12 @@ Bez kont, reklam i Google Play Services.
 - **Mapy offline**: pobieranie kafelków (własny serwer kafelków) + import plików MBTiles/GEMF/ZIP
 - Eksport do GPX; interfejs w stylu iOS (kafelki, okienka, przyciski-pigułki, ciemny motyw)
 
+## Strona www (folder `web/`)
+Statyczna strona na GitHub Pages: animacja startowa jak w aplikacji, **wyniki z aplikacji**, ranking i **wyścig duchów** na mapie,
+aktywności (z rozkładem nawierzchni), **planer tras** (routing po drogach, profil wysokości, zapis do konta i eksport GPX) oraz
+jasny/ciemny motyw. Działa na tym samym zapleczu Supabase; bez konfiguracji pokazuje tryb demonstracyjny (`?demo=1`).
+Wdrożenie: *Settings → Pages → Source: GitHub Actions*, sekrety jak w buildzie aplikacji – szczegóły w [`web/README.md`](web/README.md).
+
 ## Tracko 0.10 – rywalizacja online
 Moduł wymiany danych z internetem: rekordy, duchy, przejechane aktywności i trasy trafiają na serwer, a ze strony www
 (np. na GitHub Pages) – z powrotem do aplikacji. **GitHub Pages jest hostingiem statycznym i nie przyjmuje danych**, więc
