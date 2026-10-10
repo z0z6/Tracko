@@ -1,0 +1,21 @@
+# klucze podpisu i sekrety – NIGDY w repozytorium
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+keystore.properties
+.env
+.env.*
+
+# lokalne i generowane
+local.properties
+build/
+.gradle/
+.idea/
+*.iml
+captures/
+
+# artefakty aplikacji
+*.apk
+*.aab
