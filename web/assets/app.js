@@ -3,6 +3,7 @@ import * as U from './lib.js';
 import { runSplash } from './splash.js';
 import { createApi } from './api.js';
 import { createDemoApi } from './demo.js';
+import { tileConfig } from './tiles.js';
 
 const cfg = window.TRACKO_CONFIG || {};
 const params = new URLSearchParams(location.search);
@@ -63,14 +64,15 @@ function tile(k, v, extra = '', cls = '') { return `<div class="tile ${cls}"><di
 
 // ------------------------------------------------------------------ mapy (Leaflet + kafelki CARTO zależne od motywu)
 
-const TILES = {
-  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-};
+const TILE = tileConfig(cfg);
+const TILES = { light: TILE.light, dark: TILE.dark };
+const darkFilter = (t) => TILE.filterDark && t === 'dark';
 const mapsOpen = new Set();
 function makeMap(el, opts = {}) {
   const map = L.map(el, { zoomControl: true, scrollWheelZoom: opts.wheel !== false, zoomSnap: 0.25 });
-  map._tl = L.tileLayer(TILES[theme()], { maxZoom: 19, subdomains: 'abcd', attribution: '© OpenStreetMap, © CARTO' }).addTo(map);
+  map._tl = L.tileLayer(TILES[theme()], { maxZoom: 19, attribution: TILE.attr }).addTo(map);
+  map._el = el;
+  el.classList.toggle('dark-tiles', darkFilter(theme()));
   map.setView(opts.center || [50.06, 19.94], opts.zoom || 11);
   mapsOpen.add(map);
   return map;
@@ -820,12 +822,16 @@ function setTheme(t) {
   document.documentElement.dataset.theme = t;
   try { localStorage.setItem('tracko.theme', t); } catch (e) { /* tryb prywatny */ }
   updateThemeBtn();
-  for (const m of mapsOpen) if (m._tl) m._tl.setUrl(TILES[t]);
+  for (const m of mapsOpen) {
+    if (m._tl) m._tl.setUrl(TILES[t]);
+    if (m._el) m._el.classList.toggle('dark-tiles', darkFilter(t));
+  }
 }
 
 async function boot() {
   document.getElementById('foot-app').href = cfg.releasesUrl || '#';
   document.getElementById('foot-repo').href = cfg.repoUrl || '#';
+  document.getElementById('foot-map').innerHTML = `Mapa ${TILE.attr}`;
   if (DEMO) {
     document.getElementById('demo').innerHTML = `<div class="demo-banner">Tryb demonstracyjny – dane przykładowe. Aby zobaczyć prawdziwe wyniki z aplikacji, skonfiguruj zaplecze (<a href="${esc((cfg.repoUrl || '#') + '/blob/main/docs/CLOUD_API.md')}" rel="noopener">instrukcja</a>).</div>`;
   }

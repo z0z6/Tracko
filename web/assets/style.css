@@ -166,6 +166,8 @@ button.chip:hover { border-color: var(--c, var(--blue)); }
 .map { height: 420px; border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); background: var(--fill); position: relative; z-index: 0; }
 .map.tall { height: min(68vh, 640px); }
 .leaflet-container { font: inherit; background: var(--fill); }
+/* dostawca bez stylu ciemnego (domyślnie OpenStreetMap): odwracamy jasność kafelków */
+.map.dark-tiles .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(.75) brightness(.92) contrast(.92); }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--card); color: var(--label); border-radius: 14px; box-shadow: var(--shadow); }
 .leaflet-popup-content { margin: 12px 14px; font-size: 14px; }
 .leaflet-control-zoom a { background: var(--glass) !important; color: var(--label) !important; backdrop-filter: blur(12px); border-color: var(--sep) !important; }

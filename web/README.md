@@ -29,10 +29,18 @@ python3 -m http.server 8000 -d web      # potem: http://localhost:8000/?demo=1
    potrzebne, jeśli potwierdzasz e-maile przy zakładaniu kont.
 4. Push do `main` (zmiana w `web/`) publikuje stronę automatycznie; ręcznie: *Actions → Pages → Run workflow*.
 
+## Mapa (kafelki)
+Od końca sierpnia 2026 **CARTO wymaga darmowego klucza** (bez niego każdy kafelek ma napis „API KEY REQUIRED”). Dlatego domyślnie strona
+używa kafelków **OpenStreetMap** (bez klucza, do umiarkowanego użytku; ciemny motyw to filtr CSS). Lepsza mapa jasna/ciemna:
+- **CARTO:** klucz z <https://carto.com/basemaps/apikey> (bez konta) → sekret `TRACKO_CARTO_KEY` → wdróż stronę ponownie.
+- **Własny dostawca:** sekrety `TRACKO_TILE_URL` (adres z `{z}/{x}/{y}` i kluczem), opcjonalnie `TRACKO_TILE_URL_DARK` i `TRACKO_TILE_ATTR`
+  (np. MapTiler, Stadia, Thunderforest – ogranicz klucz do domeny strony).
+Atrybucja dostawcy musi zostać widoczna (strona robi to sama).
+
 ## Usługi zewnętrzne (zasady uczciwego użycia)
 | Do czego | Usługa | Uwagi |
 |---|---|---|
-| kafelki mapy | CARTO (dane © OpenStreetMap) | atrybucja widoczna na mapie; przy dużym ruchu użyj własnego dostawcy z kluczem |
+| kafelki mapy | OpenStreetMap (domyślnie) lub CARTO / własny dostawca | patrz „Mapa” poniżej; atrybucja widoczna na mapie |
 | trasy po drogach | FOSSGIS OSRM (`routing.openstreetmap.de`) | publiczny serwer do umiarkowanego użytku |
 | wysokości | Open-Meteo Elevation | bezpłatne dla użytku niekomercyjnego |
 | szukanie miejsc | Nominatim (OSM) | max. 1 zapytanie/s, wyszukiwanie tylko na żądanie użytkownika |
