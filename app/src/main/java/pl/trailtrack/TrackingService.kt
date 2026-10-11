@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -210,6 +211,10 @@ class TrackingService : Service(), LocationListener {
 
     override fun onDestroy() {
         if (Live.state.value.recording) finish()
+        // zamknięcie kolejki: po wykonaniu zaległych zapisów korutyna konsumenta kończy pracę (wcześniej każdy przebieg
+        // nagrywania zostawiał działającą korutynę trzymającą serwis w pamięci)
+        ops.close()
+        mainScope.cancel()
         Sound.scheduleRelease()
         super.onDestroy()
     }

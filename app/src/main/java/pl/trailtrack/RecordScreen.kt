@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,7 +45,9 @@ import androidx.core.content.ContextCompat
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.input.pointer.pointerInput
@@ -241,7 +244,13 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
     val live by Live.state.collectAsState()
     val sport = live.sport
     val weight = Prefs.weightKg.toDouble()
-    val stats = remember(live.points, live.laps, sport) { computeStats(live.points, weight, live.laps, sport) }
+    // Statystyki całej trasy liczymy poza wątkiem UI: wcześniej computeStats przebiegał całą trasę na głównym wątku przy
+    // każdym fiksie GPS (co sekundę), co przy kilkugodzinnych trasach powodowało przycięcia i zużywało baterię.
+    val ptsNow = live.points
+    val lapsNow = live.laps
+    val stats by produceState(initialValue = emptyStats(), ptsNow.size, lapsNow.size, sport) {
+        value = withContext(Dispatchers.Default) { computeStats(ptsNow, weight, lapsNow, sport) }
+    }
     val last = live.points.lastOrNull()
     val activeSec = live.activeMs / 1000.0
     var confirmStop by remember { mutableStateOf(false) }

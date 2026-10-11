@@ -218,26 +218,50 @@ object SurfaceDetector {
     // ------------------------------------------------------------------ wejście
 
     /**
-     * Wykrywa nawierzchnię dla każdego punktu aktywności. Zwraca null, gdy nie udało się pobrać danych mapy.
-     * [onProgress] dostaje (ukończone zapytania, wszystkie zapytania). Wołać z wątku roboczego.
+     * Wierzchołki zapytania do Overpass (co ~40 m wzdłuż śladu) oraz liczba punktów, które faktycznie weszły do zapytania.
+     * Prywatność: do zewnętrznego serwera nie wysyłamy początku i końca śladu (okolicy domu) – odległość z ustawienia
+     * „Wycinaj początek i koniec”. Punkty z pominiętych końców dostają nawierzchnię od najbliższych dopasowanych ([smooth]).
+     * Zwraca null, gdy ślad jest za krótki, żeby coś zostało po przycięciu (wtedy nic nie wysyłamy).
      */
-    fun detect(points: List<TrackPoint>, onProgress: (Int, Int) -> Unit = { _, _ -> }): Detection? {
+    internal fun queryVertices(points: List<TrackPoint>, trimM: Double = Prefs.privacyTrimM.toDouble()): Pair<List<Pair<Double, Double>>, Int>? {
         if (points.size < 2) return null
-
-        // wierzchołki zapytania: co ~40 m wzdłuż śladu
-        val verts = ArrayList<Pair<Double, Double>>()
-        verts.add(points[0].lat to points[0].lon)
-        var acc = 0.0
+        val cum = DoubleArray(points.size)
         for (i in 1 until points.size) {
-            val p = points[i]
-            val q = points[i - 1]
+            cum[i] = cum[i - 1] + if (points[i].brk) 0.0 else haversine(points[i - 1].lat, points[i - 1].lon, points[i].lat, points[i].lon)
+        }
+        val total = cum[points.size - 1]
+        val qp: List<TrackPoint> = if (trimM <= 0.0) points else {
+            if (total < 2 * trimM + 100.0) return null
+            points.filterIndexed { i, _ -> cum[i] >= trimM && cum[i] <= total - trimM }
+        }
+        if (qp.size < 2) return null
+
+        val verts = ArrayList<Pair<Double, Double>>()
+        verts.add(qp[0].lat to qp[0].lon)
+        var acc = 0.0
+        for (i in 1 until qp.size) {
+            val p = qp[i]
+            val q = qp[i - 1]
             if (!p.brk) acc += haversine(q.lat, q.lon, p.lat, p.lon)
             if (acc >= VERTEX_SPACING_M || p.brk) {
                 verts.add(p.lat to p.lon)
                 acc = 0.0
             }
         }
-        verts.add(points.last().lat to points.last().lon)
+        verts.add(qp.last().lat to qp.last().lon)
+        return verts to qp.size
+    }
+
+    /**
+     * Wykrywa nawierzchnię dla każdego punktu aktywności. Zwraca null, gdy nie udało się pobrać danych mapy.
+     * [onProgress] dostaje (ukończone zapytania, wszystkie zapytania). Wołać z wątku roboczego.
+     */
+    fun detect(points: List<TrackPoint>, onProgress: (Int, Int) -> Unit = { _, _ -> }): Detection? {
+        if (points.size < 2) return null
+
+        val qv = queryVertices(points) ?: return null
+        val verts = qv.first
+        val sentCount = qv.second
 
         val chunks = ArrayList<List<Pair<Double, Double>>>()
         var s = 0
@@ -265,6 +289,6 @@ object SurfaceDetector {
             raw[i] = t
             if (t != null) matched++
         }
-        return Detection(smooth(raw), matched.toDouble() / points.size)
+        return Detection(smooth(raw), (matched.toDouble() / sentCount).coerceAtMost(1.0))   // względem punktów faktycznie wysłanych (bez przyciętych końców)
     }
 }

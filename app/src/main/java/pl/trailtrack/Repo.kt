@@ -129,6 +129,8 @@ class Repo(private val ctx: Context) {
     suspend fun deleteSegment(uid: String) = withContext(Dispatchers.IO) {
         dao.deleteEfforts(uid)
         dao.deleteSegment(uid)
+        Prefs.setPullSince(uid, "")                       // po ponownym pobraniu ranking ma przyjść od zera
+        Cloud.queueDelete("segments", uid, uid)           // kopia online (jeśli była wysłana) też znika
     }
 
     /** Dodaje wynik (bez duplikatów: ten sam zawodnik i czas rozpoczęcia). Zwraca false, jeśli już był. */
@@ -158,6 +160,24 @@ class Repo(private val ctx: Context) {
         uid
     }
 
+    /** Czyta plik z limitem rozmiaru (zbyt duży plik wejściowy nie może wyczerpać pamięci). */
+    private fun readLimited(uri: Uri, maxBytes: Int): ByteArray? =
+        ctx.contentResolver.openInputStream(uri)?.use { ins ->
+            val out = java.io.ByteArrayOutputStream()
+            val buf = ByteArray(16 * 1024)
+            var total = 0
+            while (true) {
+                val n = ins.read(buf)
+                if (n < 0) break
+                total += n
+                require(total <= maxBytes) { "Plik jest za duży" }
+                out.write(buf, 0, n)
+            }
+            out.toByteArray()
+        }
+
+    private val uidRegex = Regex("^[0-9A-Za-z-]{8,64}$")
+
     /** Plik .ttseg (JSON) z odcinkiem i najlepszymi wynikami – do wysłania innym użytkownikom. */
     suspend fun exportSegment(uid: String): File? = withContext(Dispatchers.IO) {
         val seg = dao.getSegment(uid) ?: return@withContext null
@@ -184,31 +204,38 @@ class Repo(private val ctx: Context) {
         f
     }
 
-    /** Import pliku .ttseg. 1 = nowy odcinek, 2 = dołożono wyniki do istniejącego, 0 = błąd. */
+    /** Import pliku .ttseg. 1 = nowy odcinek, 2 = dołożono wyniki do istniejącego, 0 = błąd (w tym plik niezgodny z formatem/limitami). */
     suspend fun importSegment(uri: Uri): Int = withContext(Dispatchers.IO) {
         runCatching {
-            val text = ctx.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
-                ?: return@runCatching 0
+            val text = readLimited(uri, 2_000_000)?.toString(Charsets.UTF_8) ?: return@runCatching 0
             val o = org.json.JSONObject(text)
             if (o.optString("format") != "trailtrack-segment") return@runCatching 0
             val uid = o.getString("uid")
+            if (!uidRegex.matches(uid)) return@runCatching 0
             val geom = o.getString("geom")
+            if (geom.length > 120_000) return@runCatching 0
             val g = decodeGeom(geom) ?: return@runCatching 0
+            if (g.n < 2 || g.length < 100.0 || g.length > 300_000.0) return@runCatching 0
             val isNew = dao.getSegment(uid) == null
             if (isNew) {
                 dao.upsertSegment(
-                    SegmentEntity(uid, o.optString("name", "Odcinek"), o.optInt("sport", 0), g.length, geom,
-                        System.currentTimeMillis(), o.optString("author", ""))
+                    SegmentEntity(uid, o.optString("name", "Odcinek").take(80).ifBlank { "Odcinek" }, o.optInt("sport", 0).coerceIn(0, 20),
+                        g.length, geom, System.currentTimeMillis(), o.optString("author", "").take(40))
                 )
             }
+            // „moje” tylko wtedy, gdy imię zostało ustawione przez użytkownika – domyślne (model telefonu) jest wspólne dla wielu osób
+            val myName = Prefs.athleteName
+            val customName = myName != android.os.Build.MODEL
             val arr = o.optJSONArray("efforts")
             if (arr != null) {
-                for (i in 0 until arr.length()) {
+                for (i in 0 until minOf(arr.length(), 200)) {
                     val e = arr.getJSONObject(i)
                     val prof = e.getString("profile")
-                    if (decodeProfile(prof) == null) continue
-                    val athlete = e.optString("athlete", "?")
-                    addEffort(uid, athlete, athlete == Prefs.athleteName, e.getLong("startedAt"), e.getDouble("timeSec"), prof, 0L)
+                    if (prof.length > 2500 || decodeProfile(prof) == null) continue
+                    val t = e.getDouble("timeSec")
+                    if (!t.isFinite() || t < 5.0 || t > 172_800.0) continue
+                    val athlete = e.optString("athlete", "?").take(40)
+                    addEffort(uid, athlete, customName && athlete == myName, e.getLong("startedAt"), t, prof, 0L)
                 }
             }
             if (isNew) 1 else 2
@@ -225,8 +252,14 @@ class Repo(private val ctx: Context) {
     suspend fun saveRemoteSegment(uid: String, name: String, sport: Int, lengthM: Double, geom: String, author: String): Boolean =
         withContext(Dispatchers.IO) {
             if (dao.getSegment(uid) != null) return@withContext false
-            if (decodeGeom(geom) == null) return@withContext false
-            dao.upsertSegment(SegmentEntity(uid, name, sport, lengthM, geom, System.currentTimeMillis(), author))
+            if (!uidRegex.matches(uid) || geom.length > 120_000) return@withContext false
+            val g = decodeGeom(geom) ?: return@withContext false
+            if (g.n < 2 || g.length < 100.0 || g.length > 300_000.0) return@withContext false
+            // długość liczymy z geometrii – nie ufamy `length_m` z serwera (ghost i dopasowanie liczą na jej podstawie)
+            dao.upsertSegment(
+                SegmentEntity(uid, name.take(80).ifBlank { "Odcinek" }, sport.coerceIn(0, 20), g.length, geom,
+                    System.currentTimeMillis(), author.take(40))
+            )
             true
         }
 
@@ -265,7 +298,10 @@ class Repo(private val ctx: Context) {
         LoadedRide(r, dao.getPoints(id).map { it.toTrackPoint() }, dao.getLaps(id).map { it.pointIdx })
     }
 
-    suspend fun deleteRide(id: Long) = withContext(Dispatchers.IO) { dao.deleteRide(id) }
+    suspend fun deleteRide(id: Long) = withContext(Dispatchers.IO) {
+        dao.deleteRide(id)
+        Cloud.queueDelete("rides", id.toString(), id.toString())
+    }
 
     suspend fun renameRide(id: Long, name: String) = withContext(Dispatchers.IO) { dao.renameRide(id, name) }
 
@@ -297,7 +333,7 @@ class Repo(private val ctx: Context) {
                 val pts = dao.getPoints(r.id).map { it.toTrackPoint() }
                 if (pts.size < 2) continue
                 val laps = dao.getLaps(r.id).map { it.pointIdx }
-                zip.putNextEntry(ZipEntry("tracko_${stamp(r.id)}.tcx"))
+                zip.putNextEntry(ZipEntry("tracko_${stamp(r.id)}_${r.id}.tcx"))   // id w nazwie: dwie aktywności z tej samej minuty nie kolidują
                 zip.write(buildTcx(r.id, pts, laps, r.kcal).toByteArray(Charsets.UTF_8))
                 zip.closeEntry()
             }
@@ -339,7 +375,7 @@ class Repo(private val ctx: Context) {
     /** Import pliku FIT (np. z Garmin Edge 530). Zwraca id przejazdu, -1 = błąd, -2 = już zaimportowany. */
     suspend fun importFit(uri: Uri): Long = withContext(Dispatchers.IO) {
         val parsed = runCatching {
-            val bytes = ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            val bytes = readLimited(uri, 40_000_000)
             if (bytes == null) null else parseFit(bytes)
         }.getOrNull() ?: return@withContext -1L
         if (parsed.points.size < 2) return@withContext -1L
@@ -376,7 +412,11 @@ class Repo(private val ctx: Context) {
         LoadedRoute(r, dao.getRoutePoints(id).map { GpxPoint(it.lat, it.lon, it.ele) })
     }
 
-    suspend fun deleteRoute(id: Long) = withContext(Dispatchers.IO) { dao.deleteRoute(id) }
+    suspend fun deleteRoute(id: Long) = withContext(Dispatchers.IO) {
+        val createdAt = dao.getRoute(id)?.createdAt
+        dao.deleteRoute(id)
+        if (createdAt != null) Cloud.queueDelete("routes", id.toString(), "r$createdAt")   // client_uid z uploadRoute
+    }
 
     private fun displayName(uri: Uri): String? = runCatching {
         ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->
@@ -390,7 +430,7 @@ class Repo(private val ctx: Context) {
         val dir = File(ctx.filesDir, "rides")
         val files = dir.listFiles() ?: return@withContext
         for (f in files) {
-            runCatching {
+            val migrated = runCatching {
                 val o = JSONObject(f.readText())
                 val id = o.getLong("id")
                 val arr = o.getJSONArray("points")
@@ -405,8 +445,8 @@ class Repo(private val ctx: Context) {
                     dao.insertPoints(pts.mapIndexed { i, p -> p.toEntity(id, i) })
                     finalizeRide(id, pts, emptyList())
                 }
-            }
-            f.delete()
+            }.isSuccess
+            if (migrated) f.delete()   // uszkodzonego pliku nie kasujemy – można go jeszcze odzyskać
         }
         File(ctx.filesDir, "draft.json").delete()
     }

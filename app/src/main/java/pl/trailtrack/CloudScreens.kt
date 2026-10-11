@@ -170,10 +170,13 @@ fun CloudScreen(repo: Repo, onBack: () -> Unit, onSegments: () -> Unit, onRoutes
 
                 IosGroup(
                     header = "Co udostępniam",
-                    footer = "Odcinki i wyniki tworzą rankingi i duchy. Aktywności i trasy są opcjonalne. „Publicznie” oznacza, że widzą je inni " +
-                        "użytkownicy; bez tego widzisz je tylko Ty po zalogowaniu na stronie."
+                    footer = "Odcinki i wyniki tworzą rankingi i duchy – żeby inni widzieli Twoje odcinki i ścigali się z Twoimi wynikami, włącz " +
+                        "„Odcinki publiczne” (dotyczy odcinków wysyłanych od teraz). Aktywności i trasy są opcjonalne; „publicznie” oznacza, że widzą " +
+                        "je inni użytkownicy, bez tego widzisz je tylko Ty po zalogowaniu na stronie."
                 ) {
                     CloudSwitch("Odcinki i moje wyniki", Prefs.shareSegments) { Prefs.shareSegments = it }
+                    IosDivider()
+                    CloudSwitch("Odcinki publiczne (widoczne dla wszystkich)", Prefs.shareSegmentsPublic) { Prefs.shareSegmentsPublic = it }
                     IosDivider()
                     CloudSwitch("Przejechane aktywności (ślad)", Prefs.shareRides) { Prefs.shareRides = it }
                     IosDivider()
@@ -184,7 +187,8 @@ fun CloudScreen(repo: Repo, onBack: () -> Unit, onSegments: () -> Unit, onRoutes
 
                 IosGroup(
                     header = "Prywatność śladu",
-                    footer = "Przed wysłaniem wycinamy początek i koniec śladu na wybranej odległości, żeby nie zdradzać miejsca zamieszkania. " +
+                    footer = "Przed wysłaniem wycinamy początek i koniec śladu (aktywności i publiczne trasy) na wybranej odległości, żeby nie zdradzać " +
+                        "miejsca zamieszkania. To samo dotyczy zapytań o nawierzchnię do serwera OpenStreetMap (Overpass). " +
                         "Ślad jest też upraszczany (punkt co ok. 15 m); tętno i szczegóły sensorów nie są wysyłane."
                 ) {
                     Column(Modifier.padding(16.dp)) {
@@ -244,10 +248,12 @@ fun CloudScreen(repo: Repo, onBack: () -> Unit, onSegments: () -> Unit, onRoutes
     if (showConsent) {
         IosAlert(
             title = "Wysyłanie danych na serwer",
-            message = "Po włączeniu Tracko wyśle: odcinki, które utworzysz (PUBLICZNIE, razem z przebiegiem na mapie – także jeśli zaczynają się pod Twoim domem), " +
+            message = "Po włączeniu Tracko wyśle: odcinki, które utworzysz (domyślnie PRYWATNE – widzisz je tylko Ty; możesz je upublicznić " +
+                "w ustawieniach, ale wtedy każdy zobaczy ich przebieg na mapie, także jeśli zaczynają się pod Twoim domem), " +
                 "oraz Twoje wyniki na nich (czas, imię z Ustawień, data startu). " +
-                "Opcjonalnie – przejechane aktywności (uproszczony ślad bez początku i końca) i trasy. " +
-                "Nic więcej nie jest wysyłane. Dane możesz w każdej chwili usunąć (Usuń konto).",
+                "Opcjonalnie – przejechane aktywności i trasy (publiczne tracą początek i koniec). " +
+                "Usunięcie elementu w aplikacji usuwa też jego kopię online. Nic więcej nie jest wysyłane. " +
+                "Wszystko możesz usunąć naraz (Usuń konto).",
             confirmText = "Zgadzam się",
             onConfirm = {
                 showConsent = false

@@ -15,7 +15,9 @@ Aplikacja i strona rozmawiają z tą samą bazą przez REST (PostgREST). Strona 
 ## 1. Uruchomienie zaplecza (jednorazowo)
 
 1. Załóż projekt na <https://supabase.com> (plan Free).
-2. **SQL Editor** → wklej `backend/supabase/schema.sql` → Run (można uruchamiać wielokrotnie).
+2. **SQL Editor** → wklej `backend/supabase/schema.sql` → Run (nowy projekt; można uruchamiać wielokrotnie).
+   **Masz już bazę utworzoną starszym schematem?** Nie uruchamiaj ponownie `schema.sql` (`CREATE TABLE IF NOT EXISTS` nie doda nowych
+   ograniczeń do istniejących tabel) – uruchom pliki z `backend/supabase/migrations/` w kolejności dat.
 3. **Authentication → Sign In / Providers → Allow anonymous sign-ins: włącz** (aplikacja loguje się anonimowo, bez rejestracji).
 4. Opcjonalnie **Authentication → Providers → Email → wyłącz „Confirm email”** – wtedy założenie konta z e-mailem w aplikacji działa od razu.
 5. Skopiuj dwie wartości (to są właśnie `TRACKO_CLOUD_URL` i `TRACKO_CLOUD_ANON_KEY`):
@@ -100,12 +102,19 @@ Mapę i profil wysokości na stronie można rysować np. Leaflet + dane z `geom`
 
 - **Wszystkie tabele mają RLS**: odczyt publicznych rekordów dla każdego, zapis tylko właściciela (`owner = auth.uid()`).
   Aktywności i trasy są domyślnie **prywatne** (`visibility = 'private'`, `is_public = false`).
-- Przed wysłaniem aplikacja **wycina początek i koniec śladu** (0 / 100 / 200 / 500 m, domyślnie 200 m) i upraszcza go.
+- **Odcinki są domyślnie prywatne** (widzi je tylko właściciel); publiczne tylko po włączeniu „Odcinki publiczne” – wtedy ich przebieg
+  na mapie widzą wszyscy (odcinek jest wysyłany w całości, bez przycinania, bo służy do ścigania się).
+- Przed wysłaniem aplikacja **wycina początek i koniec śladu** (0 / 100 / 200 / 500 m, domyślnie 200 m) w **aktywnościach i trasach
+  publicznych** i upraszcza go. To samo przycięcie obowiązuje przy zapytaniach o nawierzchnię do serwera Overpass (OpenStreetMap).
   Tętno, moc i inne dane sensorów **nie są wysyłane**.
 - Wysyłanie jest **opt-in** (okno zgody przy pierwszym włączeniu), a konto można usunąć razem z danymi
   (Ustawienia → Rywalizacja online → Usuń konto…). Na stronie przygotuj politykę prywatności zgodną z RODO.
-- **Kontrola uczciwości**: baza odrzuca wyniki o nierealnej średniej prędkości (> ~108 km/h), z profilem niezgodnym z czasem
-  i ponad 200 wyników na godzinę z jednego konta; są też dzienne limity odcinków (30), aktywności (300) i tras (100).
+- **Kontrola uczciwości**: baza odrzuca wyniki o nierealnej średniej prędkości (limit zależy od aktywności, np. bieganie 12 m/s),
+  z profilem niemalejącym, niezgodnym z czasem lub zbyt długim, a także ponad 200 wyników na godzinę z jednego konta (limit jest
+  serializowany, więc równoległe żądania go nie omijają); są też dzienne limity odcinków (30), aktywności (300) i tras (100).
+  Geometria i długość odcinka są niezmienne, gdy istnieją na nim wyniki.
+- **Usuwanie:** usunięcie aktywności, trasy lub odcinka w aplikacji usuwa też ich kopię na serwerze (kolejka działa także po powrocie
+  sieci). Odcinek znika z serwera tylko wtedy, gdy nie ma na nim cudzych wyników.
   To nie jest ochrona przed zdeterminowanym oszustem (aplikacja nie ma dowodu przejazdu) – dla rywalizacji towarzyskiej wystarcza.
 - Anonimowe logowanie ma limit żądań na adres IP (Supabase), a konta anonimowe można nadużywać – jeśli ruch wzrośnie, włącz
   CAPTCHA w Supabase albo wymagaj e-maila przed wysyłaniem.

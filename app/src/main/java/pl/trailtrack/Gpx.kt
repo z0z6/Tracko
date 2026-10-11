@@ -11,6 +11,9 @@ import java.util.TimeZone
 data class GpxPoint(val lat: Double, val lon: Double, val ele: Double)
 data class ParsedGpx(val name: String?, val points: List<GpxPoint>)
 
+/** Górny limit punktów z jednego pliku GPX (ochrona przed wyczerpaniem pamięci przez ogromny plik). */
+private const val MAX_GPX_POINTS = 500_000
+
 /** Parser GPX: bierze punkty <trkpt> (a jeśli ich brak – <rtept>). */
 fun parseGpx(input: InputStream): ParsedGpx {
     val p = Xml.newPullParser()
@@ -28,13 +31,15 @@ fun parseGpx(input: InputStream): ParsedGpx {
                 "trk" -> inTrk = true
                 "rte" -> inRte = true
                 "trkpt", "rtept" -> {
-                    val lat = p.getAttributeValue(null, "lat").toDouble()
-                    val lon = p.getAttributeValue(null, "lon").toDouble()
-                    cur = doubleArrayOf(lat, lon, 0.0)
+                    val lat = p.getAttributeValue(null, "lat")?.toDoubleOrNull()
+                    val lon = p.getAttributeValue(null, "lon")?.toDoubleOrNull()
+                    // punkt bez poprawnych współrzędnych (brak, NaN, poza zakresem) pomijamy zamiast przerywać cały import
+                    cur = if (lat != null && lon != null && lat.isFinite() && lon.isFinite() &&
+                        lat in -90.0..90.0 && lon in -180.0..180.0) doubleArrayOf(lat, lon, 0.0) else null
                 }
                 "ele" -> {
                     val c = cur
-                    if (c != null) c[2] = p.nextText().trim().toDoubleOrNull() ?: 0.0
+                    if (c != null) c[2] = p.nextText().trim().toDoubleOrNull()?.takeIf { it.isFinite() } ?: 0.0
                 }
                 "name" -> {
                     if (name == null && cur == null && (inTrk || inRte)) name = p.nextText().trim()
@@ -42,8 +47,8 @@ fun parseGpx(input: InputStream): ParsedGpx {
             }
         } else if (event == XmlPullParser.END_TAG) {
             when (p.name) {
-                "trkpt" -> { cur?.let { trk.add(GpxPoint(it[0], it[1], it[2])) }; cur = null }
-                "rtept" -> { cur?.let { rte.add(GpxPoint(it[0], it[1], it[2])) }; cur = null }
+                "trkpt" -> { cur?.let { if (trk.size < MAX_GPX_POINTS) trk.add(GpxPoint(it[0], it[1], it[2])) }; cur = null }
+                "rtept" -> { cur?.let { if (rte.size < MAX_GPX_POINTS) rte.add(GpxPoint(it[0], it[1], it[2])) }; cur = null }
                 "trk" -> inTrk = false
                 "rte" -> inRte = false
             }

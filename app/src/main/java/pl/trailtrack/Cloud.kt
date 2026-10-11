@@ -60,6 +60,9 @@ object Cloud {
 
     private fun fail(msg: String) = CloudResult(false, -1, "", msg)
 
+    /** JSONObject.put rzuca wyjątek dla NaN/Infinity – jedna taka wartość zatrzymywała całą synchronizację. */
+    private fun fin(d: Double): Double = if (d.isFinite()) d else 0.0
+
     private fun extractError(body: String, code: Int): String {
         val j = runCatching { JSONObject(body) }.getOrNull()
         val m = j?.optString("message")?.takeIf { it.isNotBlank() }
@@ -250,59 +253,84 @@ object Cloud {
             .put("uid", seg.uid).put("owner", Prefs.cloudUserId).put("name", seg.name.take(80)).put("sport", seg.sport)
             .put("length_m", seg.lengthM).put("geom", seg.geom)
             .put("min_lat", minLat).put("max_lat", maxLat).put("min_lon", minLon).put("max_lon", maxLon)
-            .put("author", (seg.author.ifBlank { Prefs.athleteName }).take(40)).put("is_public", true)
+            .put("author", (seg.author.ifBlank { Prefs.athleteName }).take(40)).put("is_public", Prefs.shareSegmentsPublic)
         // istniejący odcinek (np. cudzy, zaimportowany z pliku) zostaje nietknięty
         val r = rest("POST", "segments?on_conflict=uid", JSONArray().put(o).toString(), "resolution=ignore-duplicates,return=minimal")
         if (r.ok) Prefs.markSynced("segments", uid)
+        Prefs.flushSynced()
         r
     }
 
-    /** Wysyła własne wyniki na odcinku. Zwraca (liczba wysłanych, pierwszy błąd). */
+    private fun effortJson(uid: String, e: EffortEntity): JSONObject = JSONObject()
+        .put("segment_uid", uid).put("owner", Prefs.cloudUserId).put("athlete", e.athlete.take(40))
+        .put("started_at", e.startedAt).put("time_sec", fin(e.timeSec)).put("profile", e.profile)
+
+    /** Wysyła własne wyniki na odcinku (po 40 w jednym żądaniu). Zwraca (liczba wysłanych, pierwszy błąd). */
     suspend fun uploadEfforts(repo: Repo, uid: String): Pair<Int, String?> = withContext(Dispatchers.IO) {
         if (!ensureAuth()) return@withContext 0 to (lastAuthError ?: "Brak logowania")
         val done = Prefs.syncedSet("efforts")
+        val pending = repo.efforts(uid).filter { it.mine == 1 && "$uid|${it.startedAt}" !in done }
         var sent = 0
         var firstError: String? = null
-        for (e in repo.efforts(uid).filter { it.mine == 1 }) {
-            val key = "$uid|${e.startedAt}"
-            if (key in done) continue
-            val o = JSONObject()
-                .put("segment_uid", uid).put("owner", Prefs.cloudUserId).put("athlete", e.athlete.take(40))
-                .put("started_at", e.startedAt).put("time_sec", e.timeSec).put("profile", e.profile)
-            val r = rest(
-                "POST", "segment_efforts?on_conflict=segment_uid,owner,started_at", JSONArray().put(o).toString(),
-                "resolution=ignore-duplicates,return=minimal"
-            )
-            when {
-                r.ok -> { Prefs.markSynced("efforts", key); sent++ }
-                // serwer odrzucił wynik jako niewiarygodny – nie ponawiamy
-                r.error?.contains("implausible") == true || r.error?.contains("profile_mismatch") == true ->
-                    Prefs.markSynced("efforts", key)
-                else -> if (firstError == null) firstError = r.error
+        val path = "segment_efforts?on_conflict=segment_uid,owner,started_at"
+        val prefer = "resolution=ignore-duplicates,return=minimal"
+        for (chunk in pending.chunked(40)) {
+            val arr = JSONArray()
+            for (e in chunk) arr.put(effortJson(uid, e))
+            val batch = rest("POST", path, arr.toString(), prefer)
+            if (batch.ok) {
+                for (e in chunk) Prefs.markSynced("efforts", "$uid|${e.startedAt}")
+                sent += chunk.size
+                continue
+            }
+            // jeden odrzucony wynik odrzuca całą paczkę – wtedy wysyłamy pojedynczo, żeby poprawne nie czekały
+            for (e in chunk) {
+                val key = "$uid|${e.startedAt}"
+                val r = rest("POST", path, JSONArray().put(effortJson(uid, e)).toString(), prefer)
+                when {
+                    r.ok -> { Prefs.markSynced("efforts", key); sent++ }
+                    // serwer odrzucił wynik jako niewiarygodny – nie ponawiamy
+                    r.error?.let { m -> m.contains("implausible") || m.contains("profile_") } == true ->
+                        Prefs.markSynced("efforts", key)
+                    else -> if (firstError == null) firstError = r.error
+                }
             }
         }
+        Prefs.flushSynced()
         sent to firstError
     }
 
-    /** Pobiera ranking odcinka i dokłada nowe wyniki do lokalnych (to są „duchy” innych zawodników). */
+    /** Pobiera ranking odcinka i dokłada nowe wyniki do lokalnych (to są „duchy” innych zawodników). Kolejne wywołania ściągają tylko nowsze. */
     suspend fun pullEfforts(repo: Repo, uid: String): Int = withContext(Dispatchers.IO) {
-        val r = restGet("segment_efforts?segment_uid=eq.${Uri.encode(uid)}&select=owner,athlete,started_at,time_sec,profile&order=time_sec.asc&limit=100")
+        val since = Prefs.pullSince(uid)
+        val base = "segment_efforts?segment_uid=eq.${Uri.encode(uid)}&select=owner,athlete,started_at,time_sec,profile,created_at"
+        val path = if (since.isBlank()) "$base&order=time_sec.asc&limit=100"
+        else "$base&created_at=gt.${Uri.encode(since)}&order=created_at.asc&limit=200"
+        val r = restGet(path)
         if (!r.ok) return@withContext 0
         val arr = runCatching { JSONArray(r.body) }.getOrNull() ?: return@withContext 0
         var added = 0
+        var newest = since
         for (i in 0 until arr.length()) {
             val e = arr.optJSONObject(i) ?: continue
+            val ca = e.optString("created_at")
+            if (ca.isNotBlank() && (newest.isBlank() || isNewer(ca, newest))) newest = ca
             val profile = e.optString("profile")
             if (decodeProfile(profile) == null) continue
             val owner = e.optString("owner")
             val ok = repo.addEffort(
-                uid, e.optString("athlete", "?"), owner == Prefs.cloudUserId && owner.isNotBlank(),
+                uid, e.optString("athlete", "?").take(40), owner == Prefs.cloudUserId && owner.isNotBlank(),
                 e.optLong("started_at"), e.optDouble("time_sec"), profile, 0L
             )
             if (ok) added++
         }
+        if (newest.isNotBlank() && newest != since) Prefs.setPullSince(uid, newest)
         added
     }
+
+    private fun isNewer(a: String, b: String): Boolean = runCatching {
+        java.time.OffsetDateTime.parse(a).isAfter(java.time.OffsetDateTime.parse(b))
+    }.getOrDefault(false)
 
     /** Pobiera odcinek z internetu razem z rankingiem. */
     suspend fun downloadSegment(repo: Repo, uid: String): Boolean = withContext(Dispatchers.IO) {
@@ -317,6 +345,8 @@ object Cloud {
             )
             if (!saved) return@withContext false
             Prefs.markSynced("segments", uid)   // pochodzi z serwera – nie wysyłamy go z powrotem
+            Prefs.flushSynced()
+            Prefs.setPullSince(uid, "")          // nowy lokalny odcinek nie ma jeszcze wyników – ściągnij ranking od zera
         }
         pullEfforts(repo, uid)
         true
@@ -371,13 +401,14 @@ object Cloud {
         val o = JSONObject()
             .put("owner", Prefs.cloudUserId).put("started_at", r.id).put("sport", r.sport)
             .put("name", r.name.take(120)).put("athlete", Prefs.athleteName.take(40))
-            .put("distance_m", r.distanceM).put("moving_s", r.movingSec).put("ascent_m", r.ascentM)
-            .put("kcal", r.kcal).put("avg_hr", r.avgHr).put("tss", r.tss)
+            .put("distance_m", fin(r.distanceM)).put("moving_s", fin(r.movingSec)).put("ascent_m", fin(r.ascentM))
+            .put("kcal", fin(r.kcal)).put("avg_hr", r.avgHr).put("tss", fin(r.tss))
             .put("terrain_enc", if (r.terrainEnc.length <= 400) r.terrainEnc else "")
             .put("polyline", if (sport.gps) buildPolyline(d.points) else "")
             .put("visibility", if (Prefs.sharePublic) "public" else "private")
         val res = rest("POST", "rides?on_conflict=owner,started_at", JSONArray().put(o).toString(), "resolution=merge-duplicates,return=minimal")
         if (res.ok) Prefs.markSynced("rides", id.toString())
+        Prefs.flushSynced()
         res
     }
 
@@ -400,18 +431,38 @@ object Cloud {
         }
     }
 
+    /**
+     * Wycina [trimM] metrów od początku i końca trasy (ochrona miejsca zamieszkania). Zwraca pustą listę, gdy trasa
+     * jest za krótka, żeby coś zostało po przycięciu.
+     */
+    internal fun trimRoutePoints(pts: List<GpxPoint>, trimM: Double): List<GpxPoint> {
+        if (trimM <= 0.0 || pts.size < 2) return pts
+        val cum = DoubleArray(pts.size)
+        for (i in 1 until pts.size) cum[i] = cum[i - 1] + haversine(pts[i - 1].lat, pts[i - 1].lon, pts[i].lat, pts[i].lon)
+        val total = cum[pts.size - 1]
+        if (total < 2 * trimM + 200.0) return emptyList()
+        val from = cum.indexOfFirst { it >= trimM }
+        val to = cum.indexOfLast { it <= total - trimM }
+        if (from < 0 || to - from < 1) return emptyList()
+        return pts.subList(from, to + 1)
+    }
+
     suspend fun uploadRoute(repo: Repo, id: Long): CloudResult = withContext(Dispatchers.IO) {
         val lr = repo.loadRoute(id) ?: return@withContext fail("Nie znaleziono trasy")
         if (lr.points.size < 2) return@withContext fail("Trasa ma za mało punktów")
+        // trasy publiczne tracą początek i koniec (jak aktywności); prywatne widzi tylko właściciel, więc zostają w całości
+        val pts = if (Prefs.sharePublic) trimRoutePoints(lr.points, Prefs.privacyTrimM.toDouble()) else lr.points
+        if (pts.size < 2) return@withContext fail("Trasa jest za krótka po przycięciu początku i końca (ustawienia prywatności)")
         if (!ensureAuth()) return@withContext fail(lastAuthError ?: "Brak logowania")
         val o = JSONObject()
             .put("owner", Prefs.cloudUserId).put("client_uid", "r${lr.route.createdAt}")
-            .put("name", lr.route.name.take(80)).put("sport", Live.state.value.sport.let { if (it.gps) it.id else 0 })
-            .put("distance_m", lr.route.distanceM).put("ascent_m", lr.route.ascentM)
-            .put("geom", routeGeom(lr.points)).put("is_public", Prefs.sharePublic).put("source", "app")
+            .put("name", lr.route.name.take(80)).put("sport", 0)   // trasa nie ma własnej aktywności; 0 = rower (wcześniej: aktualnie nagrywana)
+            .put("distance_m", fin(lr.route.distanceM)).put("ascent_m", fin(lr.route.ascentM))
+            .put("geom", routeGeom(pts)).put("is_public", Prefs.sharePublic).put("source", "app")
             .put("author", Prefs.athleteName.take(40))
         val res = rest("POST", "routes?on_conflict=owner,client_uid", JSONArray().put(o).toString(), "resolution=merge-duplicates,return=minimal")
         if (res.ok) Prefs.markSynced("routes", id.toString())
+        Prefs.flushSynced()
         res
     }
 
@@ -444,7 +495,49 @@ object Cloud {
         }
         val id = repo.createRoute(r.name.ifBlank { "Trasa z internetu" }, pts) ?: return@withContext false
         Prefs.markSynced("routes", "remote:${r.id}")
+        Prefs.flushSynced()
         id > 0
+    }
+
+    // ------------------------------------------------------------------ usuwanie z serwera
+
+    /**
+     * Wołane po lokalnym usunięciu aktywności/odcinka/trasy. Jeśli element był wysłany, jego kopia na serwerze też zostanie
+     * skasowana (od razu albo przy najbliższej okazji – kolejka przeżywa brak sieci).
+     * [kind]: "segments" | "rides" | "routes"; [syncedKey] – klucz w zbiorze wysłanych; [ref] – identyfikator na serwerze.
+     */
+    fun queueDelete(kind: String, syncedKey: String, ref: String) {
+        if (syncedKey !in Prefs.syncedSet(kind)) return
+        Prefs.addPendingDelete("$kind|$ref")
+        scope.launch { runCatching { lock.withLock { processPendingDeletes() } } }
+    }
+
+    private fun processPendingDeletes() {
+        if (!configured || !signedIn || !networkAllowed(true)) return
+        val me = Prefs.cloudUserId
+        if (me.isBlank()) return
+        for (item in Prefs.pendingDeletes()) {
+            val kind = item.substringBefore('|')
+            val ref = item.substringAfter('|')
+            val ok = when (kind) {
+                "rides" -> rest("DELETE", "rides?owner=eq.${Uri.encode(me)}&started_at=eq.${Uri.encode(ref)}").ok
+                "routes" -> rest("DELETE", "routes?owner=eq.${Uri.encode(me)}&client_uid=eq.${Uri.encode(ref)}").ok
+                "segments" -> deleteSegmentOnline(ref, me)
+                else -> true
+            }
+            if (ok) Prefs.removePendingDelete(item)
+        }
+    }
+
+    /** Kasuje własne wyniki; sam odcinek tylko wtedy, gdy nie ma na nim cudzych wyników (usunięcie odcinka kasuje je kaskadowo). */
+    private fun deleteSegmentOnline(uid: String, me: String): Boolean {
+        val enc = Uri.encode(uid)
+        if (!rest("DELETE", "segment_efforts?segment_uid=eq.$enc&owner=eq.${Uri.encode(me)}").ok) return false
+        val left = rest("GET", "segment_efforts?segment_uid=eq.$enc&select=id&limit=1")
+        if (!left.ok) return false
+        val others = runCatching { JSONArray(left.body).length() > 0 }.getOrDefault(true)
+        if (others) return true   // zostają cudze wyniki – odcinek też (RLS i tak pozwala go usunąć tylko właścicielowi)
+        return rest("DELETE", "segments?uid=eq.$enc").ok
     }
 
     // ------------------------------------------------------------------ synchronizacja
@@ -455,6 +548,7 @@ object Cloud {
         if (!networkAllowed(manual)) return@withLock "Brak sieci (albo włączone „tylko Wi-Fi”)"
         busy.value = true
         status.value = "Synchronizacja…"
+        runCatching { processPendingDeletes() }
         var sSeg = 0; var sEff = 0; var sRide = 0; var sRoute = 0; var pulled = 0
         var error: String? = null
         try {
@@ -490,6 +584,7 @@ object Cloud {
             Prefs.cloudLastSync = System.currentTimeMillis()
         } finally {
             busy.value = false
+            Prefs.flushSynced()
         }
         val msg = "Wysłano: $sSeg odc., $sEff wyn., $sRide akt., $sRoute tras · pobrano $pulled nowych wyników" +
             (if (error != null) "\nBłąd: $error" else "")
@@ -503,7 +598,11 @@ object Cloud {
         if (!active) return
         scope.launch {
             if (!networkAllowed(false)) return@launch
-            runCatching { lock.withLock { block() } }
+            try {
+                runCatching { lock.withLock { block() } }
+            } finally {
+                Prefs.flushSynced()
+            }
         }
     }
 
@@ -536,9 +635,12 @@ object Cloud {
         launchAuto { pullEfforts(repo, uid) }
     }
 
-    /** Po starcie aplikacji. */
+    @Volatile private var startSyncDone = false
+
+    /** Po starcie aplikacji (raz na proces – nie przy każdym obrocie ekranu czy ponownym utworzeniu aktywności). */
     fun autoSyncOnStart(repo: Repo) {
-        if (!active) return
+        if (!active || startSyncDone) return
+        startSyncDone = true
         scope.launch {
             delay(4000)
             runCatching { syncAll(repo, manual = false) }

@@ -103,6 +103,25 @@ fun rememberMapView(): MapView {
  * poprzedni→bieżący punkt ma nawierzchnię bieżącego punktu. Po pauzie (brk) linia nie łączy
  * punktów przez „dziurę”.
  */
+/**
+ * Ogranicza liczbę punktów rysowanych na mapie (przy kilkugodzinnych trasach warstwy były odbudowywane z dziesiątków tysięcy
+ * obiektów co sekundę). Zachowuje początek, koniec, przerwy ([TrackPoint.brk]) i zmiany nawierzchni, więc wygląd trasy się nie zmienia.
+ */
+internal fun decimateForDisplay(points: List<TrackPoint>, maxPts: Int = 2000): List<TrackPoint> {
+    val n = points.size
+    if (n <= maxPts) return points
+    val step = (n + maxPts - 1) / maxPts
+    val out = ArrayList<TrackPoint>(maxPts + 64)
+    for (i in 0 until n) {
+        val p = points[i]
+        val next = if (i + 1 < n) points[i + 1] else null
+        val keep = i == 0 || i == n - 1 || i % step == 0 || p.brk ||
+            p.terrain != points[i - 1].terrain || (next != null && (next.brk || next.terrain != p.terrain))
+        if (keep) out.add(p)
+    }
+    return out
+}
+
 internal fun splitRuns(points: List<TrackPoint>): List<Pair<Terrain, List<GeoPoint>>> {
     val out = ArrayList<Pair<Terrain, List<GeoPoint>>>()
     var cur = ArrayList<GeoPoint>()
@@ -225,7 +244,7 @@ fun TrackMap(
                         })
                     }
                 }
-                val runs = splitRuns(points)
+                val runs = splitRuns(decimateForDisplay(points))
                 // najpierw jasne obwódki (czytelność na każdej mapie), potem kolorowe linie na wierzchu
                 for ((_, geo) in runs) {
                     mv.overlays.add(Polyline().apply {

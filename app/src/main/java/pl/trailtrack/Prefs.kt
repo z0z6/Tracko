@@ -122,6 +122,11 @@ object Prefs {
         get() = sp.getBoolean("shareSegments", true)
         set(v) = sp.edit().putBoolean("shareSegments", v).apply()
 
+    /** odcinki wysyłane jako publiczne (widoczne dla wszystkich, z przebiegiem na mapie). Domyślnie prywatne – widzisz je tylko Ty. */
+    var shareSegmentsPublic: Boolean
+        get() = sp.getBoolean("shareSegmentsPublic", false)
+        set(v) = sp.edit().putBoolean("shareSegmentsPublic", v).apply()
+
     var shareRides: Boolean
         get() = sp.getBoolean("shareRides", false)
         set(v) = sp.edit().putBoolean("shareRides", v).apply()
@@ -149,19 +154,61 @@ object Prefs {
         set(v) = sp.edit().putLong("cloudLastSync", v).apply()
 
     /** zbiory już wysłanych / pobranych elementów (żeby nie powtarzać), osobno dla rodzaju: segments, efforts, rides, routes */
-    fun syncedSet(kind: String): Set<String> = sp.getStringSet("cloudSynced_$kind", emptySet()) ?: emptySet()
+    // Zbiory są trzymane w pamięci (szybkie `in`), a do SharedPreferences zapisywane hurtem przez [flushSynced] –
+    // wcześniej każde oznaczenie kopiowało cały zbiór i przepisywało cały plik preferencji (O(n²) przy dużej historii).
+    private val syncedCache = java.util.concurrent.ConcurrentHashMap<String, MutableSet<String>>()
+    private val syncedDirty = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+    private fun syncedMutable(kind: String): MutableSet<String> = syncedCache.getOrPut(kind) {
+        val s = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+        s.addAll(sp.getStringSet("cloudSynced_$kind", emptySet()) ?: emptySet())
+        s
+    }
+
+    fun syncedSet(kind: String): Set<String> = syncedMutable(kind)
 
     fun markSynced(kind: String, v: String) {
-        val s = HashSet(syncedSet(kind))
-        s.add(v)
-        sp.edit().putStringSet("cloudSynced_$kind", s).apply()
+        if (syncedMutable(kind).add(v)) syncedDirty.add(kind)
     }
 
-    fun clearSynced() {
+    /** Zapisuje zmienione zbiory (wołane na końcu operacji wysyłania). */
+    @Synchronized
+    fun flushSynced() {
+        if (syncedDirty.isEmpty()) return
         val e = sp.edit()
-        for (k in listOf("segments", "efforts", "rides", "routes")) e.remove("cloudSynced_$k")
+        for (kind in syncedDirty.toList()) e.putStringSet("cloudSynced_$kind", HashSet(syncedMutable(kind)))
+        syncedDirty.clear()
         e.apply()
     }
+
+    @Synchronized
+    fun clearSynced() {
+        syncedCache.clear()
+        syncedDirty.clear()
+        val e = sp.edit()
+        for (k in listOf("segments", "efforts", "rides", "routes")) e.remove("cloudSynced_$k")
+        e.remove("cloudPendingDelete")
+        for (k in sp.all.keys) if (k.startsWith("cloudPull_")) e.remove(k)
+        e.apply()
+    }
+
+    /** Elementy usunięte lokalnie, których kopię na serwerze trzeba jeszcze skasować: "segments|uid", "rides|id", "routes|client_uid". */
+    @Synchronized
+    fun pendingDeletes(): Set<String> = HashSet(sp.getStringSet("cloudPendingDelete", emptySet()) ?: emptySet())
+
+    @Synchronized
+    fun addPendingDelete(item: String) {
+        sp.edit().putStringSet("cloudPendingDelete", pendingDeletes() + item).apply()
+    }
+
+    @Synchronized
+    fun removePendingDelete(item: String) {
+        sp.edit().putStringSet("cloudPendingDelete", pendingDeletes() - item).apply()
+    }
+
+    /** `created_at` najnowszego pobranego wyniku odcinka – kolejne pobrania ściągają tylko nowsze. Puste = pobierz ranking od zera. */
+    fun pullSince(uid: String): String = sp.getString("cloudPull_$uid", "") ?: ""
+    fun setPullSince(uid: String, v: String) = sp.edit().putString("cloudPull_$uid", v).apply()
 
     // ----- odcinki i duchy -----
     /** uid odcinka, z którym się ścigamy (pusty = brak) */
