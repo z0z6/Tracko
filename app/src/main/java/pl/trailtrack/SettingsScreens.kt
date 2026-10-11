@@ -77,10 +77,18 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
                             val i = cur.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                             if (i >= 0 && cur.moveToFirst()) name = cur.getString(i) ?: name
                         }
-                        val target = File(Configuration.getInstance().osmdroidBasePath, name)
+                        // nazwa pochodzi od zewnętrznego dostawcy dokumentów – nie ufamy jej (path traversal)
+                        val base = Configuration.getInstance().osmdroidBasePath
+                        val safe = File(name).name.takeIf { n ->
+                            listOf(".mbtiles", ".gemf", ".zip").any { n.endsWith(it, ignoreCase = true) }
+                        } ?: "mapa_offline.mbtiles"
+                        val target = File(base, safe)
+                        require(target.canonicalPath.startsWith(base.canonicalPath + File.separator))
+                        val tmp = File(base, "$safe.part")
                         ctx.contentResolver.openInputStream(uri)?.use { input ->
-                            FileOutputStream(target).use { out -> input.copyTo(out) }
+                            FileOutputStream(tmp).use { out -> input.copyTo(out) }
                         }
+                        check(tmp.renameTo(target)) { "rename failed" }
                     }.isSuccess
                 }
                 Toast.makeText(

@@ -217,7 +217,10 @@ object Cloud {
     /** Usuwa konto i wszystkie dane na serwerze (RODO), potem wylogowuje. */
     suspend fun deleteAccount(): CloudResult = withContext(Dispatchers.IO) {
         val r = rest("POST", "rpc/delete_my_account", "{}")
-        if (r.ok) signOut()
+        if (r.ok) {
+            signOut()
+            Prefs.cloudEnabled = false   // bez tego autosynchronizacja po starcie założyłaby nowe konto i wysłała dane ponownie
+        }
         r
     }
 

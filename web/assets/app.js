@@ -855,5 +855,5 @@ async function boot() {
   await navigate();   // treść ładuje się pod ekranem startowym
 }
 
-window.__tracko = { navigate, state, api };
+if (DEMO) window.__tracko = { navigate, state, api };   // tylko tryb demo (debug); w produkcji nie wystawiamy api/sesji na window
 boot();

@@ -9,7 +9,7 @@ function must({ data, error }) {
 export function createApi(cfg) {
   const db = window.supabase.createClient(cfg.url, cfg.key, { auth: { persistSession: true, autoRefreshToken: true } });
   const count = async (table, filter) => {
-    let q = db.from(table).select('*', { count: 'exact', head: true });
+    let q = db.from(table).select('*', { count: 'estimated', head: true });
     if (filter) q = filter(q);
     const { count: c, error } = await q;
     if (error) throw new Error(error.message);
@@ -97,7 +97,7 @@ export function createApi(cfg) {
     async saveRoute(route) {
       const u = await this.getUser();
       if (!u) throw new Error('Zaloguj się, aby zapisać trasę');
-      const row = { owner: u.id, client_uid: 'w' + Date.now(), source: 'web', author: (u.email || '').split('@')[0].slice(0, 40), ...route };
+      const row = { owner: u.id, client_uid: 'w' + Date.now(), source: 'web', author: '', ...route };
       return must(await db.from('routes').insert(row).select().single());
     },
     async deleteRoute(id) { must(await db.from('routes').delete().eq('id', id)); },

@@ -160,7 +160,7 @@ fun CloudScreen(repo: Repo, onBack: () -> Unit, onSegments: () -> Unit, onRoutes
                     IosRow("Zaloguj się na istniejące konto", onClick = { authMode = 2 }, chevron = true)
                     if (signed) {
                         IosDivider()
-                        IosRow("Wyloguj", onClick = {
+                        IosRow(if (email.isBlank()) "Wyloguj (konto anonimowe – utracisz dostęp do danych online!)" else "Wyloguj", onClick = {
                             Cloud.signOut()
                             signed = false
                             email = ""
@@ -244,7 +244,8 @@ fun CloudScreen(repo: Repo, onBack: () -> Unit, onSegments: () -> Unit, onRoutes
     if (showConsent) {
         IosAlert(
             title = "Wysyłanie danych na serwer",
-            message = "Po włączeniu Tracko wyśle: odcinki, które utworzysz, oraz Twoje wyniki na nich (czas, imię z Ustawień, data startu). " +
+            message = "Po włączeniu Tracko wyśle: odcinki, które utworzysz (PUBLICZNIE, razem z przebiegiem na mapie – także jeśli zaczynają się pod Twoim domem), " +
+                "oraz Twoje wyniki na nich (czas, imię z Ustawień, data startu). " +
                 "Opcjonalnie – przejechane aktywności (uproszczony ślad bez początku i końca) i trasy. " +
                 "Nic więcej nie jest wysyłane. Dane możesz w każdej chwili usunąć (Usuń konto).",
             confirmText = "Zgadzam się",
@@ -297,6 +298,7 @@ fun CloudScreen(repo: Repo, onBack: () -> Unit, onSegments: () -> Unit, onRoutes
                 scope.launch {
                     val r = Cloud.deleteAccount()
                     working = false
+                    enabled = Prefs.cloudEnabled
                     signed = Cloud.signedIn
                     email = Prefs.cloudEmail
                     toast(if (r.ok) "Konto i dane online usunięte" else (r.error ?: "Nie udało się usunąć"))

@@ -35,7 +35,7 @@ export function parseTerrain(enc) {
   for (const part of String(enc).split(';')) {
     const [k, v] = part.split('=');
     const meters = parseFloat(v);
-    if (!TERRAINS[k] || !isFinite(meters) || meters <= 0) continue;
+    if (!Object.prototype.hasOwnProperty.call(TERRAINS, k) || !isFinite(meters) || meters <= 0) continue;
     items.push({ key: k, ...TERRAINS[k], meters });
   }
   const total = items.reduce((s, i) => s + i.meters, 0);
