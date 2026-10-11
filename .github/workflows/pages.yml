@@ -50,6 +50,18 @@ jobs:
               v = os.environ.get(env, "").strip()
               if v:
                   cfg[name] = v
+          # bezpiecznik: do publicznej strony nie wolno wstawić klucza serwisowego
+          import base64
+          key = cfg["key"]
+          bad = key.startswith("sb_secret_")
+          if key.count(".") == 2:
+              try:
+                  payload = key.split(".")[1]; payload += "=" * (-len(payload) % 4)
+                  bad = bad or json.loads(base64.urlsafe_b64decode(payload)).get("role") == "service_role"
+              except Exception:
+                  pass
+          if bad:
+              raise SystemExit("::error::TRACKO_CLOUD_ANON_KEY wygląda na klucz serwisowy (service_role/secret) – NIE publikuję strony")
           with open("web/assets/config.js", "w") as f:
               f.write("window.TRACKO_CONFIG = " + json.dumps(cfg) + ";\n")
           print("config.js: tryb", "produkcyjny" if cfg["url"] and cfg["key"] else "demonstracyjny (brak sekretów)")
