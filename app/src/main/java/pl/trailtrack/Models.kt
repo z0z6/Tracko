@@ -83,7 +83,10 @@ data class TrackPoint(
     val brk: Boolean = false,
     val hr: Int = 0,
     val power: Int = 0,
-    val cad: Int = 0
+    val cad: Int = 0,
+    /** dokładność pozioma / pionowa fixa GPS w metrach (0 = nieznana); do ewentualnej obróbki po fakcie */
+    val acc: Float = 0f,
+    val vacc: Float = 0f
 )
 
 enum class PauseKind { NONE, MANUAL, AUTO }

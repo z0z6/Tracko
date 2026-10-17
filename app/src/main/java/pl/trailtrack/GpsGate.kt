@@ -114,6 +114,13 @@ fun GpsGate(active: Boolean, onChangeActivity: () -> Unit, content: @Composable 
     // GPS wymuszamy tylko dla aktywności z mapą (rower, bieganie, narty); bieżnia/basen/siłownia go nie potrzebują
     val blocked = active && hasGpsHw && (!permOk || !gpsOn)
 
+    // „rozgrzewka” GPS przed Start: odbiornik łapie fix, zanim zaczniemy nagrywać (czysty początek trasy)
+    val warm = active && hasGpsHw && permOk && gpsOn && !recording
+    DisposableEffect(warm) {
+        if (warm) GpsWarmup.start(ctx)
+        onDispose { GpsWarmup.stop() }
+    }
+
     Box(Modifier.fillMaxSize()) {
         content()
         if (blocked) {

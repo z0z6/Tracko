@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +44,12 @@ class TrackingService : Service(), LocationListener {
     private var ghostJob: Job? = null
     private var cueJob: Job? = null
     private var gpsLost = false
+
+    // dokładność: filtr pozycji, fuzja wysokości (barometr + GPS), blokada usypiania procesora
+    private var fixFilter: FixFilter? = null
+    private var altFusion: AltitudeFusion? = null
+    private var baro: BaroSensor? = null
+    private var wake: PowerManager.WakeLock? = null
 
     // aktywności bez GPS (bieżnia, siłownia, basen): zegar co sekundę
     private val handler = Handler(Looper.getMainLooper())
@@ -103,6 +110,12 @@ class TrackingService : Service(), LocationListener {
                 return
             }
         }
+        if (sport.gps) {
+            fixFilter = FixFilter()
+            altFusion = AltitudeFusion()
+            baro = BaroSensor(this).also { it.start() }
+        }
+        acquireWake()
         SensorHub.connectSaved()
         if (sport.gps && !lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) showGpsAlert()
         val start = System.currentTimeMillis()
@@ -180,8 +193,27 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
+    private fun acquireWake() {
+        if (wake?.isHeld == true) return
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wake = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Tracko:recording").apply {
+            setReferenceCounted(false)
+            runCatching { acquire(12L * 60 * 60 * 1000) }   // zabezpieczenie: najwyżej 12 h
+        }
+    }
+
+    private fun releaseWake() {
+        runCatching { if (wake?.isHeld == true) wake?.release() }
+        wake = null
+    }
+
     private fun finish() {
         lm.removeUpdates(this)
+        baro?.stop()
+        baro = null
+        altFusion = null
+        fixFilter = null
+        releaseWake()
         handler.removeCallbacks(ticker)
         cancelGpsAlert()
         val s = Live.state.value
@@ -211,6 +243,7 @@ class TrackingService : Service(), LocationListener {
 
     override fun onDestroy() {
         if (Live.state.value.recording) finish()
+        releaseWake()
         // zamknięcie kolejki: po wykonaniu zaległych zapisów korutyna konsumenta kończy pracę (wcześniej każdy przebieg
         // nagrywania zostawiał działającą korutynę trzymającą serwis w pamięci)
         ops.close()
@@ -222,22 +255,27 @@ class TrackingService : Service(), LocationListener {
     override fun onLocationChanged(location: Location) {
         var s = Live.state.value
         if (!s.recording) return
-        if (location.hasAccuracy() && location.accuracy > 25f) return
+        val flt = fixFilter ?: FixFilter().also { fixFilter = it }
+        val raw = location.toRawFix()
+        if (!flt.acceptable(raw)) return          // za słaba dokładność (na starcie próg jest ostrzejszy)
         if (s.pause == PauseKind.MANUAL) return
 
-        val sp = if (location.hasSpeed()) location.speed else -1f
+        // progi auto-pauzy zależne od aktywności (spacer/kajak są wolniejsze niż rower)
+        val stopSpeed = s.sport.minMoveSpeed.coerceAtLeast(0.3).toFloat()
+        val resumeSpeed = stopSpeed * 1.9f
+        val sp = if (raw.speed >= 0) raw.speed.toFloat() else -1f
         if (!Prefs.autoPause) {
             if (s.pause == PauseKind.AUTO) s = s.copy(pause = PauseKind.NONE, needBreak = true)
             stationary = 0
         } else if (sp >= 0f) {
             if (s.pause == PauseKind.AUTO) {
-                if (sp >= RESUME_SPEED) {
+                if (sp >= resumeSpeed) {
                     s = s.copy(pause = PauseKind.NONE, needBreak = true)
                     stationary = 0
                 } else {
                     return
                 }
-            } else if (sp < STOP_SPEED) {
+            } else if (sp < stopSpeed) {
                 stationary++
                 if (stationary >= STOP_FIXES) {
                     Live.state.value = s.copy(pause = PauseKind.AUTO)
@@ -249,19 +287,27 @@ class TrackingService : Service(), LocationListener {
         }
 
         val last = s.points.lastOrNull()
+        if (last != null && location.time <= last.time) return   // powtórzony / cofnięty znacznik czasu
+        if (s.needBreak) flt.reset()                              // po pauzie / utracie GPS zaczynamy filtr od nowa
+        val f = flt.filter(raw) ?: return                         // skok pozycji – odrzucony
+
         val brk = s.needBreak && last != null
         val snap = SensorHub.snapshot()
+        val ele = altFusion?.update(baro?.takeMean(), location.gpsAltitude(), location.verticalAccM(), location.time, last?.ele)
+            ?: (if (location.hasAltitude()) location.altitude else (last?.ele ?: 0.0))
         val p = TrackPoint(
-            lat = location.latitude,
-            lon = location.longitude,
-            ele = if (location.hasAltitude()) location.altitude else (last?.ele ?: 0.0),
+            lat = f.lat,
+            lon = f.lon,
+            ele = ele,
             time = location.time,
-            speed = if (location.hasSpeed()) location.speed.toDouble() else 0.0,
+            speed = f.speed,
             terrain = s.terrain,
             brk = brk,
             hr = snap.hr,
             power = snap.power,
-            cad = snap.cad
+            cad = snap.cad,
+            acc = if (location.hasAccuracy()) location.accuracy else 0f,
+            vacc = location.verticalAccM().toFloat()
         )
         if (!brk && last != null) totalDist += haversine(last.lat, last.lon, p.lat, p.lon)
 
@@ -340,8 +386,6 @@ class TrackingService : Service(), LocationListener {
         private const val CHANNEL_ALERT = "gps_alert"
         private const val NOTIF_ID = 1
         private const val ALERT_ID = 2
-        private const val STOP_SPEED = 0.8f     // m/s
-        private const val RESUME_SPEED = 1.5f   // m/s
         private const val STOP_FIXES = 4        // kolejne odczyty "stoi" zanim włączy się auto-pauza
     }
 }

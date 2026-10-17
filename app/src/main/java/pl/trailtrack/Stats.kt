@@ -167,6 +167,9 @@ fun computeStats(
     val n = points.size
     if (n < 2) return emptyStats()
 
+    // próg histerezy przewyższeń: GPS ma pionowy szum rzędu ±10 m, więc dla aktywności z GPS jest większy
+    val hyst = if (sport.gps) 5.0 else 3.0
+
     // wygładzona wysokość (okno ±2)
     val sm = DoubleArray(n)
     for (i in 0 until n) {
@@ -208,10 +211,10 @@ fun computeStats(
         cumActive[i] = cumActive[i - 1]
         cumMoving[i] = cumMoving[i - 1]
 
-        // podjazdy/zjazdy z histerezą 3 m (filtr szumu GPS)
+        // podjazdy/zjazdy z histerezą (filtr szumu wysokości)
         val e = sm[i]
-        if (e - anchor >= 3.0) { asc += e - anchor; anchor = e }
-        else if (anchor - e >= 3.0) { desc += anchor - e; anchor = e }
+        if (e - anchor >= hyst) { asc += e - anchor; anchor = e }
+        else if (anchor - e >= hyst) { desc += anchor - e; anchor = e }
         cumAsc[i] = asc
         cumDesc[i] = desc
 

@@ -65,7 +65,9 @@ data class PointEntity(
     val brk: Boolean,
     @ColumnInfo(defaultValue = "0") val hr: Int = 0,
     @ColumnInfo(defaultValue = "0") val power: Int = 0,
-    @ColumnInfo(defaultValue = "0") val cad: Int = 0
+    @ColumnInfo(defaultValue = "0") val cad: Int = 0,
+    @ColumnInfo(defaultValue = "0.0") val acc: Float = 0f,
+    @ColumnInfo(defaultValue = "0.0") val vacc: Float = 0f
 )
 
 @Entity(
@@ -275,12 +277,19 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
     }
 }
 
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE points ADD COLUMN acc REAL NOT NULL DEFAULT 0.0")
+        db.execSQL("ALTER TABLE points ADD COLUMN vacc REAL NOT NULL DEFAULT 0.0")
+    }
+}
+
 @Database(
     entities = [
         RideEntity::class, PointEntity::class, LapEntity::class, RouteEntity::class, RoutePointEntity::class,
         SegmentEntity::class, EffortEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDb : RoomDatabase() {
@@ -290,7 +299,7 @@ abstract class AppDb : RoomDatabase() {
         @Volatile private var inst: AppDb? = null
         fun get(ctx: Context): AppDb = inst ?: synchronized(this) {
             inst ?: Room.databaseBuilder(ctx.applicationContext, AppDb::class.java, "trailtrack.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                 .build().also { inst = it }
         }
     }
@@ -298,10 +307,10 @@ abstract class AppDb : RoomDatabase() {
 
 fun PointEntity.toTrackPoint() = TrackPoint(
     lat, lon, ele, time, speed,
-    runCatching { Terrain.valueOf(terrain) }.getOrDefault(Terrain.ASPHALT), brk, hr, power, cad
+    runCatching { Terrain.valueOf(terrain) }.getOrDefault(Terrain.ASPHALT), brk, hr, power, cad, acc, vacc
 )
 
 fun TrackPoint.toEntity(rideId: Long, idx: Int) = PointEntity(
     rideId = rideId, idx = idx, lat = lat, lon = lon, ele = ele,
-    time = time, speed = speed, terrain = terrain.name, brk = brk, hr = hr, power = power, cad = cad
+    time = time, speed = speed, terrain = terrain.name, brk = brk, hr = hr, power = power, cad = cad, acc = acc, vacc = vacc
 )

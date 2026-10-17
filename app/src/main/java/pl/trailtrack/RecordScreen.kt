@@ -242,6 +242,7 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
     val live by Live.state.collectAsState()
+    val gpsAcc by GpsWarmup.acc.collectAsState()
     val sport = live.sport
     val weight = Prefs.weightKg.toDouble()
     // Statystyki całej trasy liczymy poza wątkiem UI: wcześniej computeStats przebiegał całą trasę na głównym wątku przy
@@ -366,11 +367,21 @@ fun RecordScreen(repo: Repo, onSegments: () -> Unit, onChangeActivity: () -> Uni
                                     Spacer(Modifier.width(12.dp))
                                     Column {
                                         Text(
-                                            if (sport.gps) "Gotowy do startu" else sport.label,
-                                            fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = c.label
+                                            when {
+                                                !sport.gps -> sport.label
+                                                gpsAcc < 0f -> "Szukam GPS…"
+                                                gpsAcc <= 10f -> "GPS gotowy"
+                                                else -> "GPS: słaby sygnał"
+                                            },
+                                            fontWeight = FontWeight.SemiBold, fontSize = 17.sp,
+                                            color = if (sport.gps && gpsAcc in 0f..10f) c.green else c.label
                                         )
                                         Text(
-                                            if (sport.gps) "Mapa uruchomi się po Start." else sportHint(sport),
+                                            when {
+                                                !sport.gps -> sportHint(sport)
+                                                gpsAcc < 0f -> "Poczekaj na sygnał – start od razu daje gorszy początek trasy."
+                                                else -> "Dokładność ±${gpsAcc.toInt()} m. Mapa uruchomi się po Start."
+                                            },
                                             color = c.secondary, fontSize = 13.sp
                                         )
                                     }
