@@ -16,14 +16,19 @@ import android.os.Looper
 import android.os.SystemClock
 import kotlinx.coroutines.flow.MutableStateFlow
 
-/** Przekłada [Location] na [RawFix]; prędkość i kierunek o słabej dokładności uznaje za nieznane. */
+/**
+ * Przekłada [Location] na [RawFix]; prędkość i kierunek o słabej dokładności uznaje za nieznane.
+ * [RawFix.timeMs] to czas MONOTONICZNY (elapsedRealtime) – używany tylko do liczenia odstępów dt w filtrze, dzięki czemu
+ * korekta zegara systemowego / GPS nie psuje filtra. Znacznik czasu zapisywany w trasie to nadal [Location.getTime].
+ */
 fun Location.toRawFix(): RawFix {
     val speedOk = hasSpeed() &&
         !(Build.VERSION.SDK_INT >= 26 && hasSpeedAccuracy() && speedAccuracyMetersPerSecond > 2.5f)
     val bearingOk = hasBearing() &&
         !(Build.VERSION.SDK_INT >= 26 && hasBearingAccuracy() && bearingAccuracyDegrees > 25f)
     return RawFix(
-        lat = latitude, lon = longitude, timeMs = time,
+        lat = latitude, lon = longitude,
+        timeMs = if (elapsedRealtimeNanos > 0L) elapsedRealtimeNanos / 1_000_000L else time,
         accM = if (hasAccuracy()) accuracy.toDouble() else 0.0,
         speed = if (speedOk) speed.toDouble() else -1.0,
         bearingDeg = if (bearingOk) bearing.toDouble() else Double.NaN

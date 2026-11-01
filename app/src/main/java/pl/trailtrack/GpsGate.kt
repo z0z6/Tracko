@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +30,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -109,6 +111,22 @@ fun GpsGate(active: Boolean, onChangeActivity: () -> Unit, content: @Composable 
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         askedOnce = true
         refresh()
+    }
+
+    // Jednorazowa prośba o wyłączenie optymalizacji baterii: bez niej część telefonów (Samsung, Xiaomi, Huawei...) ubija
+    // nagrywanie w tle i trasa się urywa. To systemowe okno – nic nie dzieje się bez zgody użytkownika.
+    LaunchedEffect(active, permOk, gpsOn) {
+        if (active && hasGpsHw && permOk && gpsOn && !Prefs.batteryPromptShown) {
+            val pm = ctx.getSystemService(Context.POWER_SERVICE) as PowerManager
+            if (!pm.isIgnoringBatteryOptimizations(ctx.packageName)) {
+                Prefs.batteryPromptShown = true
+                runCatching {
+                    val i = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${ctx.packageName}"))
+                    if (ctx !is Activity) i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    ctx.startActivity(i)
+                }
+            }
+        }
     }
 
     // GPS wymuszamy tylko dla aktywności z mapą (rower, bieganie, narty); bieżnia/basen/siłownia go nie potrzebują

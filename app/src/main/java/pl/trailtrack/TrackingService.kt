@@ -17,6 +17,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.IBinder
 import android.os.PowerManager
+import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import kotlinx.coroutines.CoroutineScope
@@ -64,6 +65,9 @@ class TrackingService : Service(), LocationListener {
     private var flushedPoints = 0
     private var flushedLaps = 0
     private var stationary = 0
+    private var resumeFixes = 0                    // kolejne fixy szybsze niż próg wznowienia (auto-pauza)
+    private var pauseLat = Double.NaN              // pozycja, w której włączyła się auto-pauza
+    private var pauseLon = Double.NaN
     private var totalDist = 0.0
     private var nextAutoLap = 0.0
 
@@ -122,6 +126,9 @@ class TrackingService : Service(), LocationListener {
         flushedPoints = 0
         flushedLaps = 0
         stationary = 0
+        resumeFixes = 0
+        pauseLat = Double.NaN
+        pauseLon = Double.NaN
         totalDist = 0.0
         nextAutoLap = Prefs.autoLapKm * 1000.0
         gpsLost = sport.gps && !lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -255,6 +262,10 @@ class TrackingService : Service(), LocationListener {
     override fun onLocationChanged(location: Location) {
         var s = Live.state.value
         if (!s.recording) return
+        // przeterminowany fix (np. po uśpieniu) – nie wnosi nic do trasy; elapsedRealtimeNanos = 0 u dostawców testowych
+        if (location.elapsedRealtimeNanos > 0L &&
+            SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos > STALE_FIX_MS * 1_000_000L
+        ) return
         val flt = fixFilter ?: FixFilter().also { fixFilter = it }
         val raw = location.toRawFix()
         if (!flt.acceptable(raw)) return          // za słaba dokładność (na starcie próg jest ostrzejszy)
@@ -262,22 +273,42 @@ class TrackingService : Service(), LocationListener {
 
         // progi auto-pauzy zależne od aktywności (spacer/kajak są wolniejsze niż rower)
         val stopSpeed = s.sport.minMoveSpeed.coerceAtLeast(0.3).toFloat()
-        val resumeSpeed = stopSpeed * 1.9f
+        // próg wznowienia tylko lekko wyżej niż próg postoju (wcześniej 1,9× – wolny podjazd/marsz nie wznawiał nagrywania)
+        val resumeSpeed = maxOf(stopSpeed * 1.25f, stopSpeed + 0.3f)
         val sp = if (raw.speed >= 0) raw.speed.toFloat() else -1f
         if (!Prefs.autoPause) {
-            if (s.pause == PauseKind.AUTO) s = s.copy(pause = PauseKind.NONE, needBreak = true)
-            stationary = 0
-        } else if (sp >= 0f) {
             if (s.pause == PauseKind.AUTO) {
-                if (sp >= resumeSpeed) {
-                    s = s.copy(pause = PauseKind.NONE, needBreak = true)
-                    stationary = 0
-                } else {
-                    return
-                }
-            } else if (sp < stopSpeed) {
+                s = s.copy(pause = PauseKind.NONE)
+                flt.reset()
+            }
+            stationary = 0
+            resumeFixes = 0
+        } else if (s.pause == PauseKind.AUTO) {
+            // wznowienie: 2 fixy z rzędu szybsze niż próg ALBO wyraźne oddalenie od miejsca pauzy (działa też, gdy
+            // prędkość Dopplera jest niewiarygodna). Fixy w trakcie pauzy nie są zapisywane.
+            val accM = if (raw.accM > 0) raw.accM else 15.0
+            val moved = if (pauseLat.isNaN()) 0.0 else haversine(pauseLat, pauseLon, raw.lat, raw.lon)
+            val farAway = moved > maxOf(RESUME_MIN_MOVE_M, 2.5 * accM)
+            resumeFixes = if (sp >= resumeSpeed) resumeFixes + 1 else 0
+            if (farAway || resumeFixes >= 2) {
+                // bez przerwy w linii (needBreak): po auto-pauzie jesteśmy w tym samym miejscu, więc łączymy trasę;
+                // filtr startuje od zera, żeby nie ciągnąć starego stanu
+                s = s.copy(pause = PauseKind.NONE)
+                stationary = 0
+                resumeFixes = 0
+                pauseLat = Double.NaN
+                flt.reset()
+            } else {
+                return
+            }
+        } else if (sp >= 0f) {
+            if (sp < stopSpeed) {
                 stationary++
                 if (stationary >= STOP_FIXES) {
+                    val ref = s.points.lastOrNull()
+                    pauseLat = ref?.lat ?: raw.lat
+                    pauseLon = ref?.lon ?: raw.lon
+                    resumeFixes = 0
                     Live.state.value = s.copy(pause = PauseKind.AUTO)
                     return
                 }
@@ -387,5 +418,7 @@ class TrackingService : Service(), LocationListener {
         private const val NOTIF_ID = 1
         private const val ALERT_ID = 2
         private const val STOP_FIXES = 4        // kolejne odczyty "stoi" zanim włączy się auto-pauza
+        private const val RESUME_MIN_MOVE_M = 10.0  // oddalenie od miejsca auto-pauzy uznawane za wznowienie ruchu
+        private const val STALE_FIX_MS = 10_000L    // starsze fixy są odrzucane
     }
 }

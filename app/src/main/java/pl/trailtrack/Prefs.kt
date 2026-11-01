@@ -281,6 +281,11 @@ object Prefs {
         get() = sp.getBoolean("evGps", true)
         set(v) = sp.edit().putBoolean("evGps", v).apply()
 
+    /** czy już pokazano systemową prośbę o wyłączenie optymalizacji baterii (pokazujemy tylko raz) */
+    var batteryPromptShown: Boolean
+        get() = sp.getBoolean("batteryPromptShown", false)
+        set(v) = sp.edit().putBoolean("batteryPromptShown", v).apply()
+
     var evOffRoute: Boolean
         get() = sp.getBoolean("evOffRoute", true)
         set(v) = sp.edit().putBoolean("evOffRoute", v).apply()

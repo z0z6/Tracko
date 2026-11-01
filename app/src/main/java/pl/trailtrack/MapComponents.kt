@@ -105,21 +105,90 @@ fun rememberMapView(): MapView {
  */
 /**
  * Ogranicza liczbę punktów rysowanych na mapie (przy kilkugodzinnych trasach warstwy były odbudowywane z dziesiątków tysięcy
- * obiektów co sekundę). Zachowuje początek, koniec, przerwy ([TrackPoint.brk]) i zmiany nawierzchni, więc wygląd trasy się nie zmienia.
+ * obiektów co sekundę). Zachowuje początek, koniec, przerwy ([TrackPoint.brk]) i zmiany nawierzchni; resztę upraszcza algorytmem Douglasa–Peuckera (zakręty zostają).
  */
 internal fun decimateForDisplay(points: List<TrackPoint>, maxPts: Int = 2000): List<TrackPoint> {
     val n = points.size
     if (n <= maxPts) return points
-    val step = (n + maxPts - 1) / maxPts
-    val out = ArrayList<TrackPoint>(maxPts + 64)
+
+    // lokalny rzut na płaszczyznę (metry) – odchylenie od uproszczonej linii liczymy w metrach
+    val lat0 = points[0].lat
+    val lon0 = points[0].lon
+    val kx = 111_194.93 * Math.cos(Math.toRadians(lat0))
+    val ky = 111_194.93
+    val xs = DoubleArray(n) { (points[it].lon - lon0) * kx }
+    val ys = DoubleArray(n) { (points[it].lat - lat0) * ky }
+
+    // punkty obowiązkowe: początek, koniec, przerwy i granice nawierzchni (jak wcześniej)
+    val must = BooleanArray(n)
     for (i in 0 until n) {
         val p = points[i]
         val next = if (i + 1 < n) points[i + 1] else null
-        val keep = i == 0 || i == n - 1 || i % step == 0 || p.brk ||
-            p.terrain != points[i - 1].terrain || (next != null && (next.brk || next.terrain != p.terrain))
-        if (keep) out.add(p)
+        must[i] = i == 0 || i == n - 1 || p.brk || p.terrain != points[i - 1].terrain ||
+            (next != null && (next.brk || next.terrain != p.terrain))
     }
+
+    // Douglas–Peucker: zaczynamy od tolerancji 1 m i zwiększamy ją, aż liczba punktów zmieści się w limicie.
+    // W przeciwieństwie do „co N-tego punktu” zachowuje zakręty, a gubi tylko punkty leżące na prostych odcinkach.
+    val stack = IntArray(2 * n + 4)
+    var eps = 1.0
+    var keep: BooleanArray
+    var tries = 0
+    while (true) {
+        keep = simplifyRdp(xs, ys, must, eps, stack)
+        var cnt = 0
+        for (k in keep) if (k) cnt++
+        if (cnt <= maxPts || tries >= 14) break
+        eps *= 1.7
+        tries++
+    }
+    val out = ArrayList<TrackPoint>(maxPts + 64)
+    for (i in 0 until n) if (keep[i]) out.add(points[i])
     return out
+}
+
+private fun simplifyRdp(xs: DoubleArray, ys: DoubleArray, must: BooleanArray, eps: Double, stack: IntArray): BooleanArray {
+    val n = xs.size
+    val keep = BooleanArray(n)
+    keep[0] = true
+    var prev = 0
+    for (i in 1 until n) {
+        if (!must[i]) continue
+        keep[i] = true
+        rdpSpan(xs, ys, keep, prev, i, eps, stack)
+        prev = i
+    }
+    return keep
+}
+
+/** Douglas–Peucker (iteracyjnie, bez rekurencji) dla odcinka punktów [from]..[to]; zaznacza zachowane indeksy w [keep]. */
+private fun rdpSpan(xs: DoubleArray, ys: DoubleArray, keep: BooleanArray, from: Int, to: Int, eps: Double, stack: IntArray) {
+    if (to - from < 2) return
+    var sp = 0
+    stack[sp++] = from
+    stack[sp++] = to
+    while (sp > 0) {
+        val b = stack[--sp]
+        val a = stack[--sp]
+        if (b - a < 2) continue
+        val ax = xs[a]
+        val ay = ys[a]
+        val dx = xs[b] - ax
+        val dy = ys[b] - ay
+        val len = Math.hypot(dx, dy)
+        var maxD = -1.0
+        var idx = -1
+        for (k in a + 1 until b) {
+            val d = if (len < 1e-9) Math.hypot(xs[k] - ax, ys[k] - ay)
+            else Math.abs(dy * (xs[k] - ax) - dx * (ys[k] - ay)) / len
+            if (d > maxD) { maxD = d; idx = k }
+        }
+        if (idx > 0 && maxD > eps) {
+            keep[idx] = true
+            stack[sp++] = a; stack[sp++] = idx
+            stack[sp++] = idx; stack[sp++] = b
+        }
+    }
 }
 
 internal fun splitRuns(points: List<TrackPoint>): List<Pair<Terrain, List<GeoPoint>>> {
