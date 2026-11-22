@@ -67,7 +67,8 @@ data class PointEntity(
     @ColumnInfo(defaultValue = "0") val power: Int = 0,
     @ColumnInfo(defaultValue = "0") val cad: Int = 0,
     @ColumnInfo(defaultValue = "0.0") val acc: Float = 0f,
-    @ColumnInfo(defaultValue = "0.0") val vacc: Float = 0f
+    @ColumnInfo(defaultValue = "0.0") val vacc: Float = 0f,
+    @ColumnInfo(defaultValue = "-1.0") val dist: Float = -1f
 )
 
 @Entity(
@@ -202,6 +203,13 @@ interface RideDao {
     @Query("UPDATE points SET terrain = :terrain WHERE rideId = :rideId AND idx BETWEEN :from AND :to")
     fun setTerrainRangeSync(rideId: Long, from: Int, to: Int, terrain: String)
 
+    /** Wersja blokująca – tętno dołączone po treningu (Health Connect), w transakcji na wątku roboczym. */
+    @Query("UPDATE points SET hr = :hr WHERE rideId = :rideId AND idx = :idx")
+    fun setHrSync(rideId: Long, idx: Int, hr: Int)
+
+    @Query("SELECT * FROM rides WHERE finished = 1 AND avgHr = 0 AND id > :since ORDER BY id DESC")
+    suspend fun ridesWithoutHrSince(since: Long): List<RideEntity>
+
     @Query("UPDATE rides SET terrainAuto = :v WHERE id = :id")
     suspend fun setTerrainAuto(id: Long, v: Int)
 
@@ -284,12 +292,18 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
     }
 }
 
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE points ADD COLUMN dist REAL NOT NULL DEFAULT -1.0")
+    }
+}
+
 @Database(
     entities = [
         RideEntity::class, PointEntity::class, LapEntity::class, RouteEntity::class, RoutePointEntity::class,
         SegmentEntity::class, EffortEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDb : RoomDatabase() {
@@ -299,7 +313,7 @@ abstract class AppDb : RoomDatabase() {
         @Volatile private var inst: AppDb? = null
         fun get(ctx: Context): AppDb = inst ?: synchronized(this) {
             inst ?: Room.databaseBuilder(ctx.applicationContext, AppDb::class.java, "trailtrack.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .build().also { inst = it }
         }
     }
@@ -307,10 +321,10 @@ abstract class AppDb : RoomDatabase() {
 
 fun PointEntity.toTrackPoint() = TrackPoint(
     lat, lon, ele, time, speed,
-    runCatching { Terrain.valueOf(terrain) }.getOrDefault(Terrain.ASPHALT), brk, hr, power, cad, acc, vacc
+    runCatching { Terrain.valueOf(terrain) }.getOrDefault(Terrain.ASPHALT), brk, hr, power, cad, acc, vacc, dist
 )
 
 fun TrackPoint.toEntity(rideId: Long, idx: Int) = PointEntity(
     rideId = rideId, idx = idx, lat = lat, lon = lon, ele = ele,
-    time = time, speed = speed, terrain = terrain.name, brk = brk, hr = hr, power = power, cad = cad, acc = acc, vacc = vacc
+    time = time, speed = speed, terrain = terrain.name, brk = brk, hr = hr, power = power, cad = cad, acc = acc, vacc = vacc, dist = dist
 )

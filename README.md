@@ -4,6 +4,26 @@ aktywności (z rozkładem nawierzchni), **planer tras** (routing po drogach, pro
 jasny/ciemny motyw. Działa na tym samym zapleczu Supabase; bez konfiguracji pokazuje tryb demonstracyjny (`?demo=1`).
 Wdrożenie: *Settings → Pages → Source: GitHub Actions*, sekrety jak w buildzie aplikacji – szczegóły w [`web/README.md`](web/README.md).
 
+## Tracko 0.12 – Nothing, dokładniejszy dystans, powiadomienie na żywo, więcej czujników
+- **Wygląd w stylu Nothing** (jasny i ciemny, domyślny): czerń/biel, szarości i czerwony akcent #D71921; duże liczby
+  i tytuły w matrycy punktowej (Doto), tekst w Space Grotesk, etykiety w Space Mono, pigułkowe przyciski, kropkowane
+  separatory, czerwona kropka pod wybraną zakładką, nowa animacja startowa i ikona. Po aktualizacji styl przełącza się
+  raz sam; pozostałe style (iOS, KDE, Windows 11) są nadal w Ustawieniach → Wygląd. Fonty: SIL OFL (`docs/licenses`).
+- **Powiadomienie nagrywania na ekranie blokady**: dokładny czas zapisu (co sekundę), dystans, średnia i bieżąca
+  prędkość/tempo, przewyższenie, tętno ze strefą, moc, kadencja, SpO₂, okrążenia, przewaga nad duchem; przyciski
+  *Pauza/Wznów* i *Okrążenie*. Kanał ma ważność „domyślna” bez dźwięku – ciche kanały Android ukrywa na blokadzie.
+- **Dokładniejszy dystans**: odległości na elipsoidzie WGS84 zamiast kuli (kula zaniżała w Polsce o ~0,2 %), a odcinki
+  między fixami liczone z prędkości Dopplera × czas (nie ścina zakrętów i nie dolicza szumu pozycji); długość odcinka
+  zapisuje się w punkcie (baza v8). W symulacji 27 km stara metoda gubiła 90–450 m, nowa ~25 m.
+- **Czujniki**: poza tętnem, mocą i CSC także czujniki biegowe RSC (Stryd, Polar Stride…), urządzenia FTMS (trenażery,
+  bieżnie – prędkość i nachylenie wpisują się same do „Bieżni” – wioślarze, orbitreki), pulsoksymetry, termometry,
+  producent/model urządzenia, parowanie zegarków wymagających szyfrowania, podpowiedzi dla zegarków (Garmin, Polar,
+  Coros, Suunto, Amazfit, Huawei, Whoop…). Tętno widać w powiadomieniu także bez nagrywania.
+- **CMF Watch 3 Pro i inne zegarki bez transmisji tętna** (Galaxy Watch, Fitbit): tętno z **Health Connect** (Nothing X →
+  Health Connect → Tracko) dołącza się do aktywności po synchronizacji zegarka – automatycznie przez 3 dni albo
+  przyciskiem w podsumowaniu. CMF Watch 3 Pro nie nadaje tętna na żywo przez Bluetooth (stan na 2026), więc podczas
+  jazdy tętna z niego nie ma; jeśli aktualizacja zegarka to doda, połączy się jak zwykły pas.
+
 ## Tracko 0.10 – rywalizacja online
 Moduł wymiany danych z internetem: rekordy, duchy, przejechane aktywności i trasy trafiają na serwer, a ze strony www
 (np. na GitHub Pages) – z powrotem do aplikacji. **GitHub Pages jest hostingiem statycznym i nie przyjmuje danych**, więc

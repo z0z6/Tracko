@@ -5,8 +5,8 @@ plugins {
 }
 
 // wersję podaje workflow z tagu (np. v0.8.1 → 0.8.1, kod 801); lokalnie obowiązują wartości domyślne
-val appVersionName: String = (project.findProperty("appVersionName") as String?) ?: "0.11.0"
-val appVersionCode: Int = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 1100
+val appVersionName: String = (project.findProperty("appVersionName") as String?) ?: "0.12.0"
+val appVersionCode: Int = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 1200
 
 // zaplecze online (Supabase): adres projektu i publiczny klucz „anon” – z -PcloudUrl / -PcloudAnonKey albo ze zmiennych
 // środowiskowych TRACKO_CLOUD_URL / TRACKO_CLOUD_ANON_KEY (w GitHub Actions z sekretów). Puste = ustawiane w aplikacji.
@@ -88,6 +88,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("org.osmdroid:osmdroid-android:6.1.18")
+    // Health Connect: tętno z zegarków bez transmisji BLE (CMF Watch 3 Pro → Nothing X → Health Connect)
+    implementation("androidx.health.connect:connect-client:1.1.0-alpha07")
 
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")

@@ -13,6 +13,7 @@ class TrailApp : Application() {
         SensorHub.init(this)
         Sound.init(this)
         Cloud.init(this)
+        SensorNotifier.start(this)
     }
 }
 

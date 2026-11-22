@@ -44,6 +44,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
     val c = ios()
+    val nothing = isNothing()
+    val dotFont = displayFont()
+    val monoFont = spec().mono
     val draw = remember { Animatable(0f) }
     val title = remember { Animatable(0f) }
     val exit = remember { Animatable(0f) }
@@ -73,8 +76,8 @@ fun SplashScreen(onFinished: () -> Unit) {
             .pointerInput(Unit) { detectTapGestures { } },   // w trakcie animacji nic pod spodem nie reaguje
         contentAlignment = Alignment.Center
     ) {
-        // miękka poświata za logo
-        Canvas(Modifier.fillMaxSize()) {
+        // miękka poświata za logo (w stylu Nothing – bez poświaty, czysta czerń/biel)
+        if (!nothing) Canvas(Modifier.fillMaxSize()) {
             val r = size.minDimension * 0.62f
             drawCircle(
                 brush = Brush.radialGradient(
@@ -98,6 +101,27 @@ fun SplashScreen(onFinished: () -> Unit) {
                 pm.setPath(path, false)
                 val len = pm.length
                 val sw = 7.dp.toPx()
+
+                if (nothing) {
+                    // Nothing: ślad z kropek matrycy punktowej, duch – rzadsze, szare kropki, głowica – czerwona kropka
+                    val step = 11.dp.toPx()
+                    val r = 2.7.dp.toPx()
+                    val ghostP = (draw.value - 0.17f).coerceIn(0f, 1f)
+                    var d = 0f
+                    while (d <= len * ghostP) {
+                        drawCircle(c.secondary.copy(alpha = 0.45f), radius = r * 0.7f, center = pm.getPosition(d) + Offset(0f, 12.dp.toPx()))
+                        d += step * 1.6f
+                    }
+                    d = 0f
+                    val upto = len * draw.value
+                    while (d <= upto) {
+                        drawCircle(c.label, radius = r, center = pm.getPosition(d))
+                        d += step
+                    }
+                    if (draw.value in 0.01f..0.995f) drawCircle(c.red, radius = r * 1.5f, center = pm.getPosition(upto))
+                    else drawCircle(c.red, radius = r * 1.5f, center = pm.getPosition(len))
+                    return@Canvas
+                }
 
                 // duch: lekko opóźniony, przerywany
                 val ghostP = (draw.value - 0.17f).coerceIn(0f, 1f)
@@ -140,7 +164,8 @@ fun SplashScreen(onFinished: () -> Unit) {
             Spacer(Modifier.height(18.dp))
             Text(
                 "Tracko",
-                fontSize = 34.sp, fontWeight = FontWeight.Light, color = c.label,
+                fontSize = if (nothing) 48.sp else 34.sp, fontWeight = FontWeight.Light, color = c.label,
+                fontFamily = dotFont,
                 letterSpacing = (2f + 9f * (1f - title.value)).sp,
                 modifier = Modifier.graphicsLayer {
                     alpha = title.value
@@ -151,7 +176,7 @@ fun SplashScreen(onFinished: () -> Unit) {
             Text(
                 "TRASY  ·  WYSIŁEK  ·  DUCHY",
                 fontSize = 11.sp, fontWeight = FontWeight.Medium, color = c.secondary,
-                letterSpacing = 3.sp,
+                letterSpacing = 3.sp, fontFamily = monoFont,
                 modifier = Modifier.graphicsLayer { alpha = title.value * 0.9f }
             )
         }
