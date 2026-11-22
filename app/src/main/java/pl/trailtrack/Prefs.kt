@@ -64,16 +64,31 @@ object Prefs {
         get() = sp.getString("savedSensors", "") ?: ""
         set(v) = sp.edit().putString("savedSensors", v).apply()
 
+    /** dołączanie tętna z Health Connect (zegarki bez transmisji BLE, np. CMF Watch 3 Pro) */
+    var healthHr: Boolean
+        get() = sp.getBoolean("healthHr", false)
+        set(v) = sp.edit().putBoolean("healthHr", v).apply()
+
+    /** stałe powiadomienie z tętnem, gdy czujnik jest połączony, a nic nie nagrywamy */
+    var sensorNotif: Boolean
+        get() = sp.getBoolean("sensorNotif", true)
+        set(v) = sp.edit().putBoolean("sensorNotif", v).apply()
+
     // ----- wygląd -----
     /** 0 = auto, 1 = jasny, 2 = ciemny, 3 = AMOLED */
     var themeMode: Int
         get() = sp.getInt("themeMode", 0)
         set(v) = sp.edit().putInt("themeMode", v).apply()
 
-    /** 0 = iOS, 1 = KDE Breeze, 2 = Windows 11 */
+    /** 0 = iOS, 1 = KDE Breeze, 2 = Windows 11, 3 = Nothing (domyślny) */
     var themeStyle: Int
-        get() = sp.getInt("themeStyle", 0)
+        get() = sp.getInt("themeStyle", 3)
         set(v) = sp.edit().putInt("themeStyle", v).apply()
+
+    /** czy wygląd został już raz przełączony na styl Nothing (patrz NothingTheme.migrateOnce) */
+    var nothingMigrated: Boolean
+        get() = sp.getBoolean("nothingMigrated", false)
+        set(v) = sp.edit().putBoolean("nothingMigrated", v).apply()
 
     var accent: Int
         get() = sp.getInt("accent", 0)

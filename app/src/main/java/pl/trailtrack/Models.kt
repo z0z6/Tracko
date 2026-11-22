@@ -86,7 +86,12 @@ data class TrackPoint(
     val cad: Int = 0,
     /** dokładność pozioma / pionowa fixa GPS w metrach (0 = nieznana); do ewentualnej obróbki po fakcie */
     val acc: Float = 0f,
-    val vacc: Float = 0f
+    val vacc: Float = 0f,
+    /**
+     * Długość odcinka od poprzedniego punktu w metrach policzona w trakcie nagrywania (fuzja prędkości Dopplera
+     * i pozycji, elipsoida WGS84). -1 = nieznana (import, starsze aktywności) – wtedy liczymy z pozycji.
+     */
+    val dist: Float = -1f
 )
 
 enum class PauseKind { NONE, MANUAL, AUTO }

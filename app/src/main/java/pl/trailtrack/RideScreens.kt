@@ -261,6 +261,8 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
     var autoTried by remember(id) { mutableStateOf(false) }
     var showEditor by remember { mutableStateOf(false) }
     var cloudMsg by remember { mutableStateOf("") }
+    var hrMsg by remember { mutableStateOf("") }
+    var hrAutoTried by remember(id) { mutableStateOf(false) }
     // zakres zaznaczony w edytorze nawierzchni (podświetlany na mapie)
     var hlA by remember { mutableIntStateOf(0) }
     var hlB by remember { mutableIntStateOf(0) }
@@ -307,6 +309,29 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
         if (dd != null && !autoTried && Sport.fromId(dd.ride.sport).usesTerrain && dd.ride.terrainAuto == 0) {
             autoTried = true
             detectTerrain()
+        }
+    }
+
+    /** Tętno z zegarka przez Health Connect (np. CMF Watch 3 Pro → Nothing X → Health Connect). */
+    fun fillHr(silent: Boolean) {
+        scope.launch {
+            if (!silent) hrMsg = "Szukam tętna w Health Connect…"
+            val (r, n) = repo.fillHrFromHealth(id)
+            hrMsg = when (r) {
+                Repo.HrFill.OK -> { reload++; "Dołączono tętno do $n punktów ✓" }
+                Repo.HrFill.NO_DATA -> if (silent) "" else "Brak danych tętna z tego czasu – zsynchronizuj zegarek z aplikacją producenta i spróbuj ponownie."
+                Repo.HrFill.NO_ACCESS -> if (silent) "" else "Brak dostępu – włącz Health Connect w Ustawieniach → Czujniki."
+                Repo.HrFill.NOTHING_TO_DO -> if (silent) "" else "Ta aktywność ma już pełne tętno."
+            }
+        }
+    }
+
+    // po zapisie: spróbuj od razu dołączyć tętno z Health Connect (jeśli użytkownik je włączył)
+    LaunchedEffect(data) {
+        val dd = data
+        if (dd != null && !hrAutoTried && Prefs.healthHr && dd.ride.avgHr == 0) {
+            hrAutoTried = true
+            fillHr(silent = true)
         }
     }
 
@@ -499,6 +524,12 @@ fun RideDetailScreen(repo: Repo, id: Long, onBack: () -> Unit, onNewSegment: (Lo
                     IosButton("Utwórz odcinek do ścigania z duchem", c.green, Modifier.fillMaxWidth(), filled = false, icon = AppIcon.Ghost) {
                         onNewSegment(id)
                     }
+                }
+                if (Prefs.healthHr || d.ride.avgHr == 0) {
+                    IosButton(
+                        if (hrMsg.isBlank()) "Pobierz tętno z zegarka (Health Connect)" else hrMsg,
+                        c.red, Modifier.fillMaxWidth(), filled = false, icon = AppIcon.Heart
+                    ) { fillHr(silent = false) }
                 }
                 IosButton("Eksportuj TCX (TrainingPeaks)", c.blue, Modifier.fillMaxWidth()) {
                     export("tcx", "application/vnd.garmin.tcx+xml", "Eksportuj TCX")

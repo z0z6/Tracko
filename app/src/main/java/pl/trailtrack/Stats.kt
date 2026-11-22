@@ -1,10 +1,5 @@
 package pl.trailtrack
 
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
-
 data class Split(
     val label: String,
     val distanceM: Double,
@@ -61,14 +56,8 @@ fun emptyStats() = RideStats(
     Series(FloatArray(0), FloatArray(0), FloatArray(0), IntArray(0), FloatArray(0), FloatArray(0), FloatArray(0))
 )
 
-fun haversine(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-    val r = 6371000.0
-    val dLat = Math.toRadians(lat2 - lat1)
-    val dLon = Math.toRadians(lon2 - lon1)
-    val a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLon / 2) * sin(dLon / 2)
-    return 2 * r * atan2(sqrt(a), sqrt(1 - a))
-}
+/** Odległość w metrach (nazwa historyczna – liczona już na elipsoidzie WGS84, patrz [geoDist]). */
+fun haversine(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double = geoDist(lat1, lon1, lat2, lon2)
 
 private fun avgField(points: List<TrackPoint>, i: Int, r: Int, sel: (TrackPoint) -> Int): Float {
     val lo = maxOf(0, i - r)
@@ -156,7 +145,11 @@ private fun metFor(sport: Sport, vMs: Double): Double = when (sport) {
  */
 fun segmentDist(sport: Sport, a: TrackPoint, b: TrackPoint): Double = when {
     b.brk -> 0.0
-    sport.gps -> haversine(a.lat, a.lon, b.lat, b.lon)
+    sport.gps -> {
+        val chord = geoDist(a.lat, a.lon, b.lat, b.lon)
+        // długość z nagrywania (Doppler + pozycja) jest dokładniejsza niż sama cięciwa między punktami
+        if (plausibleStoredDist(b.dist, chord)) b.dist.toDouble() else chord
+    }
     else -> b.speed * ((b.time - a.time) / 1000.0).coerceAtLeast(0.0)
 }
 

@@ -38,7 +38,8 @@ class FixFilter(
     // lokalny układ współrzędnych (m) względem punktu odniesienia
     private var oLat = 0.0
     private var oLon = 0.0
-    private var mLon = M_PER_DEG
+    private var mLat = 111_250.0     // m na stopień szerokości (WGS84, lokalnie)
+    private var mLon = 111_250.0
     private var x = 0.0
     private var y = 0.0
     private var p = 0.0          // wariancja pozycji (m²)
@@ -73,7 +74,8 @@ class FixFilter(
         if (!has) {
             oLat = f.lat
             oLon = f.lon
-            mLon = M_PER_DEG * cos(Math.toRadians(f.lat))
+            mLat = Wgs84.mPerDegLat(f.lat)
+            mLon = Wgs84.mPerDegLon(f.lat)
             x = 0.0; y = 0.0; p = r
             lastT = f.timeMs
             has = true
@@ -86,7 +88,7 @@ class FixFilter(
         if (dt <= 0.0) return null
 
         val zx = (f.lon - oLon) * mLon
-        val zy = (f.lat - oLat) * M_PER_DEG
+        val zy = (f.lat - oLat) * mLat
 
         // predykcja: przy ruchu przesuwamy estymatę o v·dt wzdłuż kierunku z Dopplera
         val dead = f.speed >= 1.0 && !f.bearingDeg.isNaN() && dt <= 3.0
@@ -127,11 +129,11 @@ class FixFilter(
     }
 
     private fun emit(f: RawFix, acc: Double, dt: Double): Filtered {
-        var la = oLat + y / M_PER_DEG
+        var la = oLat + y / mLat
         var lo = oLon + x / mLon
         val v: Double
         if (!eLat.isNaN()) {
-            val d = hypot((la - eLat) * M_PER_DEG, (lo - eLon) * mLon)
+            val d = hypot((la - eLat) * mLat, (lo - eLon) * mLon)
             v = if (f.speed >= 0) f.speed else if (dt > 0) d / dt else 0.0
             // prędkość Dopplera ~0 = na pewno stoimy: dryf GPS do ~1,5× błędu ignorujemy; przy 0,15–0,4 m/s ostrożniej
             val radius = if (v < VERY_STILL_SPEED) max(SNAP_MIN_M, 1.5 * acc) else max(SNAP_MIN_M, 0.6 * acc)
@@ -148,7 +150,6 @@ class FixFilter(
     }
 
     companion object {
-        private const val M_PER_DEG = 111_194.93   // metrów na stopień szerokości (R = 6371 km, jak w haversine)
         private const val DEFAULT_ACC = 15.0
         private const val MIN_ACC = 3.0
         private const val MIN_VAR = 1.0

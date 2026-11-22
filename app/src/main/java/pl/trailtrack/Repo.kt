@@ -118,6 +118,44 @@ class Repo(private val ctx: Context) {
             AutoTerrain.OK
         }
 
+    // ----- tętno z Health Connect (zegarki bez transmisji BLE, np. CMF Watch 3 Pro) -----
+
+    enum class HrFill { OK, NO_DATA, NO_ACCESS, NOTHING_TO_DO }
+
+    /** Dołącza do aktywności tętno z Health Connect (tylko w punktach bez tętna z czujnika) i przelicza analitykę. */
+    suspend fun fillHrFromHealth(id: Long): Pair<HrFill, Int> = withContext(Dispatchers.IO) {
+        val d = loadRide(id) ?: return@withContext HrFill.NOTHING_TO_DO to 0
+        val pts = d.points
+        if (pts.size < 2 || pts.all { it.hr > 0 }) return@withContext HrFill.NOTHING_TO_DO to 0
+        if (!HealthHr.granted(ctx)) return@withContext HrFill.NO_ACCESS to 0
+        val from = pts.first().time - 60_000L
+        val to = pts.last().time + 60_000L
+        val samples = runCatching { HealthHr.samples(ctx, from, to) }.getOrElse { return@withContext HrFill.NO_ACCESS to 0 }
+        if (samples.isEmpty()) return@withContext HrFill.NO_DATA to 0
+        val times = LongArray(pts.size) { pts[it].time }
+        val cur = IntArray(pts.size) { pts[it].hr }
+        val merged = mergeHr(times, cur, samples)
+        var changed = 0
+        for (i in pts.indices) if (merged[i] != cur[i]) changed++
+        if (changed == 0) return@withContext HrFill.NO_DATA to 0
+        appDb.runInTransaction(Runnable {
+            for (i in pts.indices) if (merged[i] != cur[i]) dao.setHrSync(id, i, merged[i])
+        })
+        val updated = pts.mapIndexed { i, p -> if (merged[i] != p.hr) p.copy(hr = merged[i]) else p }
+        finalizeRide(id, updated, d.laps)
+        HrFill.OK to changed
+    }
+
+    /**
+     * Automatycznie (po otwarciu aplikacji): aktywności z ostatnich 3 dni bez tętna – zegarek mógł już zsynchronizować
+     * dane z Health Connect. Działa tylko, gdy użytkownik udzielił zgody.
+     */
+    suspend fun autoFillRecentHr() = withContext(Dispatchers.IO) {
+        if (!Prefs.healthHr || !HealthHr.granted(ctx)) return@withContext
+        val since = System.currentTimeMillis() - 3L * 24 * 3600 * 1000
+        for (r in dao.ridesWithoutHrSince(since)) runCatching { fillHrFromHealth(r.id) }
+    }
+
     // ----- odcinki i duchy -----
 
     suspend fun segmentsFor(sport: Sport): List<SegmentEntity> = withContext(Dispatchers.IO) { dao.segmentsForSport(sport.id) }

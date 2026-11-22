@@ -1,6 +1,5 @@
 package pl.trailtrack
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -25,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -45,6 +45,8 @@ class TrackingService : Service(), LocationListener {
     private var ghostJob: Job? = null
     private var cueJob: Job? = null
     private var gpsLost = false
+    private lateinit var liveNotif: LiveNotification
+    private var notifJob: Job? = null
 
     // dokładność: filtr pozycji, fuzja wysokości (barometr + GPS), blokada usypiania procesora
     private var fixFilter: FixFilter? = null
@@ -70,14 +72,16 @@ class TrackingService : Service(), LocationListener {
     private var pauseLon = Double.NaN
     private var totalDist = 0.0
     private var nextAutoLap = 0.0
+    // poprzedni zapisany fix: prędkość Dopplera (-1 = nieznana) i czas monotoniczny – do fuzji dystansu
+    private var prevDoppler = -1.0
+    private var prevRawT = 0L
 
     override fun onCreate() {
         super.onCreate()
         lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         repo = Repo(applicationContext)
-        val ch = NotificationChannel(CHANNEL, "Nagrywanie trasy", NotificationManager.IMPORTANCE_LOW)
+        liveNotif = LiveNotification(this)
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        nm.createNotificationChannel(ch)
         nm.createNotificationChannel(
             NotificationChannel(CHANNEL_ALERT, "Ostrzeżenia o GPS", NotificationManager.IMPORTANCE_HIGH)
         )
@@ -90,6 +94,21 @@ class TrackingService : Service(), LocationListener {
         when (intent?.action) {
             ACTION_START -> startRecording()
             ACTION_STOP -> stopRecording()
+            // przyciski w powiadomieniu (działają też z ekranu blokady)
+            ACTION_PAUSE, ACTION_RESUME, ACTION_LAP -> {
+                if (Live.state.value.recording) {
+                    when (intent.action) {
+                        ACTION_PAUSE -> Live.pause()
+                        ACTION_RESUME -> Live.resume()
+                        else -> Live.lap()
+                    }
+                    liveNotif.update()
+                } else {
+                    // nieaktualne powiadomienie (np. po zakończeniu nagrywania) – nic do zrobienia
+                    (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(NOTIF_ID)
+                    stopSelf()
+                }
+            }
             else -> stopSelf()
         }
         return START_NOT_STICKY
@@ -104,7 +123,7 @@ class TrackingService : Service(), LocationListener {
         // aktywności bez GPS nie wymagają zgody na lokalizację – od Androida 14 działają jako „special use”
         val fgType = if (sport.gps || Build.VERSION.SDK_INT < 34) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
         else ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        ServiceCompat.startForeground(this, NOTIF_ID, buildNotification(sport), fgType)
+        ServiceCompat.startForeground(this, NOTIF_ID, liveNotif.build(), fgType)
         if (Live.state.value.recording) return
         if (sport.gps) {
             try {
@@ -130,6 +149,8 @@ class TrackingService : Service(), LocationListener {
         pauseLat = Double.NaN
         pauseLon = Double.NaN
         totalDist = 0.0
+        prevDoppler = -1.0
+        prevRawT = 0L
         nextAutoLap = Prefs.autoLapKm * 1000.0
         gpsLost = sport.gps && !lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
         cues = CueEngine(repo, sport)
@@ -153,6 +174,15 @@ class TrackingService : Service(), LocationListener {
             lastTick = start
             handler.postDelayed(ticker, 1000L)
         }
+        // powiadomienie odświeżane co sekundę: dokładny czas zapisu, dystans, prędkość, tętno…
+        notifJob?.cancel()
+        notifJob = scope.launch {
+            while (true) {
+                delay(1000L)
+                if (!Live.state.value.recording) break
+                liveNotif.update()
+            }
+        }
         cueJob = scope.launch {
             cues.prepare()
             Live.state.collect { cues.onState(it) }
@@ -169,14 +199,24 @@ class TrackingService : Service(), LocationListener {
         if (!s.recording || s.pause != PauseKind.NONE) return
 
         var updated = s.copy(activeMs = s.activeMs + dtMs)
+        // bieżnia z Bluetooth (FTMS): prędkość i nachylenie z maszyny zamiast ręcznych przycisków
+        if (s.sport == Sport.TREADMILL) {
+            SensorHub.machine()?.let { m ->
+                updated = updated.copy(
+                    treadSpeedMs = m.speedMs.coerceIn(0.0, 8.5),
+                    inclinePct = if (m.inclinePct.isNaN()) updated.inclinePct else m.inclinePct.coerceIn(-3.0, 15.0)
+                )
+            }
+        }
         if (s.sport == Sport.TREADMILL || s.sport == Sport.STRENGTH) {
             val last = s.points.lastOrNull()
             val brk = s.needBreak && last != null
             val snap = SensorHub.snapshot()
-            val speed = if (s.sport == Sport.TREADMILL) s.treadSpeedMs else 0.0
+            val speed = if (s.sport == Sport.TREADMILL) updated.treadSpeedMs else 0.0
+            val incline = updated.inclinePct
             val dtSec = if (last == null) 0.0 else (now - last.time) / 1000.0
             // wysokość syntetyczna z nachylenia bieżni: przyrost = dystans × nachylenie
-            val ele = (last?.ele ?: 0.0) + if (brk || s.sport != Sport.TREADMILL) 0.0 else speed * dtSec * s.inclinePct / 100.0
+            val ele = (last?.ele ?: 0.0) + if (brk || s.sport != Sport.TREADMILL) 0.0 else speed * dtSec * incline / 100.0
             val p = TrackPoint(0.0, 0.0, ele, now, speed, Terrain.ASPHALT, brk = brk, hr = snap.hr, power = snap.power, cad = snap.cad)
             updated = updated.copy(points = s.points + p, needBreak = false)
         }
@@ -225,6 +265,8 @@ class TrackingService : Service(), LocationListener {
         cancelGpsAlert()
         val s = Live.state.value
         if (!s.recording) return
+        notifJob?.cancel()
+        notifJob = null
         cueJob?.cancel()
         cues.finish()
         ghostJob?.cancel()
@@ -326,6 +368,12 @@ class TrackingService : Service(), LocationListener {
         val snap = SensorHub.snapshot()
         val ele = altFusion?.update(baro?.takeMean(), location.gpsAltitude(), location.verticalAccM(), location.time, last?.ele)
             ?: (if (location.hasAltitude()) location.altitude else (last?.ele ?: 0.0))
+        // długość odcinka: prędkość Dopplera × czas przy płynnym ruchu, inaczej cięciwa na elipsoidzie WGS84
+        val seg = if (brk || last == null) 0.0 else fusedSegmentDist(
+            geoDist(last.lat, last.lon, f.lat, f.lon), prevDoppler, raw.speed, (raw.timeMs - prevRawT) / 1000.0
+        )
+        prevDoppler = raw.speed
+        prevRawT = raw.timeMs
         val p = TrackPoint(
             lat = f.lat,
             lon = f.lon,
@@ -338,9 +386,10 @@ class TrackingService : Service(), LocationListener {
             power = snap.power,
             cad = snap.cad,
             acc = if (location.hasAccuracy()) location.accuracy else 0f,
-            vacc = location.verticalAccM().toFloat()
+            vacc = location.verticalAccM().toFloat(),
+            dist = seg.toFloat()
         )
-        if (!brk && last != null) totalDist += haversine(last.lat, last.lon, p.lat, p.lon)
+        totalDist += seg
 
         var laps = s.laps
         if (nextAutoLap > 0 && last != null && totalDist >= nextAutoLap) {
@@ -396,26 +445,14 @@ class TrackingService : Service(), LocationListener {
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(ALERT_ID)
     }
 
-    private fun buildNotification(sport: Sport): Notification {
-        val pi = PendingIntent.getActivity(
-            this, 0, Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        return NotificationCompat.Builder(this, CHANNEL)
-            .setContentTitle("Tracko")
-            .setContentText("Nagrywanie: ${sport.label}")
-            .setSmallIcon(R.drawable.ic_stat_track)
-            .setContentIntent(pi)
-            .setOngoing(true)
-            .build()
-    }
-
     companion object {
         const val ACTION_START = "pl.trailtrack.START"
         const val ACTION_STOP = "pl.trailtrack.STOP"
-        private const val CHANNEL = "tracking"
+        const val ACTION_PAUSE = "pl.trailtrack.PAUSE"
+        const val ACTION_RESUME = "pl.trailtrack.RESUME"
+        const val ACTION_LAP = "pl.trailtrack.LAP"
         private const val CHANNEL_ALERT = "gps_alert"
-        private const val NOTIF_ID = 1
+        private const val NOTIF_ID = LiveNotification.ID
         private const val ALERT_ID = 2
         private const val STOP_FIXES = 4        // kolejne odczyty "stoi" zanim włączy się auto-pauza
         private const val RESUME_MIN_MOVE_M = 10.0  // oddalenie od miejsca auto-pauzy uznawane za wznowienie ruchu

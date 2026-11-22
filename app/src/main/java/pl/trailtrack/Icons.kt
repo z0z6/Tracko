@@ -46,6 +46,10 @@ fun SensorKind.appIcon(): AppIcon = when (this) {
     SensorKind.HR -> AppIcon.Heart
     SensorKind.POWER -> AppIcon.Bolt
     SensorKind.CSC -> AppIcon.Cadence
+    SensorKind.RSC -> AppIcon.Run
+    SensorKind.FTMS -> AppIcon.Treadmill
+    SensorKind.SPO2 -> AppIcon.Heart
+    SensorKind.TEMP -> AppIcon.Sensor
 }
 
 /** Dobiera ikonę do etykiety kafelka statystyki. */

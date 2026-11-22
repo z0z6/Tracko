@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -61,7 +62,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** Kolor przewodni aktywności (kafelek, ikona, poświata). */
-fun sportAccent(s: Sport): Color = when (s) {
+fun sportAccent(s: Sport): Color = if (ThemeState.style == ThemeStyle.NOTHING.ordinal) NothingTheme.ink else when (s) {
     Sport.CYCLING -> Color(0xFF0A84FF)
     Sport.RUNNING -> Color(0xFFFF9F0A)
     Sport.SWIMMING -> Color(0xFF32ADE6)
@@ -308,7 +309,7 @@ private fun ActivityTile(
                     .background(if (!hidden) accent else c.fill)
                     .border(1.5.dp, accent.copy(alpha = 0.6f), CircleShape),
                 contentAlignment = Alignment.Center
-            ) { if (!hidden) Text("✓", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+            ) { if (!hidden) Text("✓", color = if (accent.luminance() > 0.5f) Color.Black else Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
         }
 
         if (isLast && !editing) {

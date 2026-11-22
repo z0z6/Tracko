@@ -108,7 +108,7 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
 
         IosGroup(header = "Wygląd", footer = "Styl, tryb i kolor akcentu zmieniają się od razu. Pierwszy kolor akcentu to kolor domyślny wybranego stylu.") {
             Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ThemeStyle.values().forEach { st ->
+                listOf(ThemeStyle.NOTHING, ThemeStyle.IOS, ThemeStyle.KDE, ThemeStyle.WIN11).forEach { st ->
                     ThemePreviewCard(st, ThemeState.style == st.ordinal, Modifier.weight(1f)) {
                         ThemeState.style = st.ordinal
                         Prefs.themeStyle = st.ordinal

@@ -26,6 +26,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -46,7 +48,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -78,7 +85,8 @@ val DarkIos = IosColors(
 // ---------- style: iOS / KDE Breeze / Windows 11 (Fluent) ----------
 
 enum class ThemeStyle(val label: String) {
-    IOS("iOS"), KDE("KDE Breeze"), WIN11("Windows 11")
+    // kolejność = wartość zapisana w ustawieniach (ordinal) – nowe style tylko na końcu
+    IOS("iOS"), KDE("KDE Breeze"), WIN11("Windows 11"), NOTHING("Nothing")
 }
 
 /** Parametry kształtu i typografii zależne od stylu. */
@@ -95,7 +103,11 @@ data class ThemeSpec(
     val titleSize: TextUnit,
     val titleWeight: FontWeight,
     val dividerInset: Dp,
-    val centerNavTitle: Boolean
+    val centerNavTitle: Boolean,
+    /** kroje: tekst, duże liczby/tytuły (matryca punktowa), etykiety (mono); null = systemowy */
+    val body: FontFamily? = null,
+    val display: FontFamily? = null,
+    val mono: FontFamily? = null
 )
 
 private val KdeLight = IosColors(
@@ -119,11 +131,84 @@ private val WinDark = IosColors(
     red = Color(0xFFFF99A4), orange = Color(0xFFF7630C), fill = Color(0xFF3A3A3A), border = Color(0xFF3F3F3F)
 )
 
+// Nothing: monochromatyczna baza (czerń / biel), szarości i jeden akcent – czerwień Nothing #D71921.
+// „green” (pozytywne akcje: Start, Wznów, połączono) jest w tym stylu kolorem atramentu (biel/czerń).
+private val NothingDark = IosColors(
+    bg = Color(0xFF000000), card = Color(0xFF141414), label = Color(0xFFFFFFFF), secondary = Color(0xFF8A8A8A),
+    separator = Color(0xFF2B2B2B), blue = Color(0xFFD71921), green = Color(0xFFFFFFFF),
+    red = Color(0xFFD71921), orange = Color(0xFFE8A33D), fill = Color(0xFF242424), border = Color(0xFF2B2B2B)
+)
+private val NothingLight = IosColors(
+    bg = Color(0xFFF2F2F2), card = Color(0xFFFFFFFF), label = Color(0xFF000000), secondary = Color(0xFF6B6B6B),
+    separator = Color(0xFFDCDCDC), blue = Color(0xFFD71921), green = Color(0xFF000000),
+    red = Color(0xFFD71921), orange = Color(0xFFC77700), fill = Color(0xFFE6E6E6), border = Color(0xFFDCDCDC)
+)
+
 fun paletteFor(style: ThemeStyle, dark: Boolean): IosColors = when (style) {
     ThemeStyle.IOS -> if (dark) DarkIos else LightIos
     ThemeStyle.KDE -> if (dark) KdeDark else KdeLight
     ThemeStyle.WIN11 -> if (dark) WinDark else WinLight
+    ThemeStyle.NOTHING -> if (dark) NothingDark else NothingLight
 }
+
+/** Kroje i drobiazgi stylu Nothing (fonty na licencji SIL OFL – patrz docs/licenses). */
+object NothingTheme {
+    /** Doto – matryca punktowa jak NDot w Nothing OS (instancja wght 900, okrągłe punkty) */
+    val Dot = FontFamily(
+        Font(R.font.doto_bold, FontWeight.Normal), Font(R.font.doto_bold, FontWeight.Medium),
+        Font(R.font.doto_bold, FontWeight.SemiBold), Font(R.font.doto_bold, FontWeight.Bold),
+        Font(R.font.doto_bold, FontWeight.ExtraBold), Font(R.font.doto_bold, FontWeight.Light)
+    )
+    /** Space Grotesk – tekst (odpowiednik NType) */
+    val Grotesk = FontFamily(
+        Font(R.font.space_grotesk_regular, FontWeight.Light), Font(R.font.space_grotesk_regular, FontWeight.Normal),
+        Font(R.font.space_grotesk_medium, FontWeight.Medium), Font(R.font.space_grotesk_bold, FontWeight.SemiBold),
+        Font(R.font.space_grotesk_bold, FontWeight.Bold), Font(R.font.space_grotesk_bold, FontWeight.ExtraBold)
+    )
+    /** Space Mono – etykiety, nagłówki grup, dane techniczne */
+    val Mono = FontFamily(
+        Font(R.font.space_mono_regular, FontWeight.Normal), Font(R.font.space_mono_regular, FontWeight.Medium),
+        Font(R.font.space_mono_bold, FontWeight.SemiBold), Font(R.font.space_mono_bold, FontWeight.Bold)
+    )
+
+    /** kolor „atramentu” bieżącego motywu (biel w ciemnym, czerń w jasnym) – dla elementów poza kompozycją */
+    var ink by mutableStateOf(Color.White)
+
+    /**
+     * Jednorazowo przełącza wygląd na styl Nothing (także u osób, które miały wcześniej iOS/KDE/Windows) –
+     * potem wybór w Ustawieniach → Wygląd jest szanowany.
+     */
+    fun migrateOnce() {
+        if (Prefs.nothingMigrated) return
+        Prefs.themeStyle = ThemeStyle.NOTHING.ordinal
+        Prefs.accent = 0
+        Prefs.nothingMigrated = true
+        ThemeState.style = ThemeStyle.NOTHING.ordinal
+        ThemeState.accent = 0
+    }
+}
+
+private fun typographyWith(f: FontFamily): Typography {
+    val t = Typography()
+    return Typography(
+        displayLarge = t.displayLarge.copy(fontFamily = f), displayMedium = t.displayMedium.copy(fontFamily = f),
+        displaySmall = t.displaySmall.copy(fontFamily = f), headlineLarge = t.headlineLarge.copy(fontFamily = f),
+        headlineMedium = t.headlineMedium.copy(fontFamily = f), headlineSmall = t.headlineSmall.copy(fontFamily = f),
+        titleLarge = t.titleLarge.copy(fontFamily = f), titleMedium = t.titleMedium.copy(fontFamily = f),
+        titleSmall = t.titleSmall.copy(fontFamily = f), bodyLarge = t.bodyLarge.copy(fontFamily = f),
+        bodyMedium = t.bodyMedium.copy(fontFamily = f), bodySmall = t.bodySmall.copy(fontFamily = f),
+        labelLarge = t.labelLarge.copy(fontFamily = f), labelMedium = t.labelMedium.copy(fontFamily = f),
+        labelSmall = t.labelSmall.copy(fontFamily = f)
+    )
+}
+
+/** Krój dla dużych liczb i tytułów (matryca punktowa w stylu Nothing). */
+@Composable
+fun displayFont(): FontFamily? = spec().display
+
+/** Czy obowiązuje styl Nothing. */
+@Composable
+fun isNothing(): Boolean = spec().style == ThemeStyle.NOTHING
 
 fun specFor(style: ThemeStyle): ThemeSpec = when (style) {
     ThemeStyle.IOS -> ThemeSpec(
@@ -141,10 +226,16 @@ fun specFor(style: ThemeStyle): ThemeSpec = when (style) {
         iconStroke = 1.8f, roundIcons = true, uppercaseHeaders = false,
         titleSize = 28.sp, titleWeight = FontWeight.SemiBold, dividerInset = 0.dp, centerNavTitle = false
     )
+    ThemeStyle.NOTHING -> ThemeSpec(
+        style, cardR = 22.dp, btnR = 28.dp, btnH = 52.dp, segR = 22.dp, cardBorder = false,
+        iconStroke = 1.6f, roundIcons = true, uppercaseHeaders = true,
+        titleSize = 38.sp, titleWeight = FontWeight.Normal, dividerInset = 16.dp, centerNavTitle = false,
+        body = NothingTheme.Grotesk, display = NothingTheme.Dot, mono = NothingTheme.Mono
+    )
 }
 
 val LocalIos = staticCompositionLocalOf { LightIos }
-val LocalSpec = staticCompositionLocalOf { specFor(ThemeStyle.IOS) }
+val LocalSpec = staticCompositionLocalOf { specFor(ThemeStyle.NOTHING) }
 
 @Composable
 fun spec(): ThemeSpec = LocalSpec.current
@@ -175,7 +266,7 @@ val ACCENTS = listOf(
 object ThemeState {
     /** 0 = auto, 1 = jasny, 2 = ciemny, 3 = AMOLED */
     var mode by mutableIntStateOf(Prefs.themeMode)
-    /** 0 = iOS, 1 = KDE Breeze, 2 = Windows 11 */
+    /** 0 = iOS, 1 = KDE Breeze, 2 = Windows 11, 3 = Nothing */
     var style by mutableIntStateOf(Prefs.themeStyle)
     var accent by mutableIntStateOf(Prefs.accent)
 }
@@ -209,10 +300,18 @@ fun IosTheme(content: @Composable () -> Unit) {
 
     val scheme = if (dark) darkColorScheme(primary = c.blue, background = c.bg, surface = c.card, onSurface = c.label)
     else lightColorScheme(primary = c.blue, background = c.bg, surface = c.card, onSurface = c.label)
+    SideEffect { NothingTheme.ink = c.label }
+    val body = themeSpec.body
+    val typo = remember(body) { if (body != null) typographyWith(body) else Typography() }
     CompositionLocalProvider(LocalIos provides c, LocalSpec provides themeSpec) {
-        MaterialTheme(colorScheme = scheme) {
+        MaterialTheme(colorScheme = scheme, typography = typo) {
             Box(Modifier.fillMaxSize().background(c.bg)) {
-                Surface(Modifier.fillMaxSize().safeDrawingPadding(), color = c.bg, contentColor = c.label) { content() }
+                Surface(Modifier.fillMaxSize().safeDrawingPadding(), color = c.bg, contentColor = c.label) {
+                    // wszystkie Text() dziedziczą krój stylu (Nothing: Space Grotesk)
+                    CompositionLocalProvider(LocalTextStyle provides LocalTextStyle.current.merge(TextStyle(fontFamily = body))) {
+                        content()
+                    }
+                }
             }
         }
     }
@@ -246,6 +345,14 @@ fun AccentPicker(selected: Int, onSelect: (Int) -> Unit) {
 @Composable
 fun LargeTitle(text: String) {
     val sp = spec()
+    if (sp.style == ThemeStyle.NOTHING) {
+        // tytuł w matrycy punktowej + czerwona kropka (znak rozpoznawczy Nothing)
+        Row(Modifier.padding(top = 10.dp, bottom = 6.dp), verticalAlignment = Alignment.Bottom) {
+            Text(text, fontSize = sp.titleSize, fontFamily = sp.display, color = ios().label, lineHeight = sp.titleSize)
+            Box(Modifier.padding(start = 6.dp, bottom = 9.dp).size(7.dp).clip(CircleShape).background(ios().red))
+        }
+        return
+    }
     Text(text, fontSize = sp.titleSize, fontWeight = sp.titleWeight, color = ios().label, modifier = Modifier.padding(top = 8.dp, bottom = 4.dp))
 }
 
@@ -262,15 +369,21 @@ fun IosNavBar(title: String, onBack: (() -> Unit)? = null, trailing: (@Composabl
                 Modifier.clip(RoundedCornerShape(minOf(sp.btnR, 10.dp))).clickable { onBack() }.padding(horizontal = 6.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AppIconView(AppIcon.ChevronLeft, c.blue, Modifier.size(22.dp))
-                Text("Wróć", color = c.blue, fontSize = 17.sp)
+                val tint = if (sp.style == ThemeStyle.NOTHING) c.label else c.blue
+                AppIconView(AppIcon.ChevronLeft, tint, Modifier.size(22.dp))
+                if (sp.style == ThemeStyle.NOTHING) Text("WRÓĆ", color = tint, fontSize = 13.sp, fontFamily = sp.mono, letterSpacing = 1.sp)
+                else Text("Wróć", color = tint, fontSize = 17.sp)
             }
         } else {
             Spacer(Modifier.width(8.dp))
         }
         Text(
-            title, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = c.label,
+            if (sp.style == ThemeStyle.NOTHING) title.uppercase() else title,
+            fontSize = if (sp.style == ThemeStyle.NOTHING) 14.sp else 17.sp,
+            fontWeight = FontWeight.SemiBold, color = c.label,
+            fontFamily = sp.mono, letterSpacing = if (sp.style == ThemeStyle.NOTHING) 1.5.sp else TextUnit.Unspecified,
             textAlign = if (sp.centerNavTitle) TextAlign.Center else TextAlign.Start,
+            maxLines = 1,
             modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
         )
         if (trailing != null) trailing()
@@ -295,9 +408,11 @@ fun IosGroup(header: String? = null, footer: String? = null, content: @Composabl
     Column {
         if (header != null) {
             val up = spec().uppercaseHeaders
+            val nothing = spec().style == ThemeStyle.NOTHING
             Text(
-                if (up) header.uppercase() else header, fontSize = 13.sp, color = c.secondary,
+                if (up) header.uppercase() else header, fontSize = if (nothing) 11.sp else 13.sp, color = c.secondary,
                 fontWeight = if (up) FontWeight.Normal else FontWeight.SemiBold,
+                fontFamily = spec().mono, letterSpacing = if (nothing) 1.5.sp else TextUnit.Unspecified,
                 modifier = Modifier.padding(start = 16.dp, bottom = 6.dp)
             )
         }
@@ -310,6 +425,20 @@ fun IosGroup(header: String? = null, footer: String? = null, content: @Composabl
 
 @Composable
 fun IosDivider() {
+    if (spec().style == ThemeStyle.NOTHING) {
+        // linia z kropek – motyw matrycy punktowej
+        val col = ios().separator
+        Canvas(Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(1.dp)) {
+            val step = 4.dp.toPx()
+            val r = 0.6.dp.toPx()
+            var x = r
+            while (x < size.width) {
+                drawCircle(col, radius = r, center = Offset(x, size.height / 2f))
+                x += step
+            }
+        }
+        return
+    }
     Box(Modifier.fillMaxWidth().padding(start = spec().dividerInset).height(0.5.dp).background(ios().separator))
 }
 
@@ -336,6 +465,17 @@ fun IosSwitchRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     val on = if (sp.style == ThemeStyle.IOS) c.green else c.blue
     Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(title, fontSize = 17.sp, color = c.label, modifier = Modifier.weight(1f))
+        if (sp.style == ThemeStyle.NOTHING) {
+            // Nothing: przełącznik monochromatyczny – włączony = atrament z kropką w kolorze tła
+            Switch(
+                checked = checked, onCheckedChange = onChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = c.bg, checkedTrackColor = c.label, checkedBorderColor = Color.Transparent,
+                    uncheckedThumbColor = c.secondary, uncheckedTrackColor = Color.Transparent, uncheckedBorderColor = c.secondary
+                )
+            )
+            return@Row
+        }
         Switch(
             checked = checked, onCheckedChange = onChange,
             colors = SwitchDefaults.colors(
@@ -361,9 +501,12 @@ fun IosButton(
         filled -> SolidColor(color)
         else -> SolidColor(color.copy(alpha = 0.14f))
     }
+    val nothing = sp.style == ThemeStyle.NOTHING
     val fg = if (filled) (if (color.luminance() > 0.5f) Color.Black else Color.White) else color
-    var m = modifier.height(sp.btnH).clip(shape).background(bg)
-    if (!filled && sp.style != ThemeStyle.IOS) m = m.border(1.dp, color.copy(alpha = 0.6f), shape)
+    var m = modifier.height(sp.btnH).clip(shape)
+    // Nothing: pełne „pigułki” bez gradientu, obrysowane bez wypełnienia
+    m = if (nothing && !filled) m else m.background(bg)
+    if (!filled && sp.style != ThemeStyle.IOS) m = m.border(if (nothing) 1.2.dp else 1.dp, color.copy(alpha = if (nothing) 0.9f else 0.6f), shape)
     Row(
         m.clickable { onClick() }.padding(horizontal = 10.dp),
         horizontalArrangement = Arrangement.Center,
@@ -373,7 +516,10 @@ fun IosButton(
             AppIconView(icon, fg, Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
         }
-        Text(text, color = fg, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, textAlign = TextAlign.Center, maxLines = 1)
+        Text(
+            text, color = fg, fontWeight = if (nothing) FontWeight.Medium else FontWeight.SemiBold, fontSize = 15.sp,
+            textAlign = TextAlign.Center, maxLines = 1
+        )
     }
 }
 
@@ -386,8 +532,10 @@ fun IosSegmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit, 
     Row(modifier.fillMaxWidth().clip(outer).background(c.fill).padding(2.dp)) {
         options.forEachIndexed { i, label ->
             val sel = i == selected
-            val bgc = if (!sel) Color.Transparent else if (sp.style == ThemeStyle.IOS) c.card else c.blue
-            val fg = if (sel && sp.style != ThemeStyle.IOS) (if (c.blue.luminance() > 0.5f) Color.Black else Color.White) else c.label
+            val nothing = sp.style == ThemeStyle.NOTHING
+            val selBg = if (nothing) c.label else c.blue
+            val bgc = if (!sel) Color.Transparent else if (sp.style == ThemeStyle.IOS) c.card else selBg
+            val fg = if (sel && sp.style != ThemeStyle.IOS) (if (selBg.luminance() > 0.5f) Color.Black else Color.White) else c.label
             Box(
                 Modifier.weight(1f).height(32.dp).clip(inner).background(bgc).clickable { onSelect(i) },
                 contentAlignment = Alignment.Center
@@ -401,6 +549,24 @@ fun IosSegmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit, 
 @Composable
 fun StatTile(label: String, value: String, modifier: Modifier = Modifier, accent: Color? = null, icon: AppIcon? = iconForLabel(label)) {
     val c = ios()
+    val sp = spec()
+    if (sp.style == ThemeStyle.NOTHING) {
+        // Nothing: etykieta mono WIELKIMI LITERAMI, wartość w matrycy punktowej
+        IosCard(modifier) {
+            Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (icon != null) {
+                        AppIconView(icon, accent ?: c.secondary, Modifier.size(13.dp))
+                        Spacer(Modifier.width(6.dp))
+                    }
+                    Text(label.uppercase(), fontSize = 10.sp, color = c.secondary, fontFamily = sp.mono, letterSpacing = 1.sp, maxLines = 1)
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(value, fontSize = 26.sp, fontFamily = sp.display, color = accent ?: c.label, maxLines = 1, lineHeight = 30.sp)
+            }
+        }
+        return
+    }
     IosCard(modifier) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -450,7 +616,7 @@ fun TerrainTile(t: Terrain, selected: Boolean, modifier: Modifier = Modifier, on
 fun IosTabBar(items: List<Pair<AppIcon, String>>, selected: Int, onSelect: (Int) -> Unit) {
     val c = ios()
     val sp = spec()
-    Column(Modifier.background(c.card)) {
+    Column(Modifier.background(if (sp.style == ThemeStyle.NOTHING) c.bg else c.card)) {
         Box(Modifier.fillMaxWidth().height(0.5.dp).background(if (sp.cardBorder) c.border else c.separator))
         Row(Modifier.fillMaxWidth().padding(top = if (sp.style == ThemeStyle.IOS) 6.dp else 0.dp, bottom = 6.dp)) {
             items.forEachIndexed { i, (icon, label) ->
@@ -461,6 +627,14 @@ fun IosTabBar(items: List<Pair<AppIcon, String>>, selected: Int, onSelect: (Int)
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     when (sp.style) {
+                        ThemeStyle.NOTHING -> {
+                            Spacer(Modifier.height(6.dp))
+                            AppIconView(icon, if (sel) c.label else c.secondary, Modifier.size(22.dp))
+                            Spacer(Modifier.height(3.dp))
+                            // czerwona kropka pod wybraną zakładką
+                            Box(Modifier.size(4.dp).clip(CircleShape).background(if (sel) c.red else Color.Transparent))
+                            Spacer(Modifier.height(2.dp))
+                        }
                         ThemeStyle.IOS -> {
                             Box(
                                 Modifier.height(30.dp).width(52.dp).clip(RoundedCornerShape(15.dp))
@@ -489,7 +663,11 @@ fun IosTabBar(items: List<Pair<AppIcon, String>>, selected: Int, onSelect: (Int)
                             }
                         }
                     }
-                    Text(label, fontSize = 10.sp, color = tint, fontWeight = if (sel) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
+                    if (sp.style == ThemeStyle.NOTHING) {
+                        Text(label.uppercase(), fontSize = 9.sp, color = if (sel) c.label else c.secondary, fontFamily = sp.mono, letterSpacing = 0.8.sp, maxLines = 1)
+                    } else {
+                        Text(label, fontSize = 10.sp, color = tint, fontWeight = if (sel) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
+                    }
                 }
             }
         }
