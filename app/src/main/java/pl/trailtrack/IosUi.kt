@@ -465,27 +465,18 @@ fun IosSwitchRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     val on = if (sp.style == ThemeStyle.IOS) c.green else c.blue
     Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(title, fontSize = 17.sp, color = c.label, modifier = Modifier.weight(1f))
-        if (sp.style == ThemeStyle.NOTHING) {
-            // Nothing: przełącznik monochromatyczny – włączony = atrament z kropką w kolorze tła
-            Switch(
-                checked = checked, onCheckedChange = onChange,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = c.bg, checkedTrackColor = c.label, checkedBorderColor = Color.Transparent,
-                    uncheckedThumbColor = c.secondary, uncheckedTrackColor = Color.Transparent, uncheckedBorderColor = c.secondary
-                )
-            )
-            return@Row
-        }
-        Switch(
-            checked = checked, onCheckedChange = onChange,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = if (on.luminance() > 0.5f) Color.Black else Color.White,
-                checkedTrackColor = on, checkedBorderColor = Color.Transparent,
-                uncheckedThumbColor = if (sp.style == ThemeStyle.IOS) Color.White else c.secondary,
-                uncheckedTrackColor = c.fill,
-                uncheckedBorderColor = if (sp.style == ThemeStyle.IOS) Color.Transparent else c.secondary
-            )
+        // Nothing: przełącznik monochromatyczny – włączony = atrament z kropką w kolorze tła
+        val colors = if (sp.style == ThemeStyle.NOTHING) SwitchDefaults.colors(
+            checkedThumbColor = c.bg, checkedTrackColor = c.label, checkedBorderColor = Color.Transparent,
+            uncheckedThumbColor = c.secondary, uncheckedTrackColor = Color.Transparent, uncheckedBorderColor = c.secondary
+        ) else SwitchDefaults.colors(
+            checkedThumbColor = if (on.luminance() > 0.5f) Color.Black else Color.White,
+            checkedTrackColor = on, checkedBorderColor = Color.Transparent,
+            uncheckedThumbColor = if (sp.style == ThemeStyle.IOS) Color.White else c.secondary,
+            uncheckedTrackColor = c.fill,
+            uncheckedBorderColor = if (sp.style == ThemeStyle.IOS) Color.Transparent else c.secondary
         )
+        Switch(checked = checked, onCheckedChange = onChange, colors = colors)
     }
 }
 
