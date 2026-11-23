@@ -67,6 +67,36 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
 
     val lapOptions = listOf(0, 1, 5, 10)
 
+    // ----- kopia zapasowa: wszystkie dane w jednym pliku -----
+    var backupMsg by remember { mutableStateOf<String?>(null) }
+    var backupBusy by remember { mutableStateOf(false) }
+    var pendingRestore by remember { mutableStateOf<Pair<Backup.Info, File>?>(null) }
+    val backupSaver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri: Uri? ->
+        if (uri != null) {
+            backupBusy = true
+            backupMsg = "Zapisywanie kopii…"
+            scope.launch {
+                backupMsg = runCatching {
+                    val n = ctx.contentResolver.openOutputStream(uri)?.use { Backup.export(ctx, it) } ?: error("brak dostępu do pliku")
+                    "Zapisano kopię: $n aktywności, trasy, odcinki, wyniki i ustawienia ✓"
+                }.getOrElse { "Nie udało się zapisać kopii: ${it.message ?: it.javaClass.simpleName}" }
+                backupBusy = false
+            }
+        }
+    }
+    val backupPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri != null) {
+            backupBusy = true
+            backupMsg = "Sprawdzanie pliku…"
+            scope.launch {
+                runCatching { Backup.prepare(ctx, uri) }
+                    .onSuccess { pendingRestore = it; backupMsg = null }
+                    .onFailure { backupMsg = it.message ?: "Nie udało się odczytać pliku" }
+                backupBusy = false
+            }
+        }
+    }
+
     val archivePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) {
             scope.launch {
@@ -212,6 +242,36 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
             )
         }
 
+        IosGroup(
+            header = "Kopia zapasowa",
+            footer = backupMsg ?: ("Jeden plik .zip ze wszystkimi danymi: aktywności z punktami GPS, tętnem i mocą, okrążenia, " +
+                "trasy, odcinki z wynikami duchów oraz ustawienia. Zapiszesz go w telefonie, na Dysku Google czy w chmurze " +
+                "i wczytasz na tym albo innym telefonie. Wczytanie zastępuje obecne dane (przedtem aplikacja sama robi " +
+                "kopię bieżących danych). Mapy offline i logowanie do konta online nie są przenoszone.")
+        ) {
+            IosRow(
+                if (backupBusy) "Proszę czekać…" else "Zapisz wszystkie dane do pliku",
+                onClick = {
+                    if (backupBusy) return@IosRow
+                    if (Live.state.value.recording) {
+                        Toast.makeText(ctx, "Najpierw zakończ nagrywanie", Toast.LENGTH_LONG).show()
+                    } else backupSaver.launch(Backup.suggestedName())
+                },
+                chevron = true, leading = { IconBadge(AppIcon.Upload, c.blue) }
+            )
+            IosDivider()
+            IosRow(
+                "Wczytaj dane z pliku",
+                onClick = {
+                    if (backupBusy) return@IosRow
+                    if (Live.state.value.recording) {
+                        Toast.makeText(ctx, "Najpierw zakończ nagrywanie", Toast.LENGTH_LONG).show()
+                    } else backupPicker.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream", "*/*"))
+                },
+                chevron = true, leading = { IconBadge(AppIcon.Download, c.blue) }
+            )
+        }
+
         IosGroup(header = "O aplikacji") {
             val appVersion = remember {
                 runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "?" }.getOrDefault("?")
@@ -233,6 +293,29 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
             IosRow("Dane map", "© OpenStreetMap contributors")
         }
         Spacer(Modifier.height(8.dp))
+    }
+
+    val pr = pendingRestore
+    if (pr != null) {
+        val info = pr.first
+        IosAlert(
+            title = "Wczytać dane z kopii?",
+            message = "Kopia z ${if (info.created > 0) fmtDate(info.created) else "nieznanej daty"} " +
+                "(Tracko ${info.appVersion}), aktywności: ${info.rides}.\n\n" +
+                "Obecne dane i ustawienia zostaną zastąpione (aplikacja najpierw zapisze ich kopię), " +
+                "a potem uruchomi się ponownie.",
+            confirmText = "Wczytaj", confirmColor = c.red,
+            onConfirm = {
+                pendingRestore = null
+                backupBusy = true
+                backupMsg = "Wczytywanie danych…"
+                scope.launch { runCatching { Backup.restore(ctx, pr.second) }.onFailure {
+                    backupBusy = false
+                    backupMsg = "Nie udało się wczytać kopii: ${it.message ?: it.javaClass.simpleName}"
+                } }
+            },
+            dismissText = "Anuluj", onDismiss = { pendingRestore = null; pr.second.deleteRecursively() }
+        )
     }
 
     if (showAthlete) {

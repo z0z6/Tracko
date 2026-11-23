@@ -298,12 +298,15 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
     }
 }
 
+/** Wersja schematu bazy – używana też przez kopię zapasową (kopia z nowszej bazy nie da się wczytać). */
+const val DB_VERSION = 8
+
 @Database(
     entities = [
         RideEntity::class, PointEntity::class, LapEntity::class, RouteEntity::class, RoutePointEntity::class,
         SegmentEntity::class, EffortEntity::class
     ],
-    version = 8,
+    version = DB_VERSION,
     exportSchema = false
 )
 abstract class AppDb : RoomDatabase() {
@@ -315,6 +318,12 @@ abstract class AppDb : RoomDatabase() {
             inst ?: Room.databaseBuilder(ctx.applicationContext, AppDb::class.java, "trailtrack.db")
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .build().also { inst = it }
+        }
+
+        /** Zamknięcie bazy przed podmianą pliku przy imporcie kopii zapasowej (potem aplikacja startuje od nowa). */
+        fun closeForRestore() = synchronized(this) {
+            runCatching { inst?.close() }
+            inst = null
         }
     }
 }
