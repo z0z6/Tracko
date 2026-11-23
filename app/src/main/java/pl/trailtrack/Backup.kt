@@ -127,7 +127,7 @@ object Backup {
             runCatching { exportToFile(app, File(safety, "przed-importem-" + suggestedName())) }
 
             AppDb.closeForRestore()
-            val target = app.getDatabasePath(DB_NAME)
+            val target = app.getDatabasePath(DB_NAME).also { it.parentFile?.mkdirs() }
             for (suffix in listOf("", "-wal", "-shm", "-journal")) File(target.path + suffix).delete()
             File(dir, ENTRY_DB).copyTo(target, overwrite = true)
             File(dir, ENTRY_SETTINGS).takeIf { it.exists() }?.let { applySettings(app, JSONObject(it.readText())) }
