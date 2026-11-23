@@ -85,7 +85,7 @@ fun RidesScreen(repo: Repo, onOpen: (Long) -> Unit) {
     ) {
         item { LargeTitle("Aktywności") }
         item {
-            IosButton("Importuj plik FIT (Garmin Edge)", c.blue, Modifier.fillMaxWidth(), filled = false) {
+            IosButton("Importuj plik FIT", c.blue, Modifier.fillMaxWidth(), filled = false) {
                 fitPicker.launch(arrayOf("*/*"))
             }
         }

@@ -42,12 +42,14 @@ fun SensorsScreen(onBack: () -> Unit) {
     val found by SensorHub.found.collectAsState()
     val scanning by SensorHub.scanning.collectAsState()
     val live by SensorHub.live.collectAsState()
-    var all by remember { mutableStateOf(false) }
+    // domyślnie skanujemy wszystko – zegarki, opaski, pasy, czujniki dowolnej marki
+    var sportOnly by remember { mutableStateOf(false) }
+    var showUnnamed by remember { mutableStateOf(false) }
     var wheel by remember { mutableStateOf(Prefs.wheelMm.toString()) }
     var forget by remember { mutableStateOf<SensorInfo?>(null) }
 
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { res ->
-        if (res.values.all { it }) SensorHub.startScan(all)
+        if (res.values.all { it }) SensorHub.startScan(sportOnly)
         else Toast.makeText(ctx, "Bez zgody na Bluetooth nie znajdę czujników", Toast.LENGTH_LONG).show()
     }
 
@@ -140,15 +142,60 @@ fun SensorsScreen(onBack: () -> Unit) {
             }
 
             IosButton(
-                if (scanning) "Szukam… (dotknij, aby zatrzymać)" else "Wyszukaj czujniki",
+                if (scanning) "Szukam… (dotknij, aby zatrzymać)" else "Wyszukaj urządzenia",
                 c.blue, Modifier.fillMaxWidth()
             ) {
                 if (scanning) SensorHub.stopScan()
-                else if (SensorHub.hasPermissions()) SensorHub.startScan(all)
+                else if (SensorHub.hasPermissions()) SensorHub.startScan(sportOnly)
                 else permLauncher.launch(SensorHub.permissions())
             }
-            IosGroup(footer = "Zegarki i opaski często nie ogłaszają usług sportowych w reklamie BLE – jeśli Twojego urządzenia nie ma na liście, włącz tę opcję.") {
-                IosSwitchRow("Pokaż wszystkie urządzenia BLE", all) { all = it }
+            IosGroup(
+                footer = "Wyszukiwane są wszystkie urządzenia Bluetooth LE w pobliżu – smartwatche, smartbandy, pasy, czujniki. " +
+                    "Nazwa pochodzi z reklamy urządzenia; gdy jej nie podaje, widać producenta lub rodzaj i końcówkę adresu. " +
+                    "Urządzenia sparowane już z telefonem (np. zegarek z aplikacją producenta) są na liście nawet wtedy, gdy się nie reklamują."
+            ) {
+                IosSwitchRow("Tylko czujniki sportowe", sportOnly) {
+                    sportOnly = it
+                    if (scanning) { SensorHub.stopScan(); SensorHub.startScan(it) }
+                }
+                IosDivider()
+                IosSwitchRow("Pokaż urządzenia bez nazwy", showUnnamed) { showUnnamed = it }
+            }
+
+            val visible = found.filter { showUnnamed || it.name.isNotBlank() || it.kinds.isNotEmpty() || it.bonded }
+            val hiddenCount = found.size - visible.size
+            if (visible.isNotEmpty() || hiddenCount > 0) {
+                IosGroup(
+                    header = "Znalezione (dotknij, aby połączyć)",
+                    footer = if (hiddenCount > 0) "Ukryto urządzenia bez nazwy: $hiddenCount." else null
+                ) {
+                    if (visible.isEmpty()) {
+                        Text("Brak urządzeń z nazwą.", color = c.secondary, modifier = Modifier.padding(16.dp))
+                    }
+                    visible.forEachIndexed { i, f ->
+                        if (i > 0) IosDivider()
+                        val saved = devices.any { it.address == f.address }
+                        IosRow(
+                            title = f.displayName,
+                            value = when {
+                                saved -> "dodany"
+                                f.rssi == Int.MIN_VALUE -> "sparowane"
+                                else -> "${f.rssi} dBm"
+                            },
+                            onClick = { if (!saved) SensorHub.add(f.address, f.name.ifBlank { f.displayName }) },
+                            leading = { IconBadge(f.kinds.firstOrNull()?.appIcon() ?: AppIcon.Sensor, c.blue) }
+                        )
+                        val sub = listOfNotNull(
+                            f.type,
+                            f.maker?.takeIf { f.name.isNotBlank() || f.type != null },
+                            f.kinds.takeIf { it.isNotEmpty() }?.joinToString(", ") { it.label },
+                            if (f.bonded) "sparowane z telefonem" else null
+                        ).distinct().joinToString(" · ")
+                        if (sub.isNotBlank()) {
+                            Text(sub, fontSize = 12.sp, color = c.secondary, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
+                        }
+                    }
+                }
             }
 
             IosGroup(
@@ -165,8 +212,8 @@ fun SensorsScreen(onBack: () -> Unit) {
 
             IosGroup(
                 header = "Zegarki bez transmisji tętna (Health Connect)",
-                footer = "CMF Watch 3 Pro (i inne CMF/Nothing), Samsung Galaxy Watch czy Fitbit nie wysyłają tętna " +
-                    "na żywo przez Bluetooth. Ich aplikacje (Nothing X, Samsung Health, Fitbit…) zapisują je jednak " +
+                footer = "Część zegarków i opasek nie wysyła tętna na żywo przez Bluetooth. Ich aplikacje " +
+                    "zapisują je jednak " +
                     "do Health Connect – Tracko dołącza je do aktywności po treningu, gdy zegarek się zsynchronizuje " +
                     "(automatycznie przez 3 dni albo przyciskiem w podsumowaniu aktywności). Punkty z tętnem z pasa BLE " +
                     "nie są nadpisywane."
@@ -193,28 +240,6 @@ fun SensorsScreen(onBack: () -> Unit) {
                 }
             }
 
-            if (found.isNotEmpty()) {
-                IosGroup(header = "Znalezione (dotknij, aby połączyć)") {
-                    found.forEachIndexed { i, f ->
-                        if (i > 0) IosDivider()
-                        val saved = devices.any { it.address == f.address }
-                        IosRow(
-                            title = f.name,
-                            value = if (saved) "dodany" else "${f.rssi} dBm",
-                            onClick = { if (!saved) SensorHub.add(f.address, f.name) },
-                            leading = { IconBadge(f.kinds.firstOrNull()?.appIcon() ?: AppIcon.Sensor, c.blue) }
-                        )
-                        if (f.kinds.isNotEmpty()) {
-                            Text(f.kinds.joinToString(", ") { it.label }, fontSize = 12.sp, color = c.secondary,
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 6.dp))
-                        }
-                        f.hint?.let {
-                            Text(it, fontSize = 12.sp, color = c.orange, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 10.dp))
-                        }
-                    }
-                }
-            }
-
             IosGroup(
                 header = "Czujnik prędkości (CSC)",
                 footer = "Obwód koła w mm – potrzebny do przeliczenia obrotów koła na prędkość (np. 700×28c ≈ 2136 mm)."
@@ -234,19 +259,19 @@ fun SensorsScreen(onBack: () -> Unit) {
 
             IosGroup(header = "Obsługiwany sprzęt") {
                 Text(
-                    "• Tętno: każdy pas i zegarek ze standardowym profilem Bluetooth – Garmin (HRM-Pro/Dual/600, zegarki z " +
-                        "„Nadawaniem tętna”), Polar (H9/H10, Verity Sense, zegarki), Wahoo TICKR, Coros, Suunto, Amazfit/Zepp, " +
-                        "Xiaomi/Redmi (udostępnianie tętna), Huawei/Honor (transmisja tętna), Whoop, Decathlon/Kiprun, Magene, " +
-                        "Moofit, CooSpo, iGPSport, Scosche i inne.\n" +
-                        "• Rower: mierniki mocy (Cycling Power), czujniki prędkości/kadencji (CSC), trenażery FTMS " +
-                        "(Wahoo KICKR, Tacx, Elite, Zwift Hub, JetBlack, Magene…).\n" +
-                        "• Bieg: czujniki RSC (Stryd, Polar Stride, Garmin RD-Pod z BLE, Milestone) – prędkość i kadencja kroków.\n" +
-                        "• Maszyny FTMS: bieżnie (prędkość i nachylenie trafiają same do aktywności „Bieżnia”), wioślarze, orbitreki.\n" +
-                        "• Pulsoksymetry BLE (SpO₂) i termometry (Health Thermometer).\n" +
-                        "• Zegarki bez transmisji tętna (CMF/Nothing, Samsung, Fitbit): tętno przez Health Connect – patrz wyżej.\n" +
-                        "• Dane z komputera Garmin Edge zaimportujesz jako plik .FIT (zakładka Przejazdy → Importuj plik FIT).\n" +
-                        "• ANT+ nie jest obsługiwany (telefony zwykle nie mają radia ANT); większość czujników ma równolegle Bluetooth.\n" +
-                        "• Czujnik zwykle łączy się z jednym urządzeniem naraz – rozłącz go od komputera/zegarka, jeśli nie widać go w skanie.",
+                    "Tracko łączy się z każdym urządzeniem Bluetooth LE, niezależnie od marki – smartwatchem, smartbandem, " +
+                        "pasem piersiowym, opaską na ramię, czujnikiem czy maszyną treningową – przez standardowe profile:\n" +
+                        "• tętno (Heart Rate),\n" +
+                        "• moc, prędkość i kadencja na rowerze (Cycling Power, CSC),\n" +
+                        "• prędkość i kadencja biegu (RSC),\n" +
+                        "• trenażery, bieżnie, wioślarze, orbitreki (FTMS) – na bieżni prędkość i nachylenie trafiają same do aktywności,\n" +
+                        "• SpO₂ (Pulse Oximeter) i temperatura (Health Thermometer),\n" +
+                        "• bateria, producent i model (Battery, Device Information).\n\n" +
+                        "Zegarki i opaski zwykle trzeba przełączyć w tryb udostępniania tętna. Urządzenie, które nie ma żadnego " +
+                        "z tych profili, może przekazać tętno po treningu przez Health Connect.\n" +
+                        "Treningi zapisane na innym urządzeniu zaimportujesz jako plik .FIT (Aktywności → Importuj plik FIT).\n" +
+                        "ANT+ nie jest obsługiwane (telefony zwykle nie mają radia ANT). Czujnik zwykle łączy się z jednym " +
+                        "odbiornikiem naraz – rozłącz go od innego urządzenia, jeśli nie widać go na liście.",
                     fontSize = 13.sp, color = c.secondary, modifier = Modifier.padding(16.dp)
                 )
             }

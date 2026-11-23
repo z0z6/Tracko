@@ -170,7 +170,7 @@ fun SettingsScreen(onOffline: () -> Unit, onSensors: () -> Unit, onAudio: () -> 
 
         IosGroup(
             header = "Czujniki",
-            footer = "Pasy tętna, mierniki mocy, czujniki prędkości i kadencji (Bluetooth LE, także Garmin)."
+            footer = "Smartwatche, smartbandy, pasy tętna, mierniki mocy, czujniki prędkości i kadencji – każde urządzenie Bluetooth LE."
         ) {
             IosRow("Czujniki Bluetooth", onClick = onSensors, chevron = true, leading = { IconBadge(AppIcon.Sensor, c.blue) })
         }

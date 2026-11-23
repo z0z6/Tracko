@@ -4,6 +4,16 @@ aktywności (z rozkładem nawierzchni), **planer tras** (routing po drogach, pro
 jasny/ciemny motyw. Działa na tym samym zapleczu Supabase; bez konfiguracji pokazuje tryb demonstracyjny (`?demo=1`).
 Wdrożenie: *Settings → Pages → Source: GitHub Actions*, sekrety jak w buildzie aplikacji – szczegóły w [`web/README.md`](web/README.md).
 
+## Tracko 0.13 – wszystkie urządzenia na równi, nazwy przed połączeniem, nowe kafelki
+- **Wyszukiwanie urządzeń**: domyślnie wszystkie urządzenia Bluetooth LE (smartwatche, smartbandy, pasy, czujniki),
+  bez wyróżniania żadnej marki. Przed połączeniem widać **nazwę** (z reklamy BLE, zapamiętywaną między ramkami, albo
+  systemową), **rodzaj** (pole Appearance: smartwatch, pas tętna, czujnik rowerowy…) i **producenta** (identyfikator
+  Bluetooth SIG – lista z bazy Nordic Semiconductor, licencja BSD w `docs/licenses`). Urządzenia bez nazwy pokazują
+  producenta/rodzaj i końcówkę adresu; całkiem anonimowe są domyślnie ukryte. Na liście są też urządzenia sparowane
+  już z telefonem. Po połączeniu nazwa uzupełnia się z GATT (Device Name).
+- **Kafelki aktywności**: bez kołowej poświaty wokół ikony; w stylu Nothing jednolite tło, cienka ramka, etykieta mono
+  i czerwona kropka „ostatnio”.
+
 ## Tracko 0.12 – Nothing, dokładniejszy dystans, powiadomienie na żywo, więcej czujników
 - **Wygląd w stylu Nothing** (jasny i ciemny, domyślny): czerń/biel, szarości i czerwony akcent #D71921; duże liczby
   i tytuły w matrycy punktowej (Doto), tekst w Space Grotesk, etykiety w Space Mono, pigułkowe przyciski, kropkowane
@@ -17,8 +27,7 @@ Wdrożenie: *Settings → Pages → Source: GitHub Actions*, sekrety jak w build
   zapisuje się w punkcie (baza v8). W symulacji 27 km stara metoda gubiła 90–450 m, nowa ~25 m.
 - **Czujniki**: poza tętnem, mocą i CSC także czujniki biegowe RSC (Stryd, Polar Stride…), urządzenia FTMS (trenażery,
   bieżnie – prędkość i nachylenie wpisują się same do „Bieżni” – wioślarze, orbitreki), pulsoksymetry, termometry,
-  producent/model urządzenia, parowanie zegarków wymagających szyfrowania, podpowiedzi dla zegarków (Garmin, Polar,
-  Coros, Suunto, Amazfit, Huawei, Whoop…). Tętno widać w powiadomieniu także bez nagrywania.
+  producent/model urządzenia, parowanie zegarków wymagających szyfrowania. Tętno widać w powiadomieniu także bez nagrywania.
 - **CMF Watch 3 Pro i inne zegarki bez transmisji tętna** (Galaxy Watch, Fitbit): tętno z **Health Connect** (Nothing X →
   Health Connect → Tracko) dołącza się do aktywności po synchronizacji zegarka – automatycznie przez 3 dni albo
   przyciskiem w podsumowaniu. CMF Watch 3 Pro nie nadaje tętna na żywo przez Bluetooth (stan na 2026), więc podczas

@@ -410,7 +410,7 @@ class Repo(private val ctx: Context) {
         }
     }
 
-    /** Import pliku FIT (np. z Garmin Edge 530). Zwraca id przejazdu, -1 = błąd, -2 = już zaimportowany. */
+    /** Import pliku FIT (z dowolnego zegarka / komputera rowerowego). Zwraca id przejazdu, -1 = błąd, -2 = już zaimportowany. */
     suspend fun importFit(uri: Uri): Long = withContext(Dispatchers.IO) {
         val parsed = runCatching {
             val bytes = readLimited(uri, 40_000_000)
