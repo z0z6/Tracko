@@ -4,6 +4,16 @@ aktywności (z rozkładem nawierzchni), **planer tras** (routing po drogach, pro
 jasny/ciemny motyw. Działa na tym samym zapleczu Supabase; bez konfiguracji pokazuje tryb demonstracyjny (`?demo=1`).
 Wdrożenie: *Settings → Pages → Source: GitHub Actions*, sekrety jak w buildzie aplikacji – szczegóły w [`web/README.md`](web/README.md).
 
+## Tracko 0.14 – kopia zapasowa w jednym pliku
+Ustawienia → **Kopia zapasowa**:
+- **Zapisz wszystkie dane do pliku** – jeden plik `Tracko-kopia-RRRR-MM-DD_GGMM.zip` (wybierasz miejsce: pamięć telefonu,
+  Dysk Google, inna chmura). Zawiera całą bazę (aktywności z punktami, tętnem, mocą, okrążenia, trasy, odcinki
+  i wyniki duchów), ustawienia (`settings.json`, bez tokenów logowania online) i `manifest.json` (data, wersja, liczba aktywności).
+- **Wczytaj dane z pliku** – sprawdza plik (format, spójność bazy, czy nie pochodzi z nowszej wersji), pokazuje datę
+  i liczbę aktywności, a po potwierdzeniu zastępuje dane i uruchamia aplikację ponownie. Przed podmianą bieżące dane
+  trafiają do automatycznej kopii (`files/backups`, 3 ostatnie). Kopie ze starszych wersji są aktualizowane migracjami bazy.
+- Mapy offline (duże pliki) i sesja konta online nie są przenoszone. Eksport i import nie działają w trakcie nagrywania.
+
 ## Tracko 0.13 – wszystkie urządzenia na równi, nazwy przed połączeniem, nowe kafelki
 - **Wyszukiwanie urządzeń**: domyślnie wszystkie urządzenia Bluetooth LE (smartwatche, smartbandy, pasy, czujniki),
   bez wyróżniania żadnej marki. Przed połączeniem widać **nazwę** (z reklamy BLE, zapamiętywaną między ramkami, albo
