@@ -1,0 +1,4076 @@
+0	Ericsson
+1	Nokia Mobile Phones
+2	Intel
+3	IBM
+4	Toshiba
+5	3Com
+6	Microsoft
+7	Lucent
+8	Motorola
+9	Infineon Technologies
+a	Qualcomm Technologies International, Ltd.
+b	Silicon Wave
+c	Digianswer
+d	Texas Instruments
+e	Parthus Technologies
+f	Broadcom
+10	Mitel Semiconductor
+11	Widcomm
+12	Zeevo
+13	Atmel
+14	Mitsubishi Electric
+15	RTX
+16	KC Technology
+17	Newlogic
+18	Transilica
+19	Rohde & Schwarz GmbH & Co. KG
+1a	TTPCom
+1b	Signia Technologies
+1c	Conexant Systems
+1d	Qualcomm
+1e	Inventel
+1f	AVM Berlin
+20	BandSpeed
+21	Mansella
+22	NEC
+23	WavePlus Technology
+24	Alcatel
+25	NXP
+26	C Technologies
+27	Open Interface
+28	R F Micro Devices
+29	Hitachi
+2a	Symbol Technologies
+2b	Tenovis
+2c	Macronix International
+2d	GCT Semiconductor
+2e	Norwood Systems
+2f	MewTel Technology
+30	ST Microelectronics
+31	Synopsys
+32	Red-M
+33	Commil
+34	Computer Access Technology Corporation
+36	Renesas Electronics
+37	Mobilian
+38	Syntronix
+39	Integrated System Solution
+3a	Panasonic Holdings
+3b	Gennum
+3c	BlackBerry
+3d	IPextreme
+3e	Systems and Chips
+3f	Bluetooth SIG
+40	Seiko Epson
+41	Integrated Silicon Solution Taiwan
+42	CONWISE Technology
+43	PARROT AUTOMOTIVE
+44	Socket Mobile
+45	Atheros Communications
+46	MediaTek
+47	Bluegiga
+48	Marvell Technology Group
+49	3DSP
+4a	Accel Semiconductor
+4b	AUMOVIO Systems
+4c	Apple
+4d	Staccato Communications
+4e	Avago Technologies
+4f	APT
+50	SiRF Technology
+51	Tzero Technologies
+52	J&M
+53	Free2move
+54	3DiJoy
+55	Plantronics
+56	Sony Ericsson Mobile Communications
+57	Harman International Industries
+58	Vizio
+59	Nordic Semiconductor
+5a	EM Microelectronic-Marin
+5b	Ralink Technology
+5c	Belkin International
+5d	Realtek Semiconductor
+5e	Stonestreet One
+5f	Wicentric
+60	RivieraWaves S.A.S
+61	RDA Microelectronics
+62	Gibson Guitars
+63	MiCommand
+64	Band XI International
+65	HP
+67	GN Hearing
+68	General Motors
+69	A&D Engineering
+6a	LTM
+6b	Polar Electro
+6c	Beautiful Enterprise
+6e	Summit Data Communications
+6f	Sound ID
+70	Monster
+71	connectBlue
+72	ShangHai Super Smart Electronics
+73	Group Sense
+74	Zomm
+75	Samsung Electronics
+76	Creative Technology
+77	Laird Connectivity
+78	Nike
+79	lesswire
+7a	MStar Semiconductor
+7b	Hanlynn Technologies
+7d	Seers Technology
+7f	Autonet Mobile
+80	DeLorme Publishing Company
+81	WuXi Vimicro
+82	DSEA
+83	TimeKeeping Systems
+84	Ludus Helsinki
+85	BlueRadios
+86	Equinux
+87	Garmin International
+89	GN Hearing
+8a	Jawbone
+8b	Topcon Positioning Systems
+8c	Gimbal
+8d	Zscan Software
+8e	Quintic
+8f	Telit Wireless Solutions
+90	Funai Electric
+91	Advanced PANMOBIL systems GmbH & Co. KG
+92	ThinkOptics
+93	Universal Electronics
+94	Airoha Technology
+95	NEC Lighting
+96	ODM Technology
+97	ConnecteDevice
+98	zero1.tv
+99	i.Tech Dynamic Global Distribution
+9a	Alpwise
+9b	Jiangsu Toppower Automotive Electronics
+9c	Colorfy
+9d	Geoforce
+9e	Bose
+9f	Suunto
+a0	Kensington Computer Products Group
+a1	SR-Medizinelektronik
+a2	Vertu
+a3	Meta Watch
+a4	LINAK
+a5	OTL Dynamics
+a6	Panda Ocean
+a7	Visteon
+a8	ARP Devices
+a9	MARELLI EUROPE S.P.A.
+aa	CAEN RFID
+ab	Ingenieur-Systemgruppe Zahn
+ac	Green Throttle Games
+ad	Peter Systemtechnik
+ae	Omegawave
+af	Cinetix
+b0	Passif Semiconductor
+b1	Saris Cycling Group
+b2	Bekey
+b3	Clarinox Technologies
+b4	BDE Technology
+b5	Swirl Networks
+b6	Meso international
+b7	TreLab
+b8	Qualcomm Innovation Center, Inc.
+b9	Johnson Controls
+ba	Starkey Hearing Technologies
+bb	S-Power Electronics
+bc	Ace Sensor
+bd	Aplix
+be	AAMP of America
+bf	Stalmart Technology
+c0	AMICCOM Electronics
+c1	Shenzhen Excelsecu Data Technology
+c2	Geneq
+c3	adidas
+c4	LG Electronics
+c5	Onset Computer
+c6	Selfly
+c7	Quuppa Oy.
+c8	GeLo
+c9	Evluma
+ca	MC10
+cb	Binauric SE
+cc	Beats Electronics
+cd	Microchip Technology
+ce	Eve Systems
+cf	ARCHOS
+d0	Dexcom
+d1	Polar Electro Europe
+d2	Renesas Design Netherlands
+d3	Taixingbang Technology (HK) Co,. LTD.
+d5	Austco Communication Systems
+d6	Timex Group USA
+d7	Qualcomm Technologies
+d8	Qualcomm Connected Experiences
+d9	Voyetra Turtle Beach
+da	txtr
+db	Snuza
+dc	Procter & Gamble
+dd	Hosiden
+de	Muzik
+df	Misfit Wearables
+e0	Google
+e1	Danlers
+e2	Semilink
+e3	inMusic Brands
+e4	L.S. Research
+e5	Eden Software Consultants
+e7	KS Technologies
+e8	ACTS Technologies
+e9	Vtrack Systems
+ea	Nielsen-Kellerman
+eb	Server Technology
+ec	BioResearch Associates
+ed	Jolly Logic
+ee	Above Average Outcomes
+ef	Bitsplitters
+f0	PayPal
+f1	Witron Technology
+f2	Morse Project
+f3	Kent Displays
+f4	Nautilus
+f5	Smartifier
+f7	VSN Technologies
+f8	AceUni
+fa	Crystal Alarm
+fb	KOUKAAM a.s.
+fc	Delphi
+fd	ValenceTech
+fe	Stanley Black and Decker
+ff	Typo Products
+100	TomTom International
+101	Fugoo
+102	Keiser
+103	Bang & Olufsen
+104	PLUS Location Systems
+105	Ubiquitous Computing Technology
+106	Innovative Yachtter Solutions
+107	Demant
+108	Chicony Electronics
+109	Atus
+10a	Codegate
+10b	ERi
+10c	Transducers Direct
+10d	DENSO TEN
+10e	Audi
+10f	HiSilicon Technologies CO., LIMITED
+110	Nippon Seiki
+111	Steelseries ApS
+112	Visybl
+113	Openbrain Technologies
+115	e.solutions
+116	10AK Technologies
+117	Wimoto Technologies
+118	Radius Networks
+11a	Qualcomm Labs
+11b	Hewlett Packard Enterprise
+11c	Baidu
+11d	Arendi
+11e	Skoda Auto a.s.
+11f	Volkswagen
+120	Porsche
+121	Sino Wealth Electronic
+122	AirTurn
+123	Kinsa
+124	HID Global
+125	SEAT es
+126	Promethean
+127	Salutica Allied Solutions
+128	GPSI Group
+129	Nimble Devices
+12a	Changzhou Yongse Infotech
+12b	SportIQ
+12c	TEMEC Instruments
+12d	Sony
+12e	ASSA ABLOY
+12f	Clarion
+130	Warehouse Innovations
+131	Cypress Semiconductor
+132	MADS
+133	Blue Maestro
+134	Resolution Products
+135	Aireware
+136	Silvair
+137	Prestigio Plaza
+138	NTEO
+139	Focus Systems
+13a	Tencent Holdings
+13b	Allegion
+13c	Murata Manufacturing
+13d	WirelessWERX
+13e	Nod
+140	Alpine Electronics
+141	FedEx Services
+142	Grape Systems
+143	Bkon Connect
+144	Lintech
+145	Novatel Wireless
+146	Ciright
+147	Mighty Cast
+148	Ambimat Electronics
+149	Perytons
+14a	Tivoli Audio
+14b	Master Lock
+14c	Mesh-Net
+14d	HUIZHOU DESAY SV AUTOMOTIVE CO., LTD.
+14e	Tangerine
+14f	B&W Group
+150	Pioneer
+151	OnBeep
+152	Vernier Software & Technology
+153	ROL Ergo
+154	Pebble Technology
+155	NETATMO
+156	Accumulate
+157	Anhui Huami Information Technology
+158	Inmite s.r.o.
+159	ChefSteps
+15a	micas
+15b	Biomedical Research
+15c	Pitius Tec S.L.
+15d	Estimote
+15e	Unikey Technologies
+15f	Timer Cap
+160	AwoX
+161	yikes
+162	MADSGlobalNZ
+163	PCH International
+164	Qingdao Yeelink Information Technology
+165	Milwaukee Electric Tools
+166	MISHIK
+167	Ascensia Diabetes Care US
+168	Spicebox
+169	emberlight
+16a	Copeland Cold Chain LP
+16b	Qblinks
+16c	MYSPHERA
+16d	LifeScan
+16e	Volantic
+16f	Podo Labs
+170	Roche Diabetes Care
+171	Amazon.com Services
+172	Connovate Technology Private
+173	Kocomojo
+174	Everykey
+175	Dynamic Controls
+176	SentriLock
+177	I-SYST inc.
+178	CASIO COMPUTER CO., LTD.
+179	LAPIS Semiconductor
+17a	Telemonitor
+17b	taskit
+17c	Mercedes-Benz Group
+17d	BatAndCat
+17e	BluDotz
+17f	XTel Wireless ApS
+180	Gigaset Technologies
+181	Gecko Health Innovations
+183	Walt Disney
+184	Nectar
+187	Seraphim Sense
+188	Unico RBC
+189	Physical Enterprises
+18a	Able Trend Technology
+18b	Konica Minolta
+18c	Wilo SE
+18d	Extron Design Services
+18e	Google
+190	Intelletto Technologies
+191	FDK CORPORATION
+192	Cloudleaf
+193	Maveric Automation
+194	Acoustic Stream
+195	Zuli
+196	Paxton Access
+197	WiSilica
+198	VENGIT Korlatolt Felelossegu Tarsasag
+199	SALTO SYSTEMS S.L.
+19a	TRON Forum
+19b	CUBETECH s.r.o.
+19c	Cokiya Incorporated
+19d	CVS Health
+19e	Ceruus
+19f	Strainstall
+1a0	Channel Enterprises
+1a1	FIAMM
+1a2	GIGALANE.CO.,LTD
+1a4	MSA Innovation
+1a5	Icon Health and Fitness
+1a6	Wille Engineering
+1a7	ENERGOUS CORPORATION
+1a8	Taobao
+1a9	Canon
+1aa	Geophysical Technology
+1ab	Meta Platforms
+1ac	Trividia Health
+1ad	FlightSafety International
+1af	Sunrise Micro Devices
+1b0	Star Micronics
+1b1	Netizens Sp. z o.o.
+1b2	Nymi
+1b3	Nytec
+1b4	Trineo Sp. z o.o.
+1b5	Nest Labs
+1b6	LM Technologies
+1b7	General Electric Company
+1b8	i+D3 S.L.
+1b9	HANA Micron
+1ba	SPIA Cycling
+1bb	Cochlear Bone Anchored Solutions
+1bc	SenionLab
+1bd	Syszone
+1be	Pulsate Mobile
+1bf	Hongkong OnMicro Electronics
+1c1	BRADATECH
+1c2	Transenergooil
+1c4	DME Microelectronics
+1c5	Bitcraze
+1c6	HASWARE
+1c7	Abiogenix
+1c8	Poly-Control ApS
+1c9	Avi-on
+1ca	Laerdal Medical
+1cb	Fetch My Pet
+1cc	Sam Labs
+1cd	Chengdu Synwing Technology
+1ce	HOUWA SYSTEM DESIGN, k.k.
+1cf	BSH
+1d0	Primus Inter Pares
+1d1	August Home
+1d2	Gill Electronics
+1d3	Sky Wave Design
+1d4	Newlab
+1d5	ELAD
+1d6	G-wearables inc.
+1d8	Code
+1d9	Savant Systems
+1da	Logitech International
+1db	Innblue Consulting
+1dd	Koninklijke Philips N.V.
+1de	Minelab Electronics Pty
+1df	Bison Group
+1e0	WS Audiology Denmark
+1e1	Jolla
+1e3	Caterpillar
+1e4	Freedom Innovations
+1e5	Dynamic Devices
+1e6	Technology Solutions
+1ea	Advanced Application Design
+1ec	Spreadtrum Communications Shanghai
+1ee	Valeo Service
+1ef	Fullpower Technologies
+1f0	KloudNation
+1f1	Zebra Technologies
+1f2	Itron
+1f3	The University of Tokyo
+1f4	UTC Fire and Security
+1f5	Cool Webthings
+1f6	DJO Global
+1f7	Gelliner
+1f8	Anyka (Guangzhou) Microelectronics Technology Co, LTD
+1f9	Medtronic
+1fa	Gozio
+1fb	Form Lifting
+1fc	Wahoo Fitness
+1fd	Kontakt Micro-Location Sp. z o.o.
+1fe	Radio Systems
+1ff	Freescale Semiconductor
+200	Verifone Systems Pte Ltd. Taiwan Branch
+201	AR Timing
+202	Rigado
+203	Kemppi
+206	Otter Products
+207	STEMP
+208	LumiGeek
+209	InvisionHeart
+20a	Macnica
+20b	Jaguar Land Rover
+20c	CoroWare Technologies
+20e	Omron Healthcare Co., LTD
+20f	Comodule GMBH
+210	ikeGPS
+211	Telink Semiconductor
+212	Interplan
+213	Wyler
+214	IK Multimedia Production
+215	Lukoton Experience
+216	MTI
+217	Tech4home, Lda
+219	DOTT
+21a	Blue Speck Labs
+21b	Cisco Systems
+21c	Mobicomm
+21d	Edamic
+21e	Goodnet
+21f	Luster Leaf Products
+220	Manus Machina
+221	Mobiquity Networks
+222	Praxis Dynamics
+223	Philip Morris Products
+224	Comarch
+225	Nestlé Nespresso
+226	Merlinia
+227	LifeBEAM Technologies
+228	Twocanoes Labs
+229	Muoverti
+22a	Stamer Musikanlagen GMBH
+22b	Tesla
+22c	Pharynks
+22d	Lupine
+22e	Siemens
+230	Foster Electric Company
+231	ETA
+232	x-Senso Solutions Kft
+234	FengFan (BeiJing) Technology Co
+235	Qrio
+236	Pitpatpet
+237	MSHeli s.r.l.
+238	Trakm8
+239	JIN CO
+23a	Alatech Tehnology
+23b	Beijing CarePulse Electronic Technology Co
+23d	ViCentra
+23e	Raven Industries
+23f	WaveWare Technologies
+240	Argenox Technologies
+241	Bragi
+243	Masimo
+244	Iotera
+245	Endress+Hauser
+246	ACKme Networks
+247	FiftyThree
+248	Parker Hannifin
+24a	Uwatec
+24b	Orlan
+24c	Blue Clover Devices
+24d	M-Way Solutions
+24e	Microtronics Engineering
+24f	Schneider Schreibgeräte
+250	Sapphire Circuits
+251	Lumo Bodytech
+252	Restar
+253	Xicato
+254	Playbrush
+255	Dai Nippon Printing
+256	G24 Power
+257	AdBabble Local Commerce
+258	Devialet
+259	ALTYOR
+25a	University of Applied Sciences Valais/Haute Ecole Valaisanne
+25b	Five Interactive, LLC dba Zendo
+25c	NetEase（Hangzhou）Network co.Ltd.
+25d	Lexmark International
+25e	Fluke
+25f	Yardarm Technologies
+261	SECVRE
+262	Glacial Ridge Technologies
+264	DDS
+265	SMK
+266	Schawbel Technologies
+267	XMI Systems
+268	Cerevo
+269	Torrox GmbH & Co KG
+26a	Gemalto
+26b	DEKA Research & Development
+26c	Domster Tadeusz Szydlowski
+26d	Technogym SPA
+26e	FLEURBAEY BVBA
+26f	Aptcode Solutions
+270	LSI ADL Technology
+271	Animas
+272	Alps Alpine
+273	OCEASOFT
+274	Motsai Research
+275	Geotab
+276	E.G.O. Elektro-Geraetebau
+277	bewhere inc
+278	Johnson Outdoors
+279	steute Schaltgerate GmbH & Co. KG
+27a	Ekomini inc.
+27b	DEFA
+27c	Aseptika
+27d	HUAWEI Technologies
+27e	HabitAware
+27f	ruwido austria gmbh
+280	ITEC corporation
+281	StoneL
+282	Sonova
+283	Maven Machines
+284	Synapse Electronics
+285	WOWTech Canada
+286	RF Code
+287	Wally Ventures S.L.
+289	SK Telecom
+28a	Jetro
+28b	Code Gears LTD
+28c	NANOLINK APS
+28e	RF Digital
+28f	Church & Dwight
+290	Multibit
+291	CliniCloud
+293	Blue Bite
+294	ELIAS
+295	Sivantos
+296	Petzl
+297	storm power ltd
+298	EISST
+299	Inexess Technology Simma KG
+29a	Currant
+29b	C2 Development
+29c	Blue Sky Scientific
+29d	ALOTTAZS LABS
+29e	Kupson spol. s r.o.
+29f	Areus Engineering
+2a0	Impossible Camera
+2a2	Sera4
+2a3	Itude
+2a4	Pacific Lock Company
+2a5	Tendyron
+2a6	Robert Bosch
+2a7	Illuxtron international
+2a8	miSport
+2a9	Chargelib
+2aa	Doppler Lab
+2ab	BBPOS
+2ad	Rx Networks
+2ae	WeatherFlow
+2af	Technicolor USA
+2b0	Bestechnic(Shanghai),Ltd
+2b1	Raden
+2b2	Oura Health
+2b3	CLABER S.P.A.
+2b4	Hyginex
+2b5	HANSHIN ELECTRIC RAILWAY CO.,LTD.
+2b6	Schneider Electric
+2b7	Oort Technologies
+2b8	Chrono Therapeutics
+2b9	Rinnai
+2ba	Swissprime Technologies
+2bb	YOKOWO CO., LTD.
+2bc	Genevac
+2bd	Chemtronics
+2be	Seguro Technology Sp. z o.o.
+2c0	Dash Robotics
+2c1	LINE
+2c2	Guillemot
+2c3	Techtronic Power Tools Technology
+2c4	Wilson Sporting Goods
+2c5	Lenovo
+2c6	Ayatan Sensors
+2c7	Electronics Tomorrow
+2c8	OneSpan
+2c9	PayRange
+2ca	ABOV Semiconductor
+2cb	AINA-Wireless
+2cd	BMA ergonomics b.v.
+2ce	Teva Branded Pharmaceutical Products R&D
+2cf	Anima
+2d0	3M
+2d1	Empatica Srl
+2d2	Afero
+2d3	Powercast
+2d4	Secuyou ApS
+2d5	OMRON
+2d6	Send Solutions
+2d7	NIPPON SYSTEMWARE CO.,LTD.
+2d8	Neosfar
+2d9	Fliegl Agrartechnik
+2da	Gilvader
+2db	Digi International Inc
+2dc	DeWalch Technologies
+2dd	Flint Rehabilitation Devices
+2de	Samsung SDS
+2df	Blur Product Development
+2e0	University of Michigan
+2e1	Victron Energy
+2e2	NTT docomo
+2e3	Carmanah Technologies
+2e4	Bytestorm
+2e5	Espressif Systems
+2e6	Unwire
+2e7	Connected Yard
+2e8	American Music Environments
+2e9	Sensogram Technologies
+2ea	Fujitsu
+2eb	Ardic Technology
+2ed	HTC
+2ee	Citizen Holdings
+2ef	SMART-INNOVATION.inc
+2f0	Blackrat Software
+2f1	The Idea Cave
+2f2	GoPro
+2f3	AuthAir
+2f4	Vensi
+2f5	Indagem Tech
+2f6	Intemo Technologies
+2f8	Runteq
+2f9	IMAGINATION TECHNOLOGIES LTD
+2fb	Clarius Mobile Health
+2fc	Shanghai Frequen Microelectronics
+2fe	Lierda Science & Technology Group
+2ff	Silicon Laboratories
+300	World Moto
+301	Giatec Scientific
+302	Loop Devices
+303	IACA electronique
+304	Oura Health
+305	Swipp ApS
+306	Life Laboratory
+307	FUJI INDUSTRIAL CO.,LTD.
+308	Surefire
+309	Dolby Labs
+30a	Ellisys
+30b	Magnitude Lighting Converters
+30c	Hilti
+30d	Devdata
+30f	Shortcut Labs
+310	SGL Italia
+311	PEEQ DATA
+312	Ducere Technologies Pvt
+313	DiveNav
+314	RIIG AI Sp. z o.o.
+315	Thermo Fisher Scientific
+316	AG Measurematics Pvt.
+317	CHUO Electronics CO., LTD.
+318	Aspenta International
+319	Eugster Frismag
+31a	Wurth Elektronik eiSos GmbH & Co. KG
+31b	HQ
+31c	Lab Sensor Solutions
+31d	Enterlab ApS
+31e	Eyefi
+31f	MetaSystem S.p.A.
+320	SONO ELECTRONICS. CO., LTD
+323	Rotor Bike Components
+324	Astro
+326	Healthwear Technologies (Changzhou)Ltd
+327	Essex Electronics
+328	Grundfos
+329	Eargo
+32a	Electronic Design Lab
+32b	ESYLUX
+32c	NIPPON SMT.CO.,Ltd
+32d	BM innovations
+32e	indoormap
+32f	OttoQ
+330	North Pole Engineering
+331	3flares Technologies
+333	Mul-T-Lock
+334	Airthings
+335	Enlighted
+336	GISTIC
+337	AJP2 Holdings
+338	COBI
+339	Blue Sky Scientific
+33a	Appception
+33b	Courtney Thorne
+33d	TPV Technology
+33e	Monitra
+33f	Automation Components
+341	Etesian Technologies
+342	GERTEC BRASIL LTDA.
+343	Drekker Development
+344	Whirl
+345	Locus Positioning
+346	Acuity Brands Lighting
+347	Prevent Biometrics
+349	VersaMe
+34b	Libratone
+34c	HM Electronics
+34d	TASER International
+34f	Heartland Payment Systems
+350	Bitstrata Systems
+351	Pieps
+352	iRiding(Xiamen)Technology
+353	Alpha Audiotronics
+354	TOPPAN
+355	Sigma Designs
+356	Spectrum Brands
+357	Polymap Wireless
+358	MagniWare
+359	Novotec Medical
+35a	Phillips-Medisize
+35b	Matrix
+35c	Eaton
+35d	KYS
+35e	Naya Health
+35f	Acromag
+360	Insulet
+361	Wellinks
+362	ON Semiconductor
+363	FREELAP
+364	Favero Electronics Srl
+365	BioMech Sensor
+366	BOLTT Sports technologies Private limited
+368	Metormote
+369	littleBits
+36a	SetPoint Medical
+36b	BRControls Products
+36c	Zipcar
+36d	AirBolt
+36e	MOTIVE TECHNOLOGIES, INC.
+36f	Motiv
+370	Wazombi Labs OÜ
+372	Nixie Labs
+373	AppNearMe
+374	Holman Industries
+375	Expain
+376	Electronic Temperature Instruments
+377	Plejd
+378	Propeller Health
+379	Shenzhen iMCO Electronic Technology
+37a	Algoria
+37b	Apption Labs
+37c	Cronologics
+37d	MICRODIA
+37e	lulabytes S.L.
+37f	Société des Produits Nestlé
+380	LLC "MEGA-F service"
+381	Sharp
+382	Precision Outcomes
+383	Kronos Incorporated
+385	Embedded Electronic Solutions Ltd. dba e2Solutions
+386	Aterica
+387	BluStor PMC
+388	Kapsch TrafficCom
+389	ActiveBlu
+38a	Kohler Mira
+38b	Noke
+38c	Appion
+38d	Resmed
+38e	Crownstone
+38f	Xiaomi
+390	INFOTECH s.r.o.
+391	Thingsquare
+392	T&D
+393	LAVAZZA S.p.A.
+395	SDATAWAY
+396	BLOKS
+397	LEGO System
+398	Thetatronics
+399	Nikon
+39a	NeST
+39b	South Silicon Valley Microelectronics
+39c	ALE International
+39d	CareView Communications
+39e	SchoolBoard
+39f	Molex
+3a0	IVT Wireless
+3a1	Alpine Labs
+3a2	Candura Instruments
+3a3	SmartMovt Technology
+3a4	Token Zero
+3a5	ACE CAD Enterprise Co., Ltd.
+3a6	Medela
+3a7	AeroScout
+3a8	Esrille
+3aa	Exon Sp. z o.o.
+3ab	Meizu Technology
+3ad	XiQ
+3ae	Allswell
+3af	Comm-N-Sense Corp DBA Verigo
+3b0	VIBRADORM
+3b1	Otodata Wireless Network
+3b2	Propagation Systems
+3b3	Midwest Instruments & Controls
+3b4	Alpha Nodus, inc.
+3b5	petPOMM
+3b6	Mattel
+3b7	Airbly
+3b8	A-Safe
+3b9	FREDERIQUE CONSTANT
+3ba	Maxscend Microelectronics Company
+3bb	Abbott
+3bc	ASB Bank
+3bd	amadas
+3be	Applied Science
+3bf	iLumi Solutions
+3c0	Arch Systems
+3c1	Ember Technologies
+3c2	Snapchat
+3c3	Casambi Technologies
+3c4	Pico Technology
+3c5	Abbott Medical
+3c6	Intricon
+3c7	Structural Health Systems
+3c8	Avvel International
+3c9	Gallagher Group
+3ca	In2things Automation Pvt.
+3cb	SYSDEV Srl
+3cc	Vonkil Technologies
+3cd	Wynd Technologies
+3ce	CONTRINEX
+3cf	MIRA
+3d0	Watteam
+3d1	Density
+3d2	IOT Pot India Private
+3d3	Sigma Connectivity
+3d4	PEG PEREGO SPA
+3d5	Wyzelink Systems
+3d6	Yota Devices LTD
+3d7	FINSECUR
+3d8	Zen-Me Labs
+3d9	3IWare
+3da	EnOcean
+3db	Instabeat
+3dc	Nima Labs
+3dd	Andreas Stihl AG & Co. KG
+3de	Nathan Rhoades
+3df	Grob Technologies
+3e0	Actions Technology
+3e1	SPD Development Company
+3e2	Sensoan
+3e3	Qualcomm Life
+3e4	Chip-ing
+3e5	ffly4u
+3e6	IoT Instruments
+3e7	TRUE Fitness Technology
+3e9	SHENZHEN LEMONJOY TECHNOLOGY CO., LTD.
+3ea	Hello
+3eb	Ozo Edu
+3ec	Jigowatts
+3ed	BASIC MICRO.COM,INC.
+3ee	CUBE TECHNOLOGIES
+3f0	CLINK
+3f1	Hestan Smart Cooking
+3f2	WindowMaster
+3f4	PAL Technologies
+3f5	WHERE
+3f6	Iton Technology
+3f7	Owl Labs
+3f8	Rockford
+3f9	Becon Technologies
+3fa	Vyassoft Technologies
+3fb	Nox Medical
+3fc	Kimberly-Clark
+3fd	Trimble
+3fe	Littelfuse
+3ff	Withings
+400	i-developer IT Beratung UG
+401	Relations
+402	Sears Holdings
+403	Gantner Electronic
+404	Authomate
+405	Vertex International
+407	Swiss Audio
+408	ToGetHome
+40a	ZF OPENMATICS s.r.o.
+40b	Jana Care
+40d	NorthStar Battery Company
+40e	SKF
+40f	CO-AX Technology
+410	Fender Musical Instruments
+411	Luidia
+412	SEFAM
+413	Wireless Cables
+416	SODA
+417	Fatigue Science
+419	Novalogy LTD
+41a	Friday Labs
+41b	OrthoAccel Technologies
+41c	WaterGuru
+41d	Benning Elektrotechnik und Elektronik GmbH & Co. KG
+41e	Dell Computer
+41f	Kopin
+420	TecBakery
+421	Backbone Labs
+422	DELSEY
+423	Chargifi
+424	Trainesense
+425	Unify Software and Solutions GmbH & Co. KG
+426	Husqvarna
+427	Focus fleet and fuel management inc
+428	SmallLoop
+429	Prolon
+42a	BD Medical
+42b	iMicroMed Incorporated
+42c	Ticto N.V.
+42d	Meshtech
+42e	MemCachier
+42f	Danfoss
+430	SnapStyk
+431	Alticor
+432	Silk Labs
+433	Pillsy
+434	Hatch Baby
+435	Blocks Wearables
+436	Drayson Technologies
+437	eBest IOT
+438	Helvar
+439	Radiance Technologies
+43a	Nuheara
+43b	Appside co., ltd.
+43d	Coiler
+43e	Thermomedics
+43f	Tentacle Sync
+440	Valencell
+442	SECOM CO., LTD.
+443	Tucker International
+444	Metanate
+445	Kobian Canada
+446	NETGEAR
+447	Fabtronics Australia
+448	Grand Centrix
+449	1UP USA.com llc
+44a	SHIMANO INC.
+44b	Nain
+44c	LifeStyle Lock
+44d	VEGA Grieshaber KG
+44e	Xtrava
+44f	TTS Tooltechnic Systems AG & Co. KG
+450	Teenage Engineering
+451	Tunstall Nordic
+452	Svep Design Center
+453	Qorvo Utrecht
+454	Sphinx Electronics GmbH & Co KG
+456	Nemik Consulting
+457	RF INNOVATION
+458	Mini Solution
+45a	2048450 Ontario
+45c	Delta T
+45d	Boston Scientific
+45e	Nuviz
+45f	Real Time Automation
+460	Kolibree
+461	vhf elektronik
+462	Bonsai Systems
+463	Fathom Systems
+464	Bellman & Symfon Group
+465	International Forte Group
+467	Codenex
+468	Kynesim
+469	Palago
+46a	INSIGMA INC.
+46b	PMD Solutions
+46c	Qingdao Realtime Technology
+46d	BEGA Gantenbrink-Leuchten KG
+46e	Pambor
+46f	Develco Products
+470	iDesign s.r.l.
+471	TiVo
+472	Control-J
+473	Steelcase
+474	iApartment co., ltd.
+475	Icom inc.
+477	Blue Spark Technologies
+478	FarSite Communications
+479	mywerk system
+47a	Sinosun Technology
+47b	MIYOSHI ELECTRONICS CORPORATION
+47d	Occly
+47e	OurHub Dev IvS
+47f	Pro-Mark
+481	Quintrax
+482	POS Tuning Udo Vosshenrich GmbH & Co. KG
+484	Revol Technologies
+485	SKIDATA
+486	DEV TECNOLOGIA INDUSTRIA, COMERCIO E MANUTENCAO DE EQUIPAMENTOS LTDA. - ME
+487	Centrica Connected Home
+488	Automotive Data Solutions
+489	Igarashi Engineering
+48a	Taelek
+48c	Vectronix
+48d	S-Labs Sp. z o.o.
+48e	Companion Medical
+48f	BlueKitchen
+490	Matting
+491	SOREX - Wireless Solutions
+492	ADC Technology
+493	Lynxemi
+494	SENNHEISER electronic GmbH & Co. KG
+496	Polymorphic Labs
+497	Cochlear
+498	METER Group, Inc. USA
+499	Ruuvi Innovations
+49a	Situne
+49b	nVisti
+49c	DyOcean
+49d	Uhlmann & Zacher
+49e	AND!XOR
+49f	Popper Pay
+4a2	ovrEngineered
+4a3	GT-tronics HK
+4a4	Herbert Waldmann GmbH & Co. KG
+4a5	Guangzhou FiiO Electronics Technology
+4a6	Vinetech
+4a7	Dallas Logic
+4a8	BioTex
+4aa	LINKIO
+4ab	Harbortronics
+4ac	Undagrid
+4ad	Shure
+4ae	ERM Electronic Systems LTD
+4af	BIOROWER Handelsagentur
+4b1	Kartographers Technologies Pvt.
+4b2	The Shadow on the Moon
+4b3	mobike
+4b4	Inuheat Group
+4b5	Swiftronix
+4b6	Diagnoptics Technologies
+4b7	Analog Devices
+4b8	Soraa
+4b9	CSR Building Products
+4ba	Crestron Electronics
+4bb	Neatebox
+4bc	Draegerwerk AG & Co. KGaA
+4bd	AlbynMedical
+4be	Averos FZCO
+4bf	VIT Initiative
+4c0	Statsports International
+4c1	Sospitas, s.r.o.
+4c2	Dmet Products
+4c3	Mantracourt Electronics
+4c4	TeAM Hutchins
+4c5	Seibert Williams Glass
+4c6	Insta
+4c7	Svantek Sp. z o.o.
+4c8	Shanghai Flyco Electrical Appliance
+4c9	Thornwave Labs
+4ca	Steiner-Optik
+4cb	Novo Nordisk
+4cd	Safetech Products
+4ce	GOOOLED S.R.L.
+4cf	DOM Sicherheitstechnik GmbH & Co. KG
+4d0	Olympus
+4d1	KTS
+4d2	Anloq Technologies
+4d3	Queercon
+4d4	TASKA PROSTHETICS LIMITED
+4d5	Gooee
+4d6	LUGLOC
+4d7	Blincam
+4d8	FUJIFILM
+4d9	RM Acquisition
+4da	Franceschi Marina snc
+4db	Engineered Audio, LLC.
+4dc	IOTTIVE (OPC) PRIVATE LIMITED
+4dd	4MOD Technology
+4de	Lutron Electronics
+4df	Emerson Electric
+4e0	Guardtec
+4e1	REACTEC LIMITED
+4e3	Under Armour
+4e4	Woodenshark
+4e5	Avack
+4e6	Smart Solution Technology
+4e8	STABILO International
+4e9	Busch Jaeger Elektro
+4ea	Pacific Bioscience Laboratories
+4eb	Bird Home Automation
+4ec	Motorola Solutions
+4ee	Auxivia
+4ef	DaisyWorks
+4f0	Kosi
+4f1	Theben
+4f2	InDreamer Techsol Private
+4f3	Cerevast Medical
+4f4	ZanCompute
+4f5	Pirelli Tyre S.P.A.
+4f6	McLear
+4f7	Shenzhen Goodix Technology
+4f8	Convergence Systems
+4f9	Interactio
+4fa	Androtec
+4fb	Benchmark Drives GmbH & Co. KG
+4fc	SwingLync L. L. C.
+4fd	Tapkey
+4fe	Woosim Systems
+4ff	Microsemi
+500	Wiliot LTD.
+501	Polaris IND
+502	Specifi-Kali
+503	Locoroll
+504	PHYPLUS
+505	InPlay
+506	Hager
+508	Axes System sp. z o. o.
+509	Garage Smart
+50a	Shake-on
+50b	Vibrissa
+50c	OSRAM
+50d	TRSystems
+50e	Yichip Microelectronics
+50f	Foundation Engineering
+510	UNI-ELECTRONICS, INC.
+511	Brookfield Equinox
+512	Soprod
+513	9974091 Canada
+514	FIBRO
+515	RB Controls
+516	Footmarks
+517	Amtronic Sverige
+518	MAMORIO.inc
+519	Tyto Life
+51a	Leica Camera
+51c	EDPS
+51d	OFF Line
+51e	Detect Blue
+51f	Setec
+520	Target
+521	IAI
+522	NS Tech
+523	MTG
+524	Hangzhou iMagic Technology
+525	HONGKONG NANO IC TECHNOLOGIES  CO., LIMITED
+526	Honeywell International
+527	Albrecht JUNG
+528	Lunera Lighting
+529	Lumen UAB
+52a	Keynes Controls
+52b	Novartis
+52c	Geosatis
+52d	EXFO
+52e	LEDVANCE
+52f	Center ID
+530	Adolene
+531	D&M Holdings
+532	CRESCO Wireless
+533	Nura Operations
+534	Frontiergadget
+535	Smart Component Technologies
+536	ZTR Control Systems
+537	MetaLogics
+538	Medela
+539	OPPLE Lighting
+53a	Savitech
+53b	prodigy
+53c	Screenovate Technologies
+53d	TESA
+53e	CLIM8 LIMITED
+53f	Silergy
+540	SilverPlus
+541	Sharknet
+542	Mist Systems
+543	MIWA LOCK CO.,Ltd
+544	OrthoSensor
+546	Apexar Technologies
+547	LOGICDATA Electronic & Software Entwicklungs
+548	Knick Elektronische Messgeraete GmbH & Co. KG
+549	Smart Technologies and Investment
+54a	Linough
+54b	Advanced Electronic Designs
+54c	Carefree Scott Fetzer Co
+54d	Sensome
+54e	FORTRONIK storitve d.o.o.
+54f	Sinnoz
+551	Sylero
+552	Avempace SARL
+553	Nintendo
+554	National Instruments
+555	KROHNE Messtechnik
+556	Otodynamics
+557	Arwin Technology
+558	benegear, inc.
+559	Newcon Optik
+55a	CANDY HOUSE
+55b	FRANKLIN TECHNOLOGY INC
+55c	Lely
+55d	Valve
+55e	Hekatron Vertriebs
+55f	PROTECH S.A.S. DI GIRARDI ANDREA & C.
+560	Sarita CareTech APS
+561	Finder S.p.A.
+562	Thalmic Labs
+563	Steinel
+564	Beghelli Spa
+566	CORE TRANSPORT TECHNOLOGIES NZ LIMITED
+567	Xiamen Everesports Goods
+568	Bodyport
+56a	Flipnavi
+56b	Rion
+56c	Long Range Systems
+56d	Redmond Industrial Group
+56e	VIZPIN INC.
+56f	BikeFinder
+570	Consumer Sleep Solutions
+571	PSIKICK, INC.
+572	AntTail.com
+573	Lighting Science Group
+574	AFFORDABLE ELECTRONICS INC
+575	Integral Memroy Plc
+576	Globalstar
+577	True Wearables
+578	Wellington Drive Technologies
+57a	OMNI Remotes
+57b	Duracell U.S. Operations
+57c	Toor Technologies
+57d	Instinct Performance
+57e	Beco
+57f	Scuf Gaming International
+581	LYS TECHNOLOGIES LTD
+582	Breakwall Analytics
+583	Code Blue Communications
+584	Gira Giersiepen GmbH & Co. KG
+585	Hearing Lab Technology
+586	LEGRAND
+587	Derichs
+588	ALT-TEKNIK
+589	Star Technologies
+58a	START TODAY CO.,LTD.
+58b	Maxim Integrated Products
+58c	Fracarro Radioindustrie SRL
+58d	Jungheinrich Aktiengesellschaft
+58e	Meta Platforms Technologies
+58f	HENDON SEMICONDUCTORS PTY LTD
+590	Pur3
+591	Viasat Group S.p.A.
+592	IZITHERM
+593	Spaulding Clinical Research
+594	Kohler Company
+595	Inor Process
+596	My Smart Blinds
+597	RadioPulse
+598	rapitag
+599	Lazlo326, LLC.
+59a	Teledyne Lecroy
+59b	Dataflow Systems
+59c	Macrogiga Electronics
+59d	Tandem Diabetes Care
+59e	Polycom
+59f	Fisher & Paykel Healthcare
+5a0	Dream Devices Technologies
+5a1	Shanghai Xiaoyi Technology
+5a2	ADHERIUM(NZ) LIMITED
+5a3	Axiomware Systems Incorporated
+5a4	O. E. M. Controls
+5a5	Kiiroo
+5a6	Telecon Mobile
+5a7	Sonos
+5a8	Tom Allebrandi Consulting
+5a9	Monidor
+5aa	Tramex
+5ab	Nofence
+5ac	GoerTek Dynaudio
+5ad	INIA
+5ae	CARMATE MFG.CO.,LTD
+5af	OV LOOP, INC.
+5b0	NewTec
+5b1	Medallion Instrumentation Systems
+5b2	CAREL INDUSTRIES S.P.A.
+5b3	Parabit Systems
+5b4	White Horse Scientific ltd
+5b5	verisilicon
+5b6	Elecs Industry
+5b7	Beijing Pinecone Electronics
+5b8	Ambystoma Labs
+5b9	Suzhou Pairlink Network Technology
+5ba	igloohome
+5bb	Oxford Metrics
+5bc	Leviton Mfg.
+5bd	ULC Robotics
+5bf	Real-World-Systems
+5c0	Nalu Medical
+5c1	P.I.Engineering
+5c2	Grote Industries
+5c3	Runtime
+5c4	Codecoup sp. z o.o. sp. k.
+5c5	SELVE GmbH & Co. KG
+5c7	Lippert Components, INC
+5c8	SOMFY
+5c9	TBS Electronics
+5ca	MHL Custom
+5cb	LucentWear
+5cc	WATTS ELECTRONICS
+5cd	RJ Brands
+5ce	V-ZUG
+5cf	Biowatch
+5d0	Anova Applied Electronics
+5d1	Lindab
+5d2	frogblue TECHNOLOGY
+5d3	Acurable
+5d4	LAMPLIGHT
+5d5	TEGAM
+5d6	Zhuhai Jieli technology
+5d7	modum.io
+5d8	Farm Jenny
+5d9	Toyo Electronics
+5da	Applied Neural Research
+5db	Avid Identification Systems
+5dc	Petronics
+5dd	essentim
+5de	QT Medical INC.
+5df	VIRTUALCLINIC.DIRECT LIMITED
+5e0	Viper Design
+5e1	Human, Incorporated
+5e2	stAPPtronics
+5e3	Elemental Machines
+5e4	Taiyo Yuden
+5e5	INEO ENERGY& SYSTEMS
+5e6	Motion Instruments
+5e7	PressurePro
+5e8	COWBOY
+5e9	iconmobile
+5ea	ACS-Control-System
+5eb	Bayerische Motoren Werke
+5ec	Gycom Svenska
+5ed	Fuji Xerox
+5ef	SIKOM
+5f0	beken
+5f1	The Linux Foundation
+5f2	Try and E CO.,LTD.
+5f3	SeeScan
+5f4	Clearity
+5f5	GS TAG
+5f6	DPTechnics
+5f7	TRACMO, INC.
+5f8	Anki
+5f9	Hagleitner Hygiene International
+5fa	Konami Sports Life
+5fb	Arblet
+5fc	Masbando
+5fd	Innoseis
+5fe	Niko nv
+5ff	Wellnomics
+600	iRobot
+601	Schrader Electronics
+602	Geberit International
+603	Fourth Evolution
+605	FMW electronic Futterer u. Maier-Wolf OHG
+606	John Deere
+607	Rookery Technology
+608	KeySafe-Cloud
+609	BUCHI Labortechnik
+60a	IQAir
+60b	Triax Technologies
+60c	Vuzix
+60d	TDK
+60e	Blueair
+60f	Signify Netherlands
+610	ADH GUARDIAN USA
+611	Beurer
+612	Playfinity
+613	Hans Dinslage
+614	OnAsset Intelligence
+615	INTER ACTION
+616	OS42 UG
+618	Audio-Technica
+619	Six Guys Labs, s.r.o.
+61a	R.W. Beckett
+61b	silex technology, inc.
+61c	Univations
+61d	SENS Innovation ApS
+61e	Diamond Kinetics
+61f	Phrame
+620	Forciot
+621	Noordung d.o.o.
+622	Beam Labs
+624	Biovotion
+625	Square Panda
+626	Amplifico
+627	WEG
+628	Ensto
+629	PHONEPE PVT LTD
+62b	MinebeaMitsumi
+62c	ASPion
+62d	Vossloh-Schwabe Deutschland
+62e	Procept
+62f	ONKYO
+630	Asthrea D.O.O.
+631	Fortiori Design
+632	Hugo Muller GmbH & Co KG
+633	Wangi Lai PLT
+634	Fanstel
+635	Crookwood
+636	ELECTRONICA INTEGRAL DE SONIDO
+637	GiP Innovation Tools
+638	LX SOLUTIONS PTY LIMITED
+639	Shenzhen Minew Technologies
+63a	Prolojik
+63b	Kromek Group Plc
+63c	Contec Medical Systems
+63d	Xradio Technology
+63e	The Indoor Lab
+63f	LDL TECHNOLOGY
+640	Dish Network
+641	Revenue Collection Systems FRANCE
+642	Bluetrum Technology
+643	makita corporation
+644	Apogee Instruments
+645	BM3
+646	SGV Group Holding GmbH & Co. KG
+647	MED-EL
+648	Ultune Technologies
+649	Ryeex Technology
+64a	Open Research Institute
+64b	Scale-Tec
+64c	Zumtobel Group
+64d	iLOQ
+64e	KRUXWorks Technologies Private
+64f	Digital Matter
+650	Coravin
+651	Stasis Labs
+652	ITZ Innovations- und Technologiezentrum
+653	Meggitt
+654	Ledlenser GmbH & Co. KG
+655	Renishaw
+656	ZhuHai AdvanPro Technology Company
+657	Meshtronix
+658	Payex Norge
+659	UnSeen Technologies
+65a	Marshall Group
+65b	Sesam Solutions
+65c	PixArt Imaging
+65d	Panduit
+65e	Alo
+65f	Ricoh Company
+660	RTC Industries
+661	Mode Lighting
+662	Particle Industries
+663	Advanced Telemetry Systems
+664	RHA TECHNOLOGIES LTD
+665	Pure International
+666	WTO Werkzeug-Einrichtungen
+668	Bleb Technology
+669	Livanova USA
+66a	Brady Worldwide
+66b	DewertOkin
+66c	Ztove ApS
+66d	Venso EcoSolutions
+66e	Eurotronik Kranj d.o.o.
+66f	Hug Technology
+670	Gema Switzerland
+671	Buzz Products
+672	Kopi
+673	Innova Ideas
+674	BeSpoon
+676	Expai Solutions Private
+677	Innovation First
+678	SABIK Offshore
+679	4iiii Innovations
+67a	The Energy Conservatory
+67b	I.FARM, INC.
+67c	Tile
+67d	Form Athletica
+67f	NETGRID S.N.C. DI BISSOLI MATTEO, CAMPOREALE SIMONE, TOGNETTI FEDERICO
+680	Mannkind
+681	Trade FIDES a.s.
+682	Photron
+683	Eltako
+684	Dermalapps
+685	Greenwald Industries
+686	inQs
+687	Cherry
+688	Amsted Digital Solutions
+689	Tacx b.v.
+68a	Raytac
+68b	Jiangsu Teranovo Tech
+68e	Razer
+68f	JRM Group
+690	Eccrine Systems
+691	Curie Point
+692	Georg Fischer
+693	Hach - Danaher
+694	T&A Laboratories
+695	Koki Holdings
+696	Gunakar Private
+697	Stemco Products
+698	Wood IT Security
+699	RandomLab
+69a	Adero
+69b	Dragonchip
+69c	Noomi
+69e	Delta Electronics
+69f	FlowMotion Technologies
+6a0	OBIQ Location Technology
+6a1	Cardo Systems
+6a2	Globalworx
+6a3	Nymbus
+6a4	LIMNO
+6a5	TEKZITEL PTY LTD
+6a6	Roambee
+6a7	Chipsea Technologies
+6a8	GD Midea Air-Conditioning Equipment
+6a9	Soundmax Electronics
+6aa	Produal
+6ab	HMS Industrial Networks
+6ac	Ingchips Technology
+6ad	InnovaSea Systems
+6ae	SenseQ
+6af	Shoof Technologies
+6b0	BRK Brands
+6b1	SimpliSafe
+6b2	Tussock Innovation 2013
+6b4	Sencilion
+6b5	Wabilogic
+6b6	Sociometric Solutions
+6b7	iCOGNIZE
+6b8	ShadeCraft
+6b9	Beflex
+6ba	Beaconzone
+6bb	Leaftronix Analogic Solutions Private
+6bc	TWS Srl
+6bd	ABB
+6be	HitSeed
+6c0	CAME S.p.A.
+6c1	Alarm.com Holdings
+6c2	Measurlogic
+6c3	King I Electronics.Co.,Ltd
+6c4	Dream Labs
+6c5	Urban Compass
+6c6	Simm Tronic
+6c8	Storz & Bickel GmbH & Co. KG
+6c9	MYLAPS
+6ca	Shenzhen Zhongguang Infotech Technology Development
+6cb	Dyeware
+6cc	Dongguan SmartAction Technology
+6cd	DIG
+6ce	FIOR & GENTZ
+6d0	Etekcity
+6d1	Meyer Sound Laboratories, Incorporated
+6d2	CeoTronics
+6d5	Sensirion
+6d6	JCT Healthcare
+6d7	FUBA Automotive Electronics
+6d8	AW Company
+6d9	Shanghai Mountain View Silicon
+6da	Zliide Technologies ApS
+6db	Automatic Labs
+6dc	Industrial Network Controls
+6dd	Intellithings
+6de	Navcast
+6df	HLI Solutions
+6e0	Avaya
+6e1	Milestone AV Technologies
+6e2	Alango Technologies
+6e3	Spinlock
+6e4	Aluna
+6e5	OPTEX CO.,LTD.
+6e6	NIHON DENGYO KOUSAKU
+6e7	VELUX
+6e8	Almendo Technologies
+6e9	Zmartfun Electronics
+6ea	SafeLine Sweden
+6eb	Houston Radar
+6ed	J Neades
+6ef	ALCARE
+6f0	Chargy Technologies, SL
+6f1	Shibutani
+6f2	Trapper Data
+6f3	Alfred International
+6f4	Touché Technology
+6f5	Vigil Technologies
+6f6	Vitulo Plus
+6f7	WILKA Schliesstechnik
+6f8	BodyPlus Technology
+6f9	happybrush
+6fa	Enequi
+6fb	Sartorius
+6fc	Tom Communication Industrial
+6fd	ESS Embedded System Solutions
+6fe	Mahr
+6ff	Redpine Signals
+700	TraqFreq
+701	PAFERS TECH
+702	Akciju sabiedriba "SAF TEHNIKA"
+703	Beijing Jingdong Century Trading
+704	JBX Designs
+705	AB Electrolux
+706	Wernher von Braun Center for ASdvanced Research
+707	Essity Hygiene and Health Aktiebolag
+708	Be Interactive
+709	Carewear
+70b	Element Products
+70c	Beijing Winner Microelectronics
+70d	SmartSnugg
+70e	FiveCo Sarl
+70f	California Things
+710	Audiodo
+711	ABAX
+712	Bull Group Company
+713	Respiri
+714	MindPeace Safety
+715	MBARC LABS
+716	Altonics
+718	IDIBAIX enginneering
+719	COREIOT PTY LTD
+71a	REVSMART WEARABLE HK CO LTD
+71b	Precor
+71c	F5 Sports
+71d	exoTIC Systems
+71e	DONGGUAN HELE ELECTRONICS CO., LTD
+71f	Dongguan Liesheng Electronic
+720	Oculeve
+721	Clover Network
+722	Xiamen Eholder Electronics
+723	Ford Motor Company
+724	Guangzhou SuperSound Information Technology
+725	Tedee Sp. z o.o.
+726	PHC
+728	Eli Lilly and Company
+729	SwaraLink Technologies
+72a	JMR embedded systems
+72b	Bitkey
+72c	GWA Hygiene
+72d	Safera
+72e	Open Platform Systems
+72f	OnePlus Electronics
+730	Wildlife Acoustics
+731	ABLIC
+732	Dairy Tech
+733	Iguanavation
+734	DiUS Computing
+735	UpRight Technologies LTD
+736	Luna XIO
+737	LLC Navitek
+738	Glass Security
+739	Jiangsu Qinheng
+73a	Chandler Systems
+73b	Fantini Cosmi s.p.a.
+73d	Beijing Hao Heng Tian Tech
+73e	Bluepack S.R.L.
+73f	Beijing Unisoc Technologies
+741	MAC SRL
+742	DML
+743	Sanofi
+744	SOCOMEC
+745	WIZNOVA
+746	Seitec Elektronik
+747	OR Technologies
+748	GuangZhou KuGou Computer Technology
+749	DIAODIAO (Beijing) Technology
+74a	Illusory Studios
+74b	Sarvavid Software Solutions LLP
+74d	Amtech Systems
+74e	EAGLE DETECTION
+74f	MEDIATECH S.R.L.
+750	Hamilton Professional Services of Canada Incorporated
+751	Changsha JEMO IC Design
+752	Elatec
+753	JLG Industries
+754	Michael Parkin
+755	Brother Industries
+756	Lumens For Less
+757	ELA Innovation
+758	umanSense
+759	Shanghai InGeek Cyber Security
+75a	HARMAN CO.,LTD.
+75b	Smart Sensor Devices
+75c	Antitronics
+75d	RHOMBUS SYSTEMS, INC.
+75e	Katerra
+75f	Remote Solution Co., LTD.
+760	Vimar SpA
+761	Mantis Tech
+762	TerOpta
+763	PIKOLIN S.L.
+764	WWZN Information Technology Company
+765	Voxx International
+766	ART AND PROGRAM, INC.
+767	NITTO DENKO ASIA TECHNICAL CENTRE PTE. LTD.
+768	Peloton Interactive
+769	Force Impact Technologies
+76a	Dmac Mobile Developments
+76b	Engineered Medical Technologies
+76c	Noodle Technology inc
+76d	Graesslin
+76e	WuQi technologies
+76f	Successful Endeavours
+770	InnoCon Medical ApS
+771	Corvex Connected Safety
+772	Thirdwayv
+774	C-MAX Asia
+775	4eBusiness
+776	Cyber Transport Control
+777	Cue
+778	KOAMTAC INC.
+779	Loopshore
+77a	Niruha Systems Private
+77c	radius co., ltd.
+77d	Sensority, s.r.o.
+77e	Sparkage
+77f	Glenview Software
+780	Finch Technologies
+781	Qingping Technology
+782	DeviceDrive
+783	ESEMBER LIMITED LIABILITY COMPANY
+784	audifon GmbH & Co. KG
+785	O2 Micro
+788	BubblyNet
+789	PCB Piezotronics
+78a	The Wildflower Foundation
+78b	Optikam Tech
+78c	MINIBREW HOLDING B.V
+78d	Cybex
+78e	FUJIMIC NIIGATA, INC.
+78f	Hanna Instruments
+790	KOMPAN
+791	Scosche Industries
+792	Cricut
+793	AEV spol. s r.o.
+794	The Coca-Cola Company
+795	GASTEC CORPORATION
+796	StarLeaf
+797	Water-i.d.
+798	HoloKit
+799	PlantChoir
+79a	GuangDong Oppo Mobile Telecommunications
+79b	CST ELECTRONICS (PROPRIETARY) LIMITED
+79c	Sky UK
+79d	Digibale
+79e	Smartloxx
+79f	Pune Scientific LLP
+7a0	Regent Beleuchtungskorper
+7a2	Roku
+7a4	Xiamen Mage Information Technology
+7a5	RAB Lighting
+7a6	Musen Connect
+7a7	Zume
+7a8	conbee
+7a9	Bruel & Kjaer Sound & Vibration
+7aa	The Kroger
+7ab	Granite River Solutions
+7ac	LoupeDeck
+7ad	New H3C Technologies
+7ae	Aurea Solucoes Tecnologicas Ltda.
+7af	Hong Kong Bouffalo Lab
+7b0	GV Concepts
+7b1	Thomas Dynamics
+7b2	Moeco IOT
+7b3	2N TELEKOMUNIKACE a.s.
+7b4	Hormann KG Antriebstechnik
+7b5	CRONO CHIP, S.L.
+7b6	Soundbrenner
+7b7	ETABLISSEMENTS GEORGES RENAULT
+7b8	iSwip
+7ba	Battery-Biz
+7bb	EPIC S.R.L.
+7bd	Genedrive Diagnostics
+7be	Axentia Technologies
+7bf	REGULA
+7c0	Biral
+7c2	Radinn
+7c3	CIMTechniques
+7c4	Johnson Health Tech NA
+7c5	June Life
+7c6	Bluenetics
+7c7	iaconicDesign
+7c8	WRLDS Creations
+7c9	Skullcandy
+7cb	West Pharmaceutical Services
+7cc	Barnacle Systems
+7cd	Smart Wave Technologies Canada
+7ce	Shanghai Top-Chip Microelectronics Tech. Co., LTD
+7cf	NeoSensory
+7d0	Hangzhou Tuya Information  Technology
+7d1	Shanghai Panchip Microelectronics
+7d2	React Accessibility
+7d3	LIVNEX
+7d4	Kano Computing
+7d5	hoots classic
+7d6	ecobee
+7d7	Nanjing Qinheng Microelectronics
+7d8	SOLUTIONS AMBRA INC.
+7d9	Micro-Design
+7da	STARLITE
+7db	Remedee Labs
+7dc	ThingOS GmbH & Co KG
+7dd	Linear Circuits
+7de	Unlimited Engineering SL
+7df	Snap-on Incorporated
+7e0	Edifier International
+7e2	Alfred Kaercher SE & Co. KG
+7e3	Airoha Technology
+7e4	Geeksme S.L.
+7e5	Minut
+7e6	Waybeyond
+7e7	Komfort IQ
+7e8	Packetcraft
+7e9	Häfele GmbH & Co KG
+7ea	ShapeLog
+7eb	NOVABASE S.R.L.
+7ec	Frecce
+7ed	Joule IQ, INC.
+7ee	KidzTek
+7ef	Aktiebolaget Sandvik Coromant
+7f0	e-moola.com
+7f1	Zimi Innovations
+7f2	SERENE GROUP, INC
+7f3	DIGISINE ENERGYTECH CO. LTD.
+7f4	MEDIRLAB Orvosbiologiai Fejleszto Korlatolt Felelossegu Tarsasag
+7f5	Byton North America
+7f6	Shenzhen TonliScience and Technology Development
+7f7	Cesar Systems
+7f8	quip NYC
+7fa	Klipsch Group
+7fb	Access
+7fc	Renault
+7fd	JSK CO., LTD.
+7fe	BIROTA
+7ff	maxon motor ltd.
+800	Optek
+801	CRONUS ELECTRONICS LTD
+802	NantSound
+803	Domintell s.a.
+804	Andon Health
+805	Urbanminded
+806	TYRI Sweden
+807	ECD Electronic Components GmbH Dresden
+808	SISTEMAS KERN, SOCIEDAD ANÓMINA
+809	Trulli Audio
+80a	Altaneos
+80b	Nanoleaf Canada
+80c	Ingy
+80d	Azbil
+80e	TATTCOM
+80f	Paradox Engineering
+810	LECO
+811	Becker Antriebe
+812	Mstream Technologies.
+813	Flextronics International USA
+814	Ossur hf.
+815	SKC
+816	SPICA SYSTEMS
+817	Wangs Alliance
+818	tatwah
+819	Hunter Douglas
+81a	Shenzhen Conex
+81b	DIM3
+81c	Bobrick Washroom Equipment
+81d	Potrykus Holdings and Development
+81e	iNFORM Technology
+81f	eSenseLab LTD
+820	Brilliant Home Technology
+821	INOVA Geophysical
+822	adafruit industries
+824	8Power
+825	CME PTE. LTD.
+826	Hyundai Motor Company
+827	Kickmaker
+828	Shanghai Suisheng Information Technology
+829	HEXAGON METROLOGY DIVISION ROMER
+82a	Mitutoyo
+82b	shenzhen fitcare electronics
+82c	INGICS TECHNOLOGY CO., LTD.
+82d	INCUS PERFORMANCE LTD.
+82e	ABB S.p.A.
+82f	Blippit
+831	Foxble
+832	Intermotive,Inc.
+833	Conneqtech
+834	RIKEN KEIKI CO., LTD.
+835	Canopy Growth
+836	Bitwards
+837	vivo Mobile Communication
+838	Etymotic Research
+839	A puissance 3
+83a	BPW Bergische Achsen Kommanditgesellschaft
+83b	Piaggio Fast Forward
+83c	BeerTech LTD
+83d	Tokenize
+83e	Zorachka LTD
+83f	D-Link
+840	Down Range Systems
+841	General Luminaire
+842	Tangshan HongJia electronic technology co., LTD.
+843	FRAGRANCE DELIVERY TECHNOLOGIES LTD
+844	Pepperl + Fuchs
+845	Dometic
+846	USound
+847	DNANUDGE LIMITED
+848	JUJU JOINTS CANADA CORP.
+849	Dopple Technologies
+84a	ARCOM
+84b	Biotechware SRL
+84c	ORSO
+84d	SafePort
+84e	Carol Cole Company
+84f	Embedded Fitness
+850	Yealink (Xiamen) Network Technology Co.,LTD
+851	Subeca
+852	Cognosos
+853	Pektron Group
+854	Tap Sound System
+855	Helios Sports
+856	Canopy Growth
+857	Parsyl
+858	SOUNDBOKS
+859	BlueUp
+85a	DAKATECH
+85b	Nisshinbo Micro Devices
+85c	ACOS CO.,LTD.
+85d	Guilin Zhishen Information Technology
+85e	Krog Systems
+860	Alflex Products
+861	SmartSensor Labs
+862	SmartDrive
+863	Yo-tronics Technology
+864	Rafaelmicro
+865	Emergency Lighting Products
+866	LAONZ
+867	Western Digital Techologies
+868	WIOsense GmbH & Co. KG
+869	EVVA Sicherheitstechnologie
+86a	Odic Incorporated
+86b	Pacific Track
+86c	Revvo Technologies
+86d	Biometrika d.o.o.
+86e	Vorwerk Elektrowerke GmbH & Co. KG
+86f	Trackunit
+870	Wyze Labs
+871	Dension Elektronikai Kft.
+872	11 Health & Technologies
+873	Innophase Incorporated
+874	Treegreen
+875	Berner International
+876	SmartResQ ApS
+877	Valtech
+878	The Chamberlain Group
+879	MIZUNO
+87a	ZRF
+87b	BYSTAMP
+87c	Crosscan
+87d	Konftel
+87e	1bar.net
+87f	Phillips Connect Technologies
+880	imagiLabs
+881	Optalert
+882	PSYONIC
+883	Wintersteiger
+884	Controlid Industria, Comercio de Hardware e Servicos de Tecnologia Ltda
+886	Movella Technologies
+887	Hydro-Gear Limited Partnership
+888	EnPointe Fencing
+889	XANTHIO
+88a	sclak s.r.l.
+88b	Tricorder Arraay Technologies
+88c	GB Solution co.,Ltd
+88d	Soliton Systems
+88f	Tait International
+890	NICHIEI INTEC CO., LTD.
+891	SmartWireless GmbH & Co. KG
+892	Ingenieurbuero Birnfeld UG
+893	Maytronics
+894	EPIFIT
+895	Gimer medical
+896	Nokian Renkaat Oyj
+897	Current Lighting Solutions
+899	SFS unimarket
+89a	Private limited company "Teltonika"
+89b	Saucon Technologies
+89c	Embedded Devices Co. Company
+89d	J-J.A.D.E. Enterprise
+89e	i-SENS, inc.
+89f	Witschi Electronic
+8a0	Aclara Technologies
+8a1	EXEO TECH CORPORATION
+8a2	Epic Systems
+8a3	Hoffmann SE
+8a4	Realme Chongqing Mobile Telecommunications
+8a6	Intelligenceworks
+8a7	TGR 1.618
+8a8	Shanghai Kfcube
+8a9	Fraunhofer IIS
+8aa	SZ DJI TECHNOLOGY CO.,LTD
+8ab	Coburn Technology
+8ac	Topre
+8ad	Kayamatics
+8ae	Moticon ReGo
+8af	Polidea Sp. z o.o.
+8b0	Trivedi Advanced Technologies
+8b1	CORE|vision
+8b2	PF SCHWEISSTECHNOLOGIE GMBH
+8b3	IONIQ Skincare GmbH & Co. KG
+8b4	Sengled
+8b6	Boehringer Ingelheim Vetmedica
+8b7	ABB
+8b8	Check Technology Solutions
+8b9	U-Shin
+8ba	HYPER ICE, INC.
+8bb	Tokai-rika co.,ltd.
+8bc	Prevayl
+8bd	bf1systems limited
+8be	ubisys technologies
+8bf	SIRC
+8c0	Accent Advanced Systems SLU
+8c1	Rayden.Earth LTD
+8c2	Lindinvent
+8c3	CHIPOLO d.o.o.
+8c5	J. Wagner
+8c7	Monadnock Systems
+8c8	Liteboxer Technologies
+8c9	Noventa
+8ca	Nubia Technology
+8cb	JT INNOVATIONS LIMITED
+8cc	TGM TECHNOLOGY CO., LTD.
+8cd	ifly
+8ce	ZIMI CORPORATION
+8cf	betternotstealmybike UG
+8d0	ESTOM Infotech Kft.
+8d1	Sensovium
+8d2	Virscient
+8d3	Novel Bits
+8d4	ADATA Technology Co., LTD.
+8d5	KEYes
+8d7	Inovonics
+8d8	WARES
+8d9	Pointr Labs
+8da	Miridia Technology Incorporated
+8db	Tertium Technology
+8dc	SHENZHEN AUKEY E BUSINESS CO., LTD
+8dd	code-Q
+8de	TE Connectivity
+8df	IRIS OHYAMA CO.,LTD.
+8e0	Philia Technology
+8e1	KOZO KEIKAKU ENGINEERING
+8e2	Shenzhen Simo Technology co. LTD
+8e3	Republic Wireless
+8e4	Rashidov ltd
+8e5	Crowd Connected
+8e6	Eneso Tecnologia de Adaptacion S.L.
+8e7	Barrot Technology
+8e8	Naonext
+8e9	Taiwan Intelligent Home
+8ea	COWBELL ENGINEERING CO.,LTD.
+8eb	Beijing Big Moment Technology
+8ec	Denso
+8ed	IMI Hydronic Engineering International
+8ee	Askey Computer
+8ef	Cumulus Digital Systems
+8f0	Joovv
+8f1	The L.S. Starrett Company
+8f2	Microoled
+8f3	PSP - Pauli Services & Products
+8f4	Kodimo Technologies Company
+8f5	Tymtix Technologies Private
+8f6	Dermal Photonics
+8f7	MTD Products Inc & Affiliates
+8f8	instagrid
+8f9	Spacelabs Medical
+8fb	Darkglass Electronics
+8fc	Hill-Rom
+8fd	BioIntelliSense
+8fe	Ketronixs Sdn Bhd
+8ff	Plastimold Products
+900	Beijing Zizai Technology Co., LTD.
+901	Lucimed
+902	TSC Auto-ID Technology
+903	DATAMARS
+904	SUNCORPORATION
+905	Yandex Services
+906	Scope Logistical Solutions
+907	User Hello
+908	Pinpoint Innovations
+909	70mai
+90a	Zhuhai Hoksi Technology CO.,LTD
+90b	EMBR labs, INC
+90c	Radiawave Technologies
+90e	OPTIMUSIOT TECH LLP
+90f	VC
+910	ASR Microelectronics
+911	Douglas Lighting Controls
+912	Nerbio Medical Software Platforms
+913	Braveheart Wireless
+914	INEO-SENSE
+915	Honda Motor
+916	Ambient Sensors
+917	ASR Microelectronics(ShenZhen)Co.
+919	NO SMD LIMITED
+91a	Albertronic
+91b	Luminostics
+91c	Oblamatik
+91d	Innokind
+91e	Melbot Studios, Sociedad Limitada
+91f	Myzee Technology
+921	KAHA PTE. LTD.
+922	Shanghai MXCHIP Information Technology
+923	JSB TECH PTE LTD
+925	Yukai Engineering
+926	Gooligum Technologies
+927	ROOQ
+928	AiRISTA
+929	Qingdao Haier Technology
+92a	Sappl Verwaltungs- und Betriebs
+92b	TekHome
+92c	PCI Private
+92d	Leggett & Platt, Incorporated
+92e	PS
+92f	C.O.B.O. SpA
+930	James Walker RotaBolt
+931	BREATHINGS
+933	SRAM
+934	KiteSpring
+935	Reconnect
+936	Elekon
+937	RealThingks
+938	Henway Technologies, LTD.
+939	ASTEM
+93a	LinkedSemi Microelectronics
+93b	ENSESO
+93c	Xenoma
+93d	Adolf Wuerth GmbH & Co KG
+93e	Catalyft Labs
+93f	JEPICO
+940	Hero Workout
+941	Rivian Automotive
+942	TRANSSION HOLDINGS LIMITED
+944	Agitron d.o.o.
+945	Globe
+946	AMC International Alfa Metalcraft
+947	First Light Technologies
+948	Wearable Link
+949	Metronom Health Europe
+94a	Zwift
+94b	Kindeva Drug Delivery L.P.
+94c	GimmiSys
+94d	tkLABS INC.
+94e	PassiveBolt
+94f	Limited Liability Company "Mikrotikls"
+950	Capetech
+951	PPRS
+952	Apptricity
+953	LogiLube
+954	Julbo
+955	Breville Group
+956	Kerlink
+957	Ohsung Electronics
+958	ZTE
+959	HerdDogg
+95b	Lismore Instruments
+95c	LogiLube
+95d	Electronic Theatre Controls
+95e	BioEchoNet inc.
+95f	NUANCE HEARING LTD
+960	Sena Technologies
+961	Linkura
+962	GL Solutions
+963	Moonbird
+964	Countrymate Technology
+965	Asahi Kasei
+966	PointGuard
+967	Neo Materials and Consulting
+968	Actev Motors
+969	Woan Technology
+96a	dricos
+96b	Guide ID
+96d	Gunwerks
+96e	Band Industries, inc.
+970	IBA Dosimetry
+971	GA
+973	Popit
+974	ABEYE
+975	BlueIOT(Beijing) Technology
+976	Fauna Audio
+977	TOYOTA motor corporation
+978	ZifferEins GmbH & Co. KG
+979	BIOTRONIK SE & Co. KG
+97a	CORE CORPORATION
+97b	CTEK Sweden
+97c	Thorley Industries
+97d	CLB
+97e	SonicSensory
+97f	ISEMAR S.R.L.
+980	DEKRA TESTING AND CERTIFICATION, S.A.U.
+981	Bernard Krone Holding SE & Co.KG
+982	ELPRO-BUCHS
+983	Feedback Sports
+984	TeraTron
+986	Cello Hill
+987	TSE BRAKES, INC.
+988	BHM-Tech Produktionsgesellschaft m.b.H
+989	WIKA Alexander Wiegand SE & Co.KG
+98a	Biovigil
+98b	Mequonic Engineering, S.L.
+98c	bGrid
+98e	ADVEEZ
+98f	Aktiebolaget Regin
+990	Anton Paar
+991	Telenor
+992	Big Kaiser Precision Tooling
+993	Absolute Audio Labs
+994	VT42
+995	Bronkhorst High-Tech
+996	C. & E. Fein
+997	NextMind
+998	Pixie Dust Technologies
+999	eTactica ehf
+99a	New Audio
+99b	Sendum Wireless
+99c	deister electronic
+99d	YKK AP
+99e	Step One
+99f	Koya Medical
+9a0	Proof Diagnostics
+9a1	VOS Systems
+9a2	ENGAGENOW DATA SCIENCES PRIVATE LIMITED
+9a3	ARDUINO
+9a4	KUMHO ELECTRICS, INC
+9a5	Security Enhancement Systems
+9a6	BEIJING ELECTRIC VEHICLE CO.,LTD
+9a7	Paybuddy ApS
+9a8	KHN Solutions
+9a9	Nippon Ceramic
+9aa	PHOTODYNAMIC INCORPORATED
+9ab	DashLogic
+9ac	Ambiq
+9ad	Narhwall
+9ae	Pozyx NV
+9af	ifLink Open Community
+9b0	Deublin Company
+9b1	BLINQY
+9b2	DYPHI
+9b3	BlueX Microelectronics
+9b4	PentaLock Aps.
+9b5	AUTEC Gesellschaft fuer Automationstechnik mbH
+9b6	Pegasus Technologies
+9b7	Bout Labs
+9b8	PlayerData
+9b9	SAVOY ELECTRONIC LIGHTING
+9ba	Elimo Engineering
+9bb	SkyStream
+9bc	Aerosens
+9bd	Centre Suisse d'Electronique et de Microtechnique
+9be	Vessel
+9bf	Span.IO
+9c0	AnotherBrain inc.
+9c1	Rosewill
+9c2	Universal Audio
+9c3	JAPAN TOBACCO INC.
+9c4	UVISIO
+9c5	HungYi Microelectronics
+9c6	Honor Device
+9c7	Combustion
+9c8	XUNTONG
+9c9	CrowdGlow
+9ca	Mobitrace
+9cb	Hx Engineering
+9cc	Senso4s d.o.o.
+9ce	Julius Blum
+9cf	BlueStreak IoT
+9d0	Chess Wise
+9d1	ABLEPAY TECHNOLOGIES
+9d2	Temperature Sensitive Solutions Systems Sweden
+9d4	ORBIS
+9d5	GEAR RADIO ELECTRONICS CORP.
+9d6	EAR TEKNIK ISITME VE ODIOMETRI CIHAZLARI SANAYI VE TICARET ANONIM SIRKETI
+9d7	Coyotta
+9d8	Synergy Tecnologia em Sistemas Ltda
+9d9	VivoSensMedical
+9da	Nagravision
+9db	Bionic Avionics
+9dd	Innoware Development
+9de	JLD Technology Solutions
+9df	Magnus Technology Sdn Bhd
+9e1	Tag-N-Trac
+9e3	Friday Home Aps
+9e4	CPS
+9e5	Mobilogix
+9e6	Masonite
+9e7	Kabushikigaisha HANERON
+9e8	Melange Systems Pvt.
+9e9	LumenRadio
+9ea	Athlos
+9eb	KEAN ELECTRONICS PTY LTD
+9ec	Yukon advanced optics worldwide, UAB
+9ed	Sibel
+9ee	OJMAR
+9ef	Steinel Solutions
+9f0	WatchGas
+9f1	OM Digital Solutions
+9f2	Audeara
+9f3	Beijing Zero Zero Infinity Technology
+9f4	Spectrum Technologies
+9f5	OKI Electric Industry
+9f6	Mobile Action Technology
+9f7	SENSATEC
+9f8	R.O. S.R.L.
+9f9	Hangzhou Yaguan Technology Co. LTD
+9fa	Listen Technologies
+9fb	TOITU CO., LTD.
+9fc	Confidex
+9fe	Lichtvision Engineering
+9ff	AIRSTAR
+a00	Ampler Bikes OU
+a01	Cleveron
+a02	Ayxon-Dynamics
+a03	donutrobotics
+a04	Flosonics Medical
+a05	Southwire Company
+a06	Shanghai wuqi microelectronics
+a07	Reflow
+a08	Oras
+a0a	Volan Technology
+a0c	Shanghai Yidian Intelligent Technology
+a0d	Blue Peacock
+a0e	Roland
+a0f	LIXIL
+a10	SUBARU
+a11	Sensolus
+a12	Dyson Technology
+a13	Tec4med LifeScience
+a14	CROXEL, INC.
+a15	Syng
+a17	Plume Design
+a18	Cambridge Animal Technologies
+a19	Maxell
+a1a	Link Labs
+a1b	Embrava
+a1c	INPEAK sp. z o.o.
+a1d	API-K
+a1e	CombiQ
+a1f	DeVilbiss Healthcare
+a20	Jiangxi Innotech Technology
+a21	Apollogic Sp. z o.o.
+a22	DAIICHIKOSHO CO., LTD.
+a23	BIXOLON CO.,LTD
+a24	Atmosic Technologies
+a25	Eran Financial Services
+a26	Louis Vuitton
+a28	NanoFlex Power
+a29	Worthcloud Technology
+a2a	Yamaha
+a2b	PaceBait IVS
+a2c	Shenzhen H&T Intelligent Control
+a2d	Shenzhen Feasycom Technology
+a2f	Instamic
+a30	Air-Weigh
+a31	Nevro
+a32	Pinnacle Technology
+a33	WMF
+a34	Luxer
+a35	safectory
+a36	NGK SPARK PLUG CO., LTD.
+a37	2587702 Ontario
+a38	Bouffalo Lab (Nanjing).
+a39	BLUETICKETING SRL
+a3b	Galileo Technology
+a3c	Siteco
+a3d	DELABIE
+a3f	Shenzhen Yopeak Optoelectronics Technology
+a41	OPEX
+a42	Motionalysis
+a43	Busch Systems International
+a44	Novidan
+a45	3SI Security Systems
+a46	Beijing HC-Infinite Technology
+a47	The Wand Company
+a48	JRC Mobility
+a4a	Map Large
+a4b	MistyWest Energy and Transport
+a4c	SiFli Technologies
+a4d	Lockn Technologies Private
+a4e	Toytec
+a4f	VANMOOF Global Holding
+a50	Nextscape
+a51	CSIRO
+a52	Follow Sense Europe
+a53	KKM COMPANY LIMITED
+a54	SQL Technologies
+a55	Inugo Systems
+a56	ambie
+a57	Meizhou Guo Wei Electronics
+a58	Indigo Diabetes
+a59	TourBuilt
+a5a	Sontheim Industrie Elektronik
+a5b	LEGIC Identsystems
+a5c	Innovative Design Labs
+a5d	MG Energy Systems
+a5f	stryker
+a60	DATANG SEMICONDUCTOR TECHNOLOGY CO.,LTD
+a61	Smart Parks
+a62	MOKO TECHNOLOGY
+a64	Geopal system
+a65	Lytx, INC.
+a67	Beijing SuperHexa Century Technology CO.
+a68	Focus Ingenieria SRL
+a69	HAPPIEST BABY, INC.
+a6a	Scribble Design
+a6b	Olympic Ophthalmics
+a6c	Pokkels
+a6e	Pac Sane
+a6f	Warner Bros.
+a70	Ooma
+a71	Senquip
+a72	Jumo GmbH & Co. KG
+a73	Innohome
+a74	MICROSON
+a75	Delta Cycle
+a76	Synaptics Incorporated
+a77	AXTRO PTE. LTD.
+a78	Shenzhen Sunricher Technology
+a79	Webasto SE
+a7a	Emlid
+a7b	UniqAir
+a7c	WAFERLOCK
+a7d	Freedman Electronics
+a7e	KEBA Handover Automation
+a7f	Intuity Medical
+a80	Cleer
+a81	Universal Biosensors
+a82	Corsair
+a83	Rivata
+a84	Greennote
+a85	Snowball Technology
+a86	ALIZENT International
+a87	Shanghai Smart System Technology
+a88	PSA Peugeot Citroen
+a89	VusionGroup
+a8a	HAINBUCH GMBH SPANNENDE TECHNIK
+a8b	SANlight
+a8c	DelpSys, s.r.o.
+a8d	JCM TECHNOLOGIES
+a8e	Perfect Company
+a8f	TOTO LTD.
+a90	Shenzhen Grandsun Electronic
+a91	Monarch International
+a92	Carestream Dental
+a93	GiPStech
+a94	OOBIK
+a95	Pamex
+a98	Foil
+a99	Shanghai high-flying electronics technology
+a9a	TEMKIN ASSOCIATES
+a9b	Eello
+a9c	Xi'an Fengyu Information Technology
+a9d	Canon Finetech Nisca
+a9f	ista International
+aa0	Loy Tec electronics
+aa1	LINCOGN TECHNOLOGY CO. LIMITED
+aa2	Care Bloom
+aa3	DIC
+aa4	FAZEPRO
+aa5	Shenzhen Uascent Technology
+aa6	Realityworks, inc.
+aa7	Urbanista
+aa8	Zencontrol
+aa9	Spintly
+aaa	Computime International
+aab	Anhui Listenai Co
+aac	OSM HK
+aad	Adevo Consulting
+aae	PS Engineering
+aaf	AIAIAI ApS
+ab0	Visiontronic s.r.o.
+ab1	InVue Security Products
+ab2	TouchTronics
+ab3	INNER RANGE PTY. LTD.
+ab4	Ellenby Technologies
+ab5	Elstat Electronics
+ab6	Xenter
+ab7	LogTag North America
+ab8	Sens.ai Incorporated
+ab9	STL
+aba	Open Bionics
+abb	R-DAS, s.r.o.
+abc	KCCS Mobile Engineering
+abd	Inventas
+abe	Robkoo Information & Technologies
+abf	PAUL HARTMANN
+ac0	Omni-ID USA, INC.
+ac1	Shenzhen Jingxun Technology
+ac2	RealMega Microelectronics technology
+ac3	Kenzen
+ac4	CODIUM
+ac5	Flexoptix
+ac6	Barnes Group
+ac7	Chengdu Aich Technology
+ac8	Keepin
+ac9	Swedlock
+aca	Shenzhen CoolKit Technology
+acb	ise Individuelle Software und Elektronik
+acc	Nuvoton
+acd	Visuallex Sport International
+ace	KOBATA GAUGE MFG. CO., LTD.
+acf	CACI Technologies
+ad0	Nordic Strong ApS
+ad2	Lautsprecher Teufel
+ad3	SSV Software Systems
+ad4	Zhuhai Pantum Electronisc
+ad5	Streamit
+ad6	nymea
+ad7	AL-KO Geraete
+ad8	Franz Kaldewei GmbH&Co KG
+ada	Codefabrik
+adb	Reelables
+adc	Duravit
+add	Boss Audio
+ade	Vocera Communications
+adf	Douglas Dynamics L.L.C.
+ae3	GlobalMed
+ae4	DALI Alliance
+ae5	unu
+ae6	Hexology
+ae7	Sunplus Technology
+ae8	LEVEL, s.r.o.
+ae9	FLIR Systems
+aea	Borda Technology
+aeb	Square
+aec	FUTEK ADVANCED SENSOR TECHNOLOGY, INC
+aed	Saxonar
+aee	Velentium
+aef	GLP German Light Products
+af0	Leupold & Stevens
+af1	CRADERS,CO.,LTD
+af3	701x
+af4	Radioworks Microelectronics PTY LTD
+af5	Unitech Electronic
+af6	AMETEK
+af7	Irdeto
+af8	First Design System
+af9	Unisto
+afa	Chengdu Ambit Technology
+afb	SMT ELEKTRONIK
+afc	Cerebrum Sensor Technologies
+afd	Weber Sensors
+afe	Earda Technologies
+aff	FUSEAWARE LIMITED
+b00	Flaircomm Microelectronics
+b01	RESIDEO TECHNOLOGIES, INC.
+b02	IORA Technology Development Ltd. Sti.
+b03	Precision Triathlon Systems
+b05	Marquardt
+b06	FAZUA
+b07	Workaround Gmbh
+b08	Shenzhen Qianfenyi Intelligent Technology Co., LTD
+b0a	Belun Technology Company
+b0b	Sanistaal
+b0c	BluPeak
+b0d	SANYO DENKO
+b0e	Minebea Access Solutions
+b0f	B.E.A.
+b10	Alfa Laval Corporate
+b11	ThermoWorks
+b12	ToughBuilt Industries
+b13	IOTOOLS
+b14	Olumee
+b15	NAOS JAPAN
+b16	Guard RFID Solutions
+b17	SIG SAUER, INC.
+b18	DECATHLON SE
+b19	WBS PROJECT H PTY LTD
+b1a	Roca Sanitario
+b1c	Nanoleq
+b1d	Accelerated Systems
+b1e	PB INC.
+b1f	Beijing ESWIN Computing Technology
+b20	TKH Security
+b22	Hygiene IQ, LLC.
+b23	iRhythm Technologies
+b24	BeiJing ZiJie TiaoDong KeJi
+b25	NIBROTECH LTD
+b26	Baracoda Daily Healthtech.
+b27	Lumi United Technology
+b29	Tech-Venom Entertainment Private
+b2b	MAINBOT
+b2c	ILLUMAGEAR
+b2d	REDARC ELECTRONICS PTY LTD
+b2e	MOCA System
+b2f	Duke Manufacturing Co
+b30	ART SPA
+b31	Silver Wolf Vehicles
+b32	Hala Systems
+b33	ARMATURA
+b34	CONZUMEX INDUSTRIES PRIVATE LIMITED
+b35	BH SENS
+b36	SINTEF
+b37	Omnivoltaic Energy Solutions Limited Company
+b38	WISYCOM S.R.L.
+b39	Red 100 Lighting Co., ltd.
+b3a	Impact Biosystems
+b3b	AIC semiconductor
+b3c	Dodge Industrial
+b3d	REALTIMEID
+b3e	ISEO Serrature S.p.a.
+b3f	MindRhythm
+b40	Havells India
+b41	Sentrax
+b42	TSI
+b43	INCITAT ENVIRONNEMENT
+b44	nFore Technology
+b45	Electronic Sensors
+b47	Gentex
+b48	NIO USA
+b49	SkyHawke Technologies
+b4a	Nomono
+b4b	EMS Integrators
+b4c	BiosBob.Biz
+b4d	Adam Hall
+b4e	ICP Systems
+b4f	Breezi.io
+b50	Mesh Systems
+b51	FUN FACTORY
+b52	ZIIP
+b53	SHENZHEN KAADAS INTELLIGENT TECHNOLOGY CO.,Ltd
+b54	Emotion Fitness GmbH & Co. KG
+b55	H G M Automotive Electronics
+b56	BORA - Vertriebs GmbH & Co KG
+b57	CONVERTRONIX TECHNOLOGIES AND SERVICES LLP
+b58	TOKAI-DENSHI INC
+b5b	Shenzhen ImagineVision Technology
+b5d	Fujian Newland Auto-ID Tech.
+b5e	CELLCONTROL, INC.
+b5f	Rivieh
+b60	RATOC Systems
+b61	Sentek
+b62	NOVEA ENERGIES
+b63	Innolux
+b64	NingBo klite Electric Manufacture Co.,LTD
+b65	The Apache Software Foundation
+b66	MITSUBISHI ELECTRIC AUTOMATION (THAILAND) COMPANY LIMITED
+b68	Quha oy
+b69	Addaday
+b6a	Dymo
+b6b	Samsara Networks
+b6c	Sensitech
+b6d	SOLUM CO., LTD
+b6e	React Mobile
+b70	JDRF Electromag Engineering
+b71	lilbit ODM
+b72	Geeknet
+b73	HARADA INDUSTRY CO., LTD.
+b74	BQN
+b75	Triple W Japan
+b76	MAX-co., ltd
+b77	Aixlink
+b78	FIELD DESIGN INC.
+b79	Sankyo Air Tech
+b7a	Shenzhen KTC Technology
+b7b	Hardcoder
+b7c	Scangrip
+b7d	FoundersLane
+b7e	Offcode
+b7f	ICU tech
+b80	AXELIFE
+b81	SCM Group
+b82	Mammut Sports Group
+b83	Taiga Motors
+b84	Presidio Medical
+b85	VIMANA TECH PTY LTD
+b86	Trek Bicycle
+b87	Ampetronic
+b88	Muguang (Guangdong) Intelligent Lighting Technology
+b89	Rotronic
+b8a	Seiko Instruments
+b8b	American Technology Components, Incorporated
+b8c	MOTREX
+b8d	Pertech Industries
+b8e	Gentle Energy
+b8f	Senscomm Semiconductor
+b91	Alfen ICU
+b93	Hangzhou BroadLink Technology
+b94	Dreem
+b96	Telecom Design
+b97	SILVER TREE LABS, INC.
+b98	Gymstory
+b99	The Goodyear Tire & Rubber Company
+b9a	Beijing Wisepool Infinite Intelligence Technology
+b9c	Komatsu
+b9d	Sensoria Holdings LTD
+b9e	Audio Partnership Plc
+b9f	Group Lotus
+ba0	Data Sciences International
+ba1	Bunn-O-Matic
+ba2	TireCheck
+ba3	Sonova Consumer Hearing
+ba4	Vervent Audio Group
+ba5	SONICOS ENTERPRISES
+ba6	Nissan Motor
+ba7	hearX Group
+ba8	GLOWFORGE INC.
+ba9	Allterco Robotics ltd
+baa	Infinitegra
+bab	Grandex International
+bac	Machfu
+bad	Roambotics
+bae	Soma Labs
+baf	NITTO KOGYO CORPORATION
+bb0	Ecolab
+bb1	Beijing ranxin intelligence technology Co.,LTD
+bb2	Fjorden Electra
+bb3	Flender
+bb4	New Cosmos USA
+bb5	Xirgo Technologies
+bb6	Build With Robots
+bb7	IONA Tech
+bb8	INNOVAG PTY. LTD.
+bb9	SaluStim Group
+bba	Huso, INC
+bbb	SWISSINNO SOLUTIONS
+bbc	T2REALITY SOLUTIONS PRIVATE LIMITED
+bbe	SAAB Aktiebolag
+bbf	HIMSA II K/S
+bc0	READY FOR SKY LLP
+bc1	Miele & Cie. KG
+bc2	EntWick
+bc3	MCOT INC.
+bc4	TECHTICS ENGINEERING
+bc5	Aperia Technologies
+bc6	TCL COMMUNICATION EQUIPMENT CO.,LTD.
+bc7	Signtle
+bc8	OTF Distribution
+bc9	Neuvatek
+bca	Perimeter Technologies
+bcb	Divesoft s.r.o.
+bcc	Sylvac sa
+bcd	Amiko
+bce	Neurosity
+bcf	LL Tec Group
+bd0	Durag
+bd1	Hubei Yuan Times Technology
+bd2	IDEC
+bd3	Procon Analytics
+bd4	ndd Medizintechnik
+bd5	Super B Lithium Power
+bd6	Shenzhen Injoinic Technology
+bd8	PURA SCENTS, INC.
+bda	Aardex
+bdb	CHAR-BROIL
+bdc	TWINKLY SRL
+bdd	Coroflo
+bde	Yale
+bdf	WINKEY ENTERPRISE (HONG KONG) LIMITED
+be0	Koizumi Lighting Technology corp.
+be2	OTC engineering
+be3	Comtel Systems
+be4	Deepfield Connect
+be5	ZWILLING J.A. Henckels Aktiengesellschaft
+be6	Puratap
+be7	Fresnel Technologies
+be8	Sensormate
+be9	Shindengen Electric Manufacturing
+bea	Twenty Five Seven, prodaja in storitve, d.o.o.
+beb	Luna Health
+bed	CORAL-TAIYI
+bee	LINKSYS USA, INC.
+bef	Safetytest
+bf0	KIDO SPORTS CO., LTD.
+bf1	Site IQ
+bf2	Angel Medical Systems
+bf3	PONE BIOMETRICS
+bf5	T5 tek
+bf6	greenTEG
+bf7	Wacker Neuson SE
+bf8	Innovacionnye Resheniya
+bfa	CleanBands Systems
+bfb	Dodam Enersys
+bfc	T+A elektroakustik GmbH & Co.KG
+bfd	Esmé Solutions
+bfe	Media-Cartec
+bff	Ratio Electric
+c00	MQA
+c01	NEOWRK SISTEMAS INTELIGENTES
+c02	Loomanet
+c03	Puff
+c04	Happy Health
+c05	Montage Connect
+c06	LED Smart
+c07	CONSTRUKTS, INC.
+c08	limited liability company "Red"
+c09	Senic
+c0a	Automated Pet Care Products
+c0b	aconno
+c0c	Mendeltron
+c0d	Mereltron bv
+c0e	ALEX DENKO CO.,LTD.
+c0f	AETERLINK
+c10	Cosmed s.r.l.
+c11	Gordon Murray Design
+c12	IoSA
+c13	Scandinavian Health
+c14	Fasetto
+c15	Geva Sol
+c16	TYKEE PTY. LTD.
+c17	SomnoMed
+c18	CORROHM
+c19	Arlo Technologies
+c1a	Catapult Group International
+c1b	Rockchip Electronics
+c1c	GEMU
+c1d	OFF Line Japan
+c1e	EC sense co.
+c1f	LVI
+c20	COMELIT GROUP S.P.A.
+c21	Foshan Viomi Electrical Technology
+c22	Glamo
+c23	KEYTEC,Inc.
+c24	SMARTD TECHNOLOGIES INC.
+c25	JURA Elektroapparate
+c26	Performance Electronics
+c27	Pal Electronics
+c28	Embecta
+c29	DENSO AIRCOOL CORPORATION
+c2a	Caresix
+c2b	GigaDevice Semiconductor
+c2c	Zeku Technology
+c2d	OTF Product Sourcing
+c2e	Easee
+c2f	BEEHERO, INC.
+c30	McIntosh Group
+c31	KINDOO LLP
+c32	Xian Yisuobao Electronic Technology
+c33	Exeger Operations
+c34	BYD Company
+c35	Thermokon-Sensortechnik
+c37	SignalQuest
+c38	Noritz Corporation.
+c39	TIGER CORPORATION
+c3b	ORB Innovations
+c3c	Classified Cycling
+c3d	Wrmth
+c3e	BELLDESIGN
+c3f	Stinger Equipment
+c40	HORIBA
+c41	Control Solutions
+c42	Heath Consultants
+c43	Berlinger &
+c44	ONCELABS
+c45	Brose Verwaltung SE, Bamberg
+c47	Epsilon Electronics,lnc
+c48	VALEO MANAGEMENT SERVICES
+c49	twopounds gmbh
+c4a	atSpiro ApS
+c4b	ADTRAN
+c4c	Orpyx Medical Technologies
+c4d	Seekwave Technology Co.,ltd.
+c4e	Tactile Engineering
+c4f	SharkNinja Operating
+c50	Imostar Technologies
+c51	INNOVA S.R.L.
+c52	ESCEA LIMITED
+c53	Taco
+c54	HiViz Lighting
+c55	Zintouch
+c56	Rheem Sales Company
+c57	UNEEG medical
+c58	Hykso
+c59	CYBERDYNE
+c5a	Lockswitch Sdn Bhd
+c5b	Alban Giacomo S.P.A.
+c5c	MGM WIRELESSS HOLDINGS PTY LTD
+c5d	StepUp Solutions ApS
+c5e	BlueID
+c5f	Wuxi Linkpower Microelectronics
+c60	KEBA Energy Automation
+c61	NNOXX
+c62	Phiaton
+c63	phg Peter Hengstler GmbH + Co. KG
+c64	dormakaba Holding
+c65	WAKO CO,.LTD
+c67	TRACKTING S.R.L.
+c68	Emerja
+c6a	CONSORCIO TRUST CONTROL - NETTEL
+c6b	GILSON
+c6c	SNIFF LOGIC LTD
+c6d	Fidure
+c6e	Sensa
+c6f	Parakey
+c70	SCARAB SOLUTIONS LTD
+c71	BitGreen Technolabz (OPC) Private
+c72	StreetCar ORV
+c73	Truma Gerätetechnik GmbH & Co. KG
+c74	yupiteru
+c75	Embedded Engineering Solutions
+c77	TEAC
+c78	CHARGTRON IOT PRIVATE LIMITED
+c79	Zhuhai Smartlink Technology
+c7a	Triductor Technology
+c7b	PT SADAMAYA GRAHA TEKNOLOGI
+c7c	Mopeka Products
+c7d	3ALogics
+c7f	Rochester Sensors
+c80	CARDIOID - TECHNOLOGIES, LDA
+c81	Carrier
+c82	NACON
+c83	Watchdog Systems
+c84	MAXON INDUSTRIES, INC.
+c85	Amlogic
+c86	Qingdao Eastsoft Communication Technology
+c87	Weltek Technologies Company
+c88	Nextivity
+c89	AGZZX OPTOELECTRONICS TECHNOLOGY CO., LTD
+c8a	A.GLOBAL co.,Ltd.
+c8b	Heavys
+c8c	T-Mobile USA
+c8d	tonies
+c8e	Technocon Engineering
+c8f	Radar Automobile Sales(Shandong)Co.,Ltd.
+c90	WESCO
+c91	Yashu Systems
+c92	Kesseböhmer Ergonomietechnik
+c93	Movesense
+c94	Baxter Healthcare
+c95	Gemstone Lights Canada
+c96	H+B Hightech
+c97	Deako
+c99	Vire Health
+c9a	ALF
+c9b	NTT sonority
+c9c	Sunstone-RTLS Ipari Szolgaltato Korlatolt Felelossegu Tarsasag
+c9d	Ribbiot, INC.
+c9f	Dragonfly Energy
+ca0	BIGBEN
+ca1	YAMAHA MOTOR CO.,LTD.
+ca2	XSENSE LTD
+ca3	MAQUET
+ca4	MITSUBISHI ELECTRIC LIGHTING CO, LTD
+ca5	Princess Cruise Lines
+ca6	Megger
+ca7	Verve InfoTec
+ca8	Sonas
+ca9	Mievo Technologies Private
+caa	Shenzhen Poseidon Network Technology
+cab	HERUTU ELECTRONICS CORPORATION
+cac	Shenzhen Shokz
+cad	Shenzhen Openhearing Tech CO., LTD .
+cae	Evident
+caf	NEURINNOV
+cb0	SwipeSense
+cb1	RF Creations
+cb2	SHINKAWA Sensor Technology
+cb3	janova
+cb4	Eberspaecher Climate Control Systems
+cb5	Racketry, d. o. o.
+cb6	THE EELECTRIC MACARON
+cb7	Cucumber Lighting Controls
+cb9	seca GmbH & Co. KG
+cba	Ameso Tech (OPC) Private
+cbb	Emlid Tech Kft.
+cbd	Pricer
+cbf	Forward Thinking Systems LLC.
+cc0	Garnet Instruments
+cc1	CLEIO
+cc2	Anker Innovations
+cc3	HMD Global
+cc4	ABUS August Bremicker Soehne Kommanditgesellschaft
+cc5	Open Road Solutions
+cc6	Serial Technology
+cc7	SB C&S
+cc8	TrikThom
+cc9	Innocent Technology
+cca	Cyclops Marine
+ccb	NOTHING TECHNOLOGY LIMITED
+ccc	Kord Defence
+ccd	YanFeng Visteon(Chongqing) Automotive Electronic
+cce	SENOSPACE
+ccf	Shenzhen CESI Information Technology
+cd0	MooreSilicon Semiconductor Technology (Shanghai) Co., LTD.
+cd1	Imagine Marketing
+cd2	EQOM SSC
+cd3	TechSwipe
+cd4	Reoqoo IoT Technology
+cd5	Numa Products
+cd6	HHO (Hangzhou) Digital Technology
+cd7	Maztech Industries
+cd8	SIA Mesh Group
+cd9	Minami acoustics
+cda	Wolf Steel ltd
+cdb	Circus World Displays
+cdc	Ypsomed
+cdd	Alif Semiconductor
+cdf	SHENZHEN CHENYUN ELECTRONICS  CO., LTD
+ce0	VODALOGIC PTY LTD
+ce1	Regal Beloit America
+ce2	CORVENT MEDICAL, INC.
+ce3	Taiwan Fuhsing
+ce4	Off-Highway Powertrain Services Germany
+ce5	Amina Distribution
+ce6	mwConnect
+ce7	TAG HEUER
+ce8	Dongguan Yougo Electronics
+ce9	PEAG, LLC dba JLab Audio
+cea	HAYWARD INDUSTRIES, INC.
+ceb	Shenzhen Tingting Technology Co. LTD
+cec	Pacific Coast Fishery Services
+ced	CV. NURI TEKNIK
+cee	MadgeTech
+cef	POGS
+cf0	THOTAKA TEKHNOLOGIES INDIA PRIVATE LIMITED
+cf1	Midmark
+cf3	Radio Sound
+cf4	SOLUX PTY LTD
+cf5	BOS Balance of Storage Systems
+cf6	OJ Electronics
+cf7	TVS Motor Company
+cf8	core sensing
+cf9	Tamblue
+cfa	Protect Animals With Satellites
+cfb	Tyromotion
+cfc	ElectronX design
+cfe	Thule Group
+d01	KEEPEN
+d02	Rocky Mountain ATV/MC Jake Wilson
+d03	MakuSafe
+d04	Bartec Auto Id
+d05	Energy Technology and Control
+d06	doubleO
+d07	Datalogic
+d08	Datalogic USA
+d09	Leica Geosystems
+d0a	CATEYE
+d0b	Research Products
+d0c	Planmeca
+d0d	C.Ed. Schulte GmbH Zylinderschlossfabrik
+d0e	PetVoice
+d0f	Timebirds Australia
+d10	JVC KENWOOD
+d12	Spartek Systems
+d13	MERRY ELECTRONICS CO., LTD.
+d14	Merry Electronics
+d15	Spark
+d16	Nations Technologies
+d17	Akix
+d18	Bioliberty
+d19	C.G. Air Systemes
+d1a	Maturix ApS
+d1b	RACHIO, INC.
+d1c	LIMBOID
+d1d	Electronics4All
+d1e	FESTINA LOTUS
+d1f	Synkopi
+d20	SCIENTERRA LIMITED
+d21	Cennox Group
+d22	Cedarware
+d23	GREE Electric Appliances, Inc. of Zhuhai
+d24	Japan Display
+d25	System Elite Holdings Group
+d26	Burkert Werke GmbH & Co. KG
+d27	velocitux
+d28	FUJITSU COMPONENT LIMITED
+d29	MIYAKAWA ELECTRIC WORKS LTD.
+d2a	PhysioLogic Devices
+d2b	Sensoryx
+d2c	SIL System Integration Laboratory
+d2d	Cooler Pro
+d2e	Advanced Electronic Applications
+d2f	Delta Development Team
+d30	Laxmi Therapeutic Devices
+d31	SYNCHRON, INC.
+d32	Badger Meter
+d33	Micropower Group
+d34	ZILLIOT TECHNOLOGIES PRIVATE LIMITED
+d35	Universidad Politecnica de Madrid
+d36	XIHAO INTELLIGENGT TECHNOLOGY CO., LTD
+d37	Zerene
+d38	CycLock
+d3a	Frost Solutions
+d3b	Lone Star Marine
+d3c	SIRONA Dental Systems
+d3d	bHaptics
+d3e	LUMINOAH, INC.
+d3f	Vogels Products
+d40	SignalFire Telemetry
+d41	CPAC Systems
+d42	TEKTRO TECHNOLOGY CORPORATION
+d43	Gosuncn Technology Group
+d44	Ex Makhina
+d45	Odeon
+d46	Thales Simulation & Training
+d47	Shenzhen DOKE Electronic
+d48	Vemcon
+d49	Refrigerated Transport Electronics
+d4a	Rockpile Solutions
+d4b	Soundwave Hearing
+d4d	Optec
+d4e	NIKAT SOLUTIONS PRIVATE LIMITED
+d4f	Movano
+d50	NINGBO FOTILE KITCHENWARE CO., LTD.
+d51	Genetus inc.
+d52	DIVAN TRADING CO., LTD.
+d53	Luxottica Group S.p.A
+d54	ISEKI FRANCE S.A.S
+d55	NO CLIMB PRODUCTS LTD
+d56	Wellang.Co,.Ltd
+d57	Nanjing Xinxiangyuan Microelectronics
+d58	ifm electronic gmbh
+d59	HYUPSUNG MACHINERY ELECTRIC CO., LTD.
+d5a	Gunnebo Aktiebolag
+d5b	Axis Communications
+d5d	Stogger
+d5e	Pella
+d5f	SiChuan Homme Intelligent Technology co.,Ltd.
+d60	Smart Products Connection
+d61	F.I.P. FORMATURA INIEZIONE POLIMERI - S.P.A.
+d62	MEBSTER s.r.o.
+d63	SKF France
+d64	Southco
+d65	Molnlycke Health Care
+d66	Hendrickson USA , L.L.C
+d67	BLACK BOX NETWORK SERVICES INDIA PRIVATE LIMITED
+d68	Status Audio
+d69	AIR AROMA INTERNATIONAL PTY LTD
+d6a	Helge Kaiser
+d6b	Crane Payment Innovations
+d6d	DYNAMOX S/A
+d6e	Look Cycle International
+d6f	Closed Joint Stock Company NVP BOLID
+d70	Kindhome
+d71	Kiteras
+d72	Earfun Technology
+d73	iota Biosciences
+d74	ANUME s.r.o.
+d75	Indistinguishable From Magic
+d76	i-focus
+d77	DualNetworks
+d78	MITACHI CO.,LTD.
+d79	VIVIWARE JAPAN
+d7a	Xiamen Intretech
+d7b	MindMaze
+d7c	BeiJing SmartChip Microelectronics Technology
+d7d	Taiko Audio
+d7e	Daihatsu Motor
+d7f	Konova
+d80	Gravaa
+d81	Beyerdynamic GmbH & Co. KG
+d82	VELCO
+d83	ATLANTIC SOCIETE FRANCAISE DE DEVELOPPEMENT THERMIQUE
+d84	Testo SE & Co. KGaA
+d85	SEW-EURODRIVE GmbH & Co KG
+d86	ROCKWELL AUTOMATION, INC.
+d87	Quectel Wireless Solutions
+d89	Nanohex
+d8a	Simply Embedded
+d8b	Software Development
+d8c	Ultimea Technology
+d8d	RF Electronics
+d8e	Optivolt Labs
+d8f	Canon Electronics
+d90	LAAS ApS
+d91	Beamex Oy Ab
+d92	TACHIKAWA CORPORATION
+d93	HagerEnergy
+d95	Hunter Industries Incorporated
+d96	NEOKOHM SISTEMAS ELETRONICOS LTDA
+d97	Zhejiang Huanfu Technology Co., LTD
+d98	E.F. Johnson Company
+d99	Caire
+d9a	Yeasound (Xiamen) Hearing Technology
+d9b	Boxyz
+d9c	Skytech Creations
+d9d	Cear
+d9e	Impulse Wellness
+d9f	MML US
+da0	SICK
+da1	Fen Systems
+da2	KIWI.KI
+da3	Airgraft
+da4	HP Tuners
+da5	PIXELA CORPORATION
+da6	Generac
+da7	Novoferm tormatic
+da8	Airwallet ApS
+da9	Inventronics
+daa	Shenzhen EBELONG Technology
+dab	Efento
+dac	ITALTRACTOR ITM S.P.A.
+dae	TITUM AUDIO, INC.
+daf	Hexagon Aura Reality
+db0	Invisalert Solutions
+db1	TELE System Communications
+db2	Whirlpool
+db3	SHENZHEN REFLYING ELECTRONIC CO., LTD
+db4	Franklin Control Systems
+db5	Djup
+db6	SAFEGUARD EQUIPMENT, INC.
+db7	Morningstar
+db8	Shenzhen Chuangyuan Digital Technology
+db9	CompanyDeep
+dba	Veo Technologies ApS
+dbb	Nexis Link Technology
+dbc	Felion Technologies Company
+dbd	MAATEL
+dbe	HELLA GmbH & Co. KGaA
+dbf	HWM-Water
+dc0	Shenzhen Jahport Electronic Technology
+dc1	NACHI-FUJIKOSHI CORP.
+dc2	Cirrus Research
+dc3	GEARBAC TECHNOLOGIES INC.
+dc4	Hangzhou NationalChip Science & Technology
+dc5	DHL
+dc6	Levita
+dc7	MORNINGSTAR FX PTE. LTD.
+dc8	ETO GRUPPE TECHNOLOGIES
+dc9	farmunited
+dca	Aptener Mechatronics Private
+dcb	GEOPH
+dcc	Trotec
+dcd	Astra LED
+dce	NOVAFON - Electromedical devices limited liability company
+dcf	KUBU SMART LIMITED
+dd0	ESNAH
+dd1	OrangeMicro
+dd2	Fresh n Rebel
+dd3	Global Satellite Engineering
+dd4	KOQOON GmbH & Co.KG
+dd5	BEEPINGS
+dd6	MODULAR MEDICAL, INC.
+dd7	Xiant Technologies
+dd9	SCHELL GmbH & Co. KG
+dda	Minebea Intec
+ddb	KAGA FEI
+ddc	AUTHOR-ALARM, razvoj in prodaja avtomobilskih sistemov proti kraji, d.o.o.
+ddd	Tozoa
+dde	SHENZHEN DNS INDUSTRIES CO., LTD.
+ddf	Shenzhen Lunci Technology
+de0	KNOG PTY. LTD.
+de1	Outshiny India Private
+de2	TAMADIC
+de3	Shenzhen MODSEMI
+de4	EMBEINT INC
+de5	Ehong Technology
+de6	DEXATEK Technology LTD
+de7	Dendro Technologies
+de8	Vivint
+de9	General Laser
+dea	Kathrein Solutions
+deb	Fitz
+dec	ATEGENOS PHARMACEUTICALS INC
+ded	Flextronic
+dee	Safety Swim
+def	SING SUN TECHNOLOGY (INTERNATIONAL) LIMITED
+df0	Woncan
+df1	iFLYTEK (Suzhou) Technology
+df2	Weber-Stephen Products
+df3	hDrop Technologies
+df4	REEKON TOOLS INC.
+df5	Delta Faucet Company
+df6	Mutrack
+df7	Hangzhou Zhaotong Microelectronics
+df8	Chengdu CSCT Microelectronics
+df9	Belusun Technology
+dfa	Shenzhen Matches IoT Technology
+dfb	Beidou Intelligent Connected Vehicle Technology
+dfc	SOJI ELECTRONICS JOINT STOCK COMPANY
+dfd	BH Technologies
+dfe	Haptech
+dff	WaveRF
+e00	SHENZHEN SOUNDSOUL INFORMATION TECHNOLOGY CO.,LTD
+e01	Wuhu Mengbo Technology
+e02	PROSYS DEV LIMITED
+e03	Shenzhen eMeet technology
+e04	Doro
+e05	SUREPULSE MEDICAL LIMITED
+e06	iodyne
+e07	Pinpoint
+e08	Heinrich Kopp
+e09	Evolutive Systems SL
+e0b	Sounding Audio Industrial
+e0c	Yuanfeng Technology
+e0d	FrontAct
+e0f	SenseWorks Tecnologia Ltda.
+e10	Eko Health
+e11	Wanzl GmbH & Co. KGaA
+e12	CLEVER LOGGER TECHNOLOGIES PTY LIMITED
+e13	ASYSTOM
+e14	Heilongjiang Tianyouwei Electronics
+e15	Eastern Partner
+e16	Xiamen RUI YI Da Electronic Technology
+e17	Ad Hoc Electronics, llc.
+e18	Hangzhou Microimage Software
+e19	Hive-Zox International
+e1a	Sensovo
+e1b	Time Location Systems
+e1c	SHENZHEN DIGITECH CO., LTD
+e1d	Capte
+e1e	9512-5837 QUEBEC INC.
+e1f	Blecon
+e20	CFLAB TEKNOLOJI TICARET LIMITED SIRKETI
+e21	FOGO
+e22	HITO INC
+e23	MS kajak7 UG
+e24	Avedis Zildjian
+e25	Hangzhou Hikvision Digital Technology
+e26	LIHJOEN SPEED METER CO., LTD.
+e27	NextSense
+e28	PatchRx
+e29	Flipper Devices
+e2a	Huizhou Foryou General Electronics
+e2b	JE electronic a/s
+e2c	9313-7263 Quebec inc.
+e2d	ECARX (Hubei) Tech
+e2e	NIHON KOHDEN CORPORATION
+e2f	ONWI
+e30	Primax Electronics
+e31	AlphaTheta
+e32	PACIFIC INDUSTRIAL CO., LTD.
+e33	Crescent NV
+e34	Vermis, software solutions llc
+e35	SNAPPWISH
+e36	Cousins and Sears
+e37	CESYS Gesellschaft für angewandte Mikroelektronik mbH
+e38	SLOC
+e39	IRES Infrarot Energie Systeme
+e3a	OFIVE LIMITED
+e3b	Swift IOT Tech (Shenzhen) Co., LTD.
+e3c	Viselabs
+e3d	Walmart
+e3e	VANBOX
+e3f	Wiser Devices
+e40	WKD Labs
+e41	Asustek Computer
+e42	Z-ONE Technology
+e43	InnoVision Medical Technologies
+e44	QUANTATEC
+e45	Filo Srl
+e46	SOUNDUCT
+e47	Hosiden Besson
+e48	KARLUNA MUHENDISLIK SANAYI VE TICARET ANONIM SIRKETI
+e49	Deone (Shanghai) Communication & Technology
+e4a	Nitto Denko
+e4b	PUDSEY DIAMOND ENGINEERING LIMITED
+e4c	Luxshare Precision Industry
+e4d	Brooksee
+e4e	QSC
+e4f	eBet Gaming Sytems Pty
+e50	Zhejiang Desman Intelligent Technology
+e51	Dyaco International
+e52	Aquana
+e53	MINIRIG
+e54	After Technologies
+e55	New Cosmos Electric
+e56	INEPRO Metering
+e57	Altina
+e58	Urban Armor Gear
+e59	Loewe Technology
+e5a	OmniWave Microelectronics Shanghai
+e5b	Wuhu Hongjing Electronic
+e5c	Rocoto
+e5d	L.T.H. Electronics
+e5e	SHAPER TOOLS, INC.
+e5f	Ruptela
+e60	Ant Group
+e61	Queclink Wireless Solutions
+e62	GOKI PTY LTD
+e63	LAST LOCK INC.
+e64	HuiTong intelligence Company
+e65	Daikin Industries, LTD
+e66	Shenzhen Baseus Technology
+e67	NEXT DEVICES LTDA
+e69	Megatronix (Beijing) Technology
+e6a	Hyena
+e6b	Shenzhen Goodocom Information Technology
+e6c	RIGH, INC.
+e6f	OpConnect
+e70	Powerstick.com
+e71	ENABLEWEAR
+e73	Adventures of the Persistently Impaired
+e74	Rocky Radios
+e75	Le Touch (Shenzhen) Electronics
+e76	Guangdong Nanguang Photo&Video Systems
+e77	MOBILE TECH, INC.
+e78	HONG KONG COMMUNICATIONS COMPANY LIMITED
+e79	Neptune First OU
+e7a	Vivago
+e7b	Circular
+e7c	final
+e7d	Jiangsu XinTongda Electric Technology
+e7e	Archon Controls
+e7f	SZR-Dev UG
+e80	IQNEXXT Solutions
+e81	Guangdong Hengqin Xingtong Technology Co.,ltd.
+e82	CHEVALIER TECH LIMITED
+e83	SPRiNTUS
+e84	Tymphany HK
+e85	TigerLight
+e86	Mercury Marine, a division of Brunswick
+e87	OpenTech Alliance
+e88	Skewered Fencing
+e89	Brudden
+e8a	Tele-Radio i Lysekil
+e8b	Allgon
+e8c	Gopod Group Holding
+e8d	Celebrities Management Private
+e8e	Nobest
+e8f	Avetos Design
+e90	RainMaker Solutions
+e91	Identita
+e92	Glutz
+e93	MIV ELECTRONICS, LTD
+e94	Tactrix
+e95	Viaanix
+e96	Skeed,co,Ltd.
+e97	kokoromil
+e98	Chromatic
+e99	Medibound
+e9a	Scanbro OU
+e9b	Panasonic Automotive Systems
+e9c	Andrews & Arnold
+e9d	Audinor ApS
+e9e	Travelxp India Private
+e9f	Owlet Baby Care
+ea0	ENLESS WIRELESS
+ea1	Culligan International Company
+ea2	QIKCONNEX
+ea3	OLIS ELECTRONICS
+ea4	BiTECH Automotive
+ea6	AMG Lab
+ea7	BrickXter
+ea8	Dongguan Trangjan Industrial
+ea9	Makichie
+eab	STEYR Sport
+eac	Dynetrex Solutions
+ead	OPTRON
+eae	BHClears Microelectronics
+eaf	Unfolded Circle ApS
+eb0	FactorySense
+eb1	WearNex
+eb2	PRADCO Outdoor Brands
+eb3	Zucchetti Axess
+eb4	BLUEFIN DATA
+eb5	Preseed Japan
+eb6	Server Products
+eb7	Embedded Solutions
+eba	THERMY LTD
+ebb	Asahi Denso
+ebc	GP Acoustics International
+ebd	Tongfang Health Technology
+ebe	Deity Acoustic Technology
+ebf	Schulte-Schlagbaum
+ec0	WEST inx
+ec1	Crossdoor
+ec2	High Entropy
+ec3	Herschel Infrared
+ec4	PACIFIC MARINE BATTERIES PTY. LIMITED
+ec5	Alibaba
+ec6	AuthGate
+ec7	Canyon Bicycles
+ec8	Codie
+ec9	NeuroPace
+eca	NexRev
+ecb	Zhong Shan City Richsound Electronic Industrial
+ecc	Shenzhen NEOECO Technology
+ecd	Nature
+ece	Guangzhou Honor Microelectronic
+ecf	GGEC America
+ed0	Gibson
+ed1	VINYL MATT MEDIA LIMITED
+ed2	SHENZHEN BESTWAY ELECTRONICS CO.,LTD
+ed3	Lichens Innovation inc.
+ed4	Goerdyna Group
+ed5	Relish Technologies
+ed6	Quintessential Design
+ed7	CS INSTRUMENTS GmbH & Co.KG
+ed8	DORAN MFG.
+ed9	Overhead Door
+eda	Kodira
+edb	ShenZhen BoYiChuangXin
+edc	Shenzhen Zoqin Technology
+edd	Ceridwen
+ede	Sony Honda Mobility
+edf	Dynaudio
+ee0	MAERSK CONTAINER INDUSTRY
+ee1	MA MICRO LIMITED
+ee2	shenzhen hongever technology Co,.
+ee3	TAMRON
+ee4	CAPTEMP, LDA
+ee5	Ambient Life
+ee6	NOCTRIX HEALTH, INC
+ee7	RICKARD AIR DIFFUSION (PTY) LTD
+ee8	SG Armaturen
+ee9	PIXEL TI IND. E COM PROD ELETRONICOS
+eea	Core Devices
+eeb	Fujita Electric Works
+eec	Willow Laboratories
+eed	BBC Bircher
+eee	ELLEA INGEGNERIA SRL UNIPERSONALE
+eef	Q42 Internet
+ef0	Seaward Electronic
+ef1	Wuxi Does IOT
+ef3	Monil
+ef5	LS ELECTRIC
+ef6	Shenzhen Cyber Innovation Technology
+ef7	Trackonomy Systems
+ef8	IoT Solutions Malta
+ef9	Aseptico
+efa	Sensear
+efb	BLUEPROVIDERZ
+efc	Jano Life
+efd	PRIMES
+efe	Teledyne Instruments
+eff	Healthcare Technology
+f00	TRACERCO LIMITED
+f01	HAPPLABS SOFTWARE PRIVATE LIMITED
+f02	GE HEALTHCARE TECHNOLOGIES INC.
+f03	Olibra
+f04	Lumen Labs
+f05	SHENZHEN GWSTAI TECHNOLOGY CO.,LTD
+f06	SHENZHEN POWEROAK NEWENER CO., LTD
+f07	Tech OVN Private
+f08	Lezyne USA
+f09	ANC CHINA LIMITED
+f0a	LION GROUP, INC.
+f0b	Brightway Innovation Intelligent Technology
+f0c	Hitachi Industrial Equipment Systems
+f0d	Maennl Elektronik
+f0e	IDEATRONIK Limited Liability Company
+f0f	caive
+f10	ShenZhen Doctors of Intelligence & Technology
+f11	Deep and Steep
+f12	Endur ID
+f13	Freshape
+f14	PreEvnt
+f15	Oval
+f16	ADHD Friendly co.Ltd
+f17	RORENTECH
+f18	iKeyless
+f19	Shenzhen SuperSound Technology
+f1a	FLO SCIENCES
+f1b	PalatiumCare
+f1c	Edge Semiconductors
+f1d	ZIMMERMANN PV-Steel Group GmbH & Co. KG
+f1e	Yolni
+f1f	Ninebot (Changzhou) Tech
+f20	Beijing Spring Creation Technology
+f21	Rokk
+f22	ONESPACE TECHNOLOGIES (PTY) LTD
+f23	Yuquan Semiconductor
+f24	Easy Measure
+f25	Sichuan Changhong Neonet Technologies
+f26	Centromere Holding
+f27	Global Link Distribution
+f28	Amp Fit Israel LTD
+f29	Trezor Company s.r.o.
+f2a	KELLER Druckmesstechnik
+f2b	ElitEngineering
+f2c	Vision Group
+f2d	ClipsClips
+f2e	BRITZ INTERNATIONAL CO.,LTD
+f2f	ThingCo
+f30	Opal Camera
+f31	TECHNOLOGIES FOR FREERIDE s.r.o
+f32	FLINTEC UK LIMITED
+f33	TETNET
+f34	NINGBO SHARKWARD ELECTRONICS CO.,LTD
+f35	Audeze
+f36	NODER Joint Stock Company
+f37	Schueco International KG
+f38	GILL INSTRUMENTS LIMITED
+f39	Seitron Spa
+f3a	Southern Audio Services
+f3b	SANWA NEWTEC CO.,LTD.
+f3c	Mobile Technology Solutions
+f3d	Vitio Medical S.L.
+f3e	Salyx Medical
+f3f	Landig + Lava GmbH & Co. KG
+f40	Health Data Insight C.I.C.
+f41	BONX INC.
+f42	LINKEDCHIP TECHNOLOGY INC
+f43	12mm Health Technology
+f44	MAVERICK ENERGY SOLUTIONS INTERNATIONAL,INC
+f45	Tactica Defense
+f46	Huizhou Meicanxin Electronics Technology
+f47	Lodestar Technology
+f49	IYO INC.
+f4a	Mitsubishi Motors
+f4b	desamisCo.,Ltd.
+f4c	JL WORLD CORPORATION LIMITED
+f4d	Qulinda
+f4e	Ningbo Dooya Mechanic & Electronic Technology
+f4f	G-Vision
+f50	Lantern Innovations Incorporated
+f51	ebm-papst Mulfingen GmbH & Co. KGaA & Co. KG
+f52	Shenzhen Yunke Intelligent
+f53	Fledt & Meiton Marin
+f54	ContiTech Deutschland
+f55	Sensoteq
+f56	Astute Access Group
+f57	Silverlake Technologies
+f58	Shenzhen Guo-link Technology
+f59	Silicon Vandals PTY LTD
+f5a	Vibe Energy
+f5b	shanghai fudan electronics group company
+f5c	Micro Technology Services
+f5d	Leapcraft ApS
+f5e	WUXI WEIDA INTELLIGENT ELECTRONICS CO.,LTD.
+f5f	ROBSON SRL
+f61	HyolimXE
+f62	Kehwin Technologies
+f63	WATTER
+f64	SafeNow
+f65	CZV
+f66	BIGREDBEE
+f67	White Eagle Sonic Technologies
+f68	Navico
+f69	Ancoe Industry
+f6a	Roam Devices
+f6b	Skywalk
+f6c	Biogents
+f6d	MODRETRO, INC.
+f6e	iSi Wearable Safety
+f6f	onanoff limited
+f70	TECHFLITTER SOLUTIONS PRIVATE LIMITED
+f71	PIRITIZ
+f72	FLORLINK, INC.
+f73	Keycafe
+f74	Sperry Labs
+f75	Senseonics, Incorporated
+f76	simatec ag
+f77	CROSS BRAIN CO.,Ltd.
+f78	Also
+f79	Walter Mueller Inc. for Industrial Electronics
+f7a	SHENZHEN GUANG QI GUO CHUANG TECHNOLOGY CO.,LTD
+f7b	SKYROAM, INC.
+f7c	Polk Audio
+f7d	eQ-3
+f7e	shenzhen Holyiot Technology
+f7f	Badass eBikes
+f80	Hydro Electronic Devices
+f81	IN Phase International lTD
+f82	Amon
+f83	Calpeda S.p.A.
+f84	KT Micro
+f85	Hangzhou Sciener Smart Technology
+f86	Lakecrest
+f87	Anacove
+f88	Kohler Ventures
+f89	STOREIO TECHNOLOGIES LTD
+f8a	Innogando S.L.
+f8b	A.Y. McDonald Mfg.
+f8c	ROYAL PARTS CO.,LTD
+f8d	JUREN CO., LTD.
+f8e	Biceek
+f8f	SIGNUM INTELLIGENCE LTD
+f90	MOBI7 TECNOLOGIA EM MOBILIDADE
+f91	Valostra Digital Ventures LLP
+f92	Ethos Group
+f93	Aktiebolaget Ebeco
+f94	IDX Company
+f95	Dongguang Huasoo Automation Technology Company
+f96	SEIKOIST, INC
+f97	SPX Aids to Navigation
+f98	Fitnexa
+f99	DEZINE GROUP
+f9a	Eiritsu Electronics Industry
+f9b	Hanshow Technology
+f9c	WePower Technologies
+f9d	IRTrans
+f9e	Hibino
+f9f	Seiko Future Creation
+fa0	DP IOT
+fa1	PALRED RETAIL PRIVATE LIMITED
+fa2	BIA NEUROSCIENCE INC.
+fa3	B.E.G. Brueck Electronic
+fa4	Nice Spa
+fa5	Avanos Medical
+fa6	Ugreen Group
+fa7	spheretek japan
+fa8	Senti Technologies Private
+fa9	Ranch Systems
+faa	Suzhou Fanxi Technology
+fab	Geo Radar AI Private
+fac	Flitsmeister
+fad	The AI Toy Company
+fae	Capacite
+faf	Terasite Technologies
+fb0	General Resistance
+fb1	Avivomed
+fb2	PLAUD
+fb3	Hooked Society
+fb4	StoneDevices
+fb5	Hangzhou Nano IC Technologies Co,.
+fb6	TQ-Systems
+fb7	Hapn Holdings
+fb8	SITERWELL ELECTRONICS CO.,LIMITED
+fb9	Shenzhen Mutual Technology
+fba	Cosonic Intelligent Technologies
+fbb	Rollease Acmeda
+fbc	ATANS TECHNOLOGY INC.
+fbd	Locus Robotics
+fbe	TaigaIoT
+fbf	Tridentify
+fc0	Littlebird Connected Care
+fc1	Air Automotive tracking
+fc2	ISSPRO, INC
+fc3	Shenzhen Jimi loT
+fc4	FulScience Automotive Electronics
+fc5	Hypershell
+fc6	ASD Lighting
+fc7	Pharox
+fc8	Eforthink Technology
+fc9	Zirbel Bike
+fca	Legato Audio
+fcb	Biocorp Production
+fcc	Neurotherapeutics
+fcd	Wimate Technology Solutions Pvt
+fce	NOJA Power
+fcf	Nestlab
+fd0	Stark Future SL
+fd1	Auranova
+fd2	Domteknika S.A
+fd3	YDIIT
+fd4	QRITAGYA LLP
+fd5	Telemacy
+fd6	LIOTYS
+fd7	Hondata
+fd8	SIVA Inotec
+fd9	REMDEVICE S.R.L.
+fda	NIVELCO PROCESS CONTROL CO.
+fdc	Beijing Hongsi Electronic Technology
+103a	FOSS Analytical
+103d	Blahaj
+103e	Nextorage
+103f	infyni
+1040	Raspberry Pi
+1041	Shenzhen Huasheng Jiaye Technology
+1042	Namara Water Technologies
+1043	Shanghai Holychip Electronic
+1044	Rotarex
+1045	VOTRONIC Elektronik-Systeme
+1046	EXELIO S.R.L.
+1047	Yamaha Motor eBike Systems
+1048	Ferrari s.p.a.
+1049	Anhui Ubico Advanced Manufacture
+104a	Mueller-BBM Rail Technologies
+104b	Yoto
+104c	LAUMAS Elettronica
+104d	BUND MEDIA PTY. LTD.
+104e	LSC Control Systems
+104f	Safety Lighting Research
+1050	Hangzhou Sneuro Medical
+1051	UnlimitedIRL
+1052	CHOZEN International CO., LTD.
+1053	Sensorworx
+1054	Romcor
+1055	NewNet
+1056	CLM-Solutions
+1057	RSA Security
+1058	Gravity (Shenzhen)Space Technology
+1059	Shenzhen Shuye Technology
+105a	ArjoHuntleigh
+105b	Fairbanks Scales
+105c	YANMAR HOLDINGS CO., LTD.
+105d	Williams Sound
+105e	Zuuka
+105f	Chip-pump Microelectronics
+1060	TOMOE VALVE CO.,LTD
+1061	VCS Vision Control Solutions
+1062	Framason Audio S.A
+1063	Field Line Automation
+1064	Shearwater Research
+1065	HIGH HIT ENTERPRISE CO., LTD.
+1066	Algiz
+1067	Shenzhen FHX Precision Hardware & Plastic
+1068	Hotron
+1069	Remoticom
+106a	OSKEY
+106b	GORDON MURRAY GROUP LIMITED
+106c	Global Electronics
+106d	Rokstar Holdings
+106e	STRYDE LIMITED
+106f	Prosaris Solutions
+1070	TLV Co.,LTD.
+1071	IZYBAT
+1072	ALTESSA SOLUTIONS INC.
+1073	Hong Kong Future lntelligent Technology
+1074	CenTrak
+1075	TM-TECHNOLOGIES, JSC
+1076	ALPHADIF
+1077	Shenzhen Muyu Technology
+1078	augment AI
+1079	Digimax Innovative Products LTD.
+107a	CodaHD
+107b	E.J. Brooks Company
+107c	Martin.Care
+107d	IMPACT-BZ LTD
+107e	Belford investment holdings pty ltd
+107f	Anton Paar ConsumerTec
+1080	Knit Sound Company
+1081	Australis Scientific
+1082	AIR PRODUCTS AND CHEMICALS, INC.
+1083	SYSTEM LOCO LTD
+1084	24x8
+1085	FUTURE INTELLIGENCE TECHNOLOGY SINGAPORE PTE. LTD.
+1086	M3SH TECHNOLOGY INC.
+1087	Matisse Interactif inc.
+1088	Sesame AI
+1089	DEER MANAGEMENT SYSTEMS
+108a	Grayhill
+108b	PERUN TECH SP. Z O.O.
+108c	Tiny Displays
+108d	DEWINE Labs
+108e	Industrial Computing
+108f	SkyCell
+1090	NAGANO KEIKI CO., LTD.
+1091	COSEL ELEKTRONIK OTOMASYON SISTEMLERI SANAYI VE TICARET LIMITED SIRKETI
+1092	BXB DIGITAL PTY LIMITED
+1093	Mindspire
+1094	Personal Products
+1095	CardiaMetrics
+1096	Aktv8
+1097	Knox Associates
+1098	smart-TEC GmbH & Co. KG
+1099	Selco
+109a	MONNIT CORPORATION
+109b	Tensoli
+109c	KIBLE
+109d	terumo
+109e	SHIBAURA ELECTRONICS CO., LTD.
+109f	Shenzhen Hali-Power Industrial
+10a0	inContAlert
+10a1	flexlog
+10a2	Audio Research
+10a3	BQT Solutions
+10a4	RAPIDISE TECHNOLOGY PRIVATE LIMITED
+10a5	Cebreo Medical
+10a6	Lightnovo ApS
+10a7	Pedigree Technologies
+10a8	Zhejiang Wanyou Intelligent Technology
+10a9	Mallow
+10aa	Sigenergy Technology
+10ab	ObjectSpectrum
+10ac	ATsens
+10ad	CoreHW Semiconductor
+10ae	Raycon
+10af	Hangzhou SDIC Microelectronics
+10b0	VSC Synapse
+10b1	Senops Tracker
+10b2	Shenzhen Xunzong Zhilian Technology
+10b3	HOSEOTELNET
+10b4	Solabs Technology
+10b5	SpartanLync Technologies
+10b6	SHENZHEN CHINA MICRO SEMICON CO.,LIMITED
+10b7	Fosilicon
+10b8	Palarum
+10b9	CYNC Labs
+10ba	Noble HiFi
+10bb	VERGESENSE INC
+10bc	Harley-Davidson Motor Company
+10bd	Variowell Development
+10be	UNIVERSAL REMOTE CONTROL, INC.
+10bf	All Inspire Health
+10c0	Minda
+10c1	Shenzhen ECO-NEWLEAF CO., LTD
+10c2	SainStore Technology
+10c3	TECH FASS s.r.o.
+10c4	OPICA
+10c5	Cardinal Scale Mfg
+10c6	Piscisea Tech
+10c7	CHIYODA TECHNOL CORPORATION
+10c8	mylife Diabetes Care
+10c9	Tractian Technologies
+10ca	FairPhone B.V
+10cb	The90
+10cc	Linde
+10cd	Kumho Tire
+10ce	Inito Health
+10cf	Tempur World
+10d0	Band24
+10d1	Acer
+10d2	Hehku Company
+10d3	AGCO
+10d4	Victor Hasselblad
+10d5	IntelliDesign
+10d6	UltronSMART
+10d7	Arashi Vision
+10d8	Westfalen Aktiengesellschaft
+10d9	Liebherr-Hausgeraete
+10da	SKAIChips
+10db	SZ Avinox Innovation
+10dc	Spectra Precision
+10dd	Triumph Designs
+10de	Gastron
+10df	Hawkeye Surgical Lighting
+10e0	Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+10e1	Neurable
+10e2	CAREHAWK INC.
+10e3	Vybe Audio
+10e4	Smart Technologies ULC
+10e5	Durin, inc.
+10e6	KWANG YANG MOTOR CO., LTD.
+10e7	Placenet Internet of Places S.L.
+10e8	Liontron GmbH & Co. KG
+10e9	Hankook Tire & Technology
+10ea	Guangdong Youhong Medical Technology
+10eb	Fontaine Fifth Wheel Company
+10ec	ZELP LTD
+10ed	BRITA SE
+10ee	Shanghai XYLink
+10ef	Keto-Check
+10f0	RFID N PRINT PTY LTD
+10f1	Ralston Instruments
+10f2	CHIGEE TECHNOLOGY CO., LTD.
+10f3	EURODIMA GmbH & CoKG
+10f4	SUPERARK LTD
+10f5	Shenzhen DeepX Technology
+10f6	Pressure Systems International
+10f7	HEX INNOVATE (UK) LIMITED
+10f8	IONLINE INTERNET SERVICE PROVIDER
+10f9	Even Realities
+10fa	QPlay
+10fb	Hydratune Australia
+10fc	CITECH CO.,LTD.
+10fd	Neurabody
+10fe	Daisen Electronic Industrial
+10ff	Sonus Faber spa
+1100	miThings
+1101	Nearfaces UG
+1102	Temple Private
+1103	BRISANT SECURE LTD
+1104	Daiichi Elektronik Sanayi ve Ticaret. A.S.
+1105	Cirrus Design
+1106	Flicfit inc.
+1107	Optrel
+1108	BEMER Int.
+1109	Hamodaz
+110a	OnRace Motorsports
+110b	SIGMA CORPORATION
+110c	rescuetrack
+110d	ARETA AI INC.
+110e	Gigawit Electronics LTD
+110f	Nylint
+1110	Hamaton
+1111	RAPSODO PTE. LTD.
+1112	JustTec
+1113	ONXMAPS, INC
+1114	Metabowerke
+1115	Thermia Aktiebolag
+1116	ALLRA LIMITED
+1117	Tive
+1118	Villeroy & Boch
+1119	TSUKURUBAI, LIMITED LIABILITY COMPANY
+111a	BOKE Drivers
+111b	DIGITANIMAL S.L.
+111c	Techavtomatica
+111d	Commodore International
+111e	DS TAGS Group
+111f	iAppliance
+1120	PI-CRYSTAL INC.
+1121	ennos ag
+1122	FUSE BLUEJAY LIMITED
+1123	Hudl
+1124	DOLLAR JUDGE INC
+1125	Wavarts Technologies
+1126	Hakemann GmbH & Co. KG
+1127	Permobil
+1128	NIC IMPEX
+1129	I.T.O. Vaarwegmarkering
+112a	Flowil International Lighting
+112b	IXI Eyewear
+112c	mees audio technology., co.ltd.
+112d	Aktiia
+112e	Oticon Medical
+112f	SECANDA Systems
+1130	Pi Variables
+1131	Chirp Innovation
+1132	Nicrew Technology
+1133	THEKEEON
+1134	Barksdale
+1135	Shenzhen GetD Technology
+1136	Loop
+1137	Eberlein Innovations EOOD
+1138	Crane Aerospace & Electronics
+1139	NaturalCycles Nordic
+113a	Celadon
+113b	ONiO
+113c	SOTI INC.
+113d	Venndelta
+113e	Westinghouse Air Brake Technologies
+113f	Dreamarea
+1140	WEGZWEI
+1141	AXsensor AB
+1142	Eight Sleep
+1143	Shenzhen HJT Electronics
+1144	GENXUNITED HOLDINGS INC.
+1145	Hon Hai Precision Ind.
+1146	Murray Blair
+1147	NESTLE PURINA PETCARE COMPANY
+1148	Revelyst
+1149	ITOKI CORPORATION
+114a	ASIMUT SOFTWARE ApS
+114b	Triciti Coverage
+114c	Acin Instrumenten
+ffff	Bluetooth SIG Specification Reserved Default Vendor ID for Remote Devices Without Device ID Service Record.

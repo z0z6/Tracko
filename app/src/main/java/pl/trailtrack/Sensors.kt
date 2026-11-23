@@ -46,13 +46,31 @@ data class SensorInfo(
     val kinds: Set<SensorKind>,
     /** producent / model z usługi Device Information (jeśli urządzenie ją udostępnia) */
     val maker: String = "",
-    /** rozpoznany profil urządzenia, np. zegarek bez transmisji tętna (patrz [KnownDevices]) */
+    /** podpowiedź, gdy połączone urządzenie nie udostępnia standardowych danych sportowych */
     val hint: String? = null
 )
 
 data class FoundDevice(
-    val address: String, val name: String, val rssi: Int, val kinds: Set<SensorKind>, val hint: String? = null
-)
+    val address: String,
+    /** nazwa z reklamy BLE / systemu; pusta = urządzenie nie podaje nazwy */
+    val name: String,
+    val rssi: Int,
+    val kinds: Set<SensorKind>,
+    /** producent wg identyfikatora Bluetooth SIG z reklamy (np. „Polar Electro”, „Xiaomi”) */
+    val maker: String? = null,
+    /** rodzaj urządzenia z pola Appearance (np. „Smartwatch”, „Pas tętna”) */
+    val type: String? = null,
+    /** sparowane już w telefonie (np. zegarek połączony z aplikacją producenta) */
+    val bonded: Boolean = false,
+    val wearable: Boolean = false
+) {
+    /** Nazwa do wyświetlenia przed połączeniem: nazwa urządzenia, a gdy jej brak – producent/rodzaj + końcówka adresu. */
+    val displayName: String
+        get() = name.ifBlank {
+            val what = type ?: maker?.let { "Urządzenie $it" } ?: "Urządzenie bez nazwy"
+            "$what (${address.takeLast(5)})"
+        }
+}
 
 data class SensorLive(
     val hr: Int = 0, val hrTime: Long = 0L,
@@ -78,42 +96,15 @@ data class SensorPeek(val hr: Int, val power: Int, val cad: Int, val spo2: Int, 
 data class MachineLive(val speedMs: Double, val inclinePct: Double)
 
 /**
- * Urządzenia rozpoznawane po nazwie. Większość zegarków i opasek (Garmin, Polar, Suunto, Coros, Amazfit, Xiaomi,
- * Huawei/Honor, Wahoo, Whoop…) udostępnia tętno standardowym profilem BLE po włączeniu „transmisji tętna”.
- * Część (np. CMF/Nothing, Samsung Galaxy Watch, Fitbit) tego nie robi – wtedy tętno da się dołączyć po treningu
- * z Health Connect (zegarek → aplikacja producenta → Health Connect → Tracko).
+ * Podpowiedź dla urządzenia, które się połączyło, ale nie udostępnia żadnego standardowego profilu sportowego.
+ * Bez wyróżniania marek: każdy zegarek, opaska czy czujnik łączy się tak samo.
  */
-object KnownDevices {
-    private class Rule(val match: (String) -> Boolean, val hint: String)
-
-    private val rules = listOf(
-        Rule({ it.contains("cmf") || it.contains("nothing") || it.startsWith("watch 3 pro") || it.startsWith("watch pro") },
-            "CMF / Nothing: zegarek nie wysyła tętna na żywo przez Bluetooth (stan na 2026). Tętno dołączy się po " +
-                "treningu z Health Connect (Nothing X → Health Connect). Jeśli aktualizacja doda transmisję tętna, " +
-                "pojawi się tu automatycznie jako zwykły czujnik."),
-        Rule({ it.startsWith("galaxy watch") || it.contains("gear ") },
-            "Samsung Galaxy Watch nie ma standardowej transmisji tętna – użyj Health Connect (Samsung Health)."),
-        Rule({ it.startsWith("fitbit") || it.startsWith("charge ") || it.startsWith("versa") || it.startsWith("sense") },
-            "Fitbit nie transmituje tętna przez Bluetooth – użyj Health Connect (aplikacja Fitbit)."),
-        Rule({ it.startsWith("forerunner") || it.startsWith("fenix") || it.startsWith("venu") || it.startsWith("vivoactive") ||
-            it.startsWith("instinct") || it.startsWith("epix") || it.startsWith("edge") },
-            "Garmin: w zegarku włącz Ustawienia → Czujniki → Nadawanie tętna (Broadcast HR)."),
-        Rule({ it.startsWith("amazfit") || it.startsWith("mi band") || it.startsWith("mi smart band") || it.startsWith("xiaomi smart band") ||
-            it.startsWith("redmi") },
-            "Amazfit / Xiaomi: włącz w aplikacji Zepp / Mi Fitness „Udostępnianie tętna” (Heart rate sharing)."),
-        Rule({ it.startsWith("huawei") || it.startsWith("honor") },
-            "Huawei / Honor: włącz w zegarku „Transmisja danych tętna” (HR data broadcasts)."),
-        Rule({ it.startsWith("polar") }, "Polar: zegarki – włącz „Udostępnij tętno innym urządzeniom” w menu treningu."),
-        Rule({ it.startsWith("suunto") }, "Suunto: włącz „HR belt / Share HR” w ustawieniach zegarka."),
-        Rule({ it.startsWith("coros") }, "Coros: włącz „Heart Rate Broadcast” w menu zegarka."),
-        Rule({ it.startsWith("whoop") }, "Whoop: włącz „Heart Rate Broadcast” w aplikacji Whoop.")
-    )
-
-    fun hintFor(name: String): String? {
-        val n = name.lowercase().trim()
-        if (n.isEmpty()) return null
-        return rules.firstOrNull { it.match(n) }?.hint
-    }
+object DeviceHints {
+    const val NO_PROFILE =
+        "Połączono, ale urządzenie nie udostępnia tętna ani innych danych sportowych przez standardowy profil Bluetooth. " +
+            "W zegarku / opasce włącz udostępnianie tętna (zwykle: „Nadawanie tętna”, „Udostępnianie tętna”, " +
+            "„Transmisja tętna”, „Broadcast HR” – w menu zegarka lub w jego aplikacji). Jeśli takiej opcji nie ma, " +
+            "tętno dołączy się po treningu z Health Connect."
 }
 
 private fun u8(v: ByteArray, o: Int): Int = v[o].toInt() and 0xFF
@@ -125,7 +116,7 @@ private fun u32(v: ByteArray, o: Int): Long = u16(v, o).toLong() or (u16(v, o + 
  * Standardowe profile BLE: Heart Rate (180D), Cycling Power (1818), Cycling Speed & Cadence (1816),
  * Running Speed & Cadence (1814), Fitness Machine (1826: trenażery, bieżnie, wioślarze, orbitreki),
  * Pulse Oximeter (1822), Health Thermometer (1809), a także bateria (180F) i Device Information (180A).
- * Dzięki temu działa sprzęt praktycznie każdego producenta, nie tylko Garmin.
+ * Każde urządzenie (zegarek, opaska, pas, czujnik) dowolnego producenta łączy się tak samo.
  */
 @SuppressLint("MissingPermission")
 object SensorHub {
@@ -155,6 +146,9 @@ object SensorHub {
     private val U_TEMP = UUID.fromString("00001809-0000-1000-8000-00805f9b34fb")
     private val U_TEMP_M = UUID.fromString("00002a1c-0000-1000-8000-00805f9b34fb")
     // informacje o urządzeniu
+    // nazwa urządzenia z GATT (Generic Access) – gdy reklama jej nie podała
+    private val U_GAP = UUID.fromString("00001800-0000-1000-8000-00805f9b34fb")
+    private val U_GAP_NAME = UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb")
     private val U_DIS = UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb")
     private val U_DIS_MAKER = UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb")
     private val U_DIS_MODEL = UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb")
@@ -219,16 +213,69 @@ object SensorHub {
 
     // ---------- skanowanie ----------
 
+    // nazwy raz odczytane z reklamy zapamiętujemy – część urządzeń wysyła nazwę tylko w co którejś ramce
+    private val nameCache = HashMap<String, String>()
+
+    @SuppressLint("MissingPermission")
+    private fun systemName(dev: BluetoothDevice): String? = runCatching {
+        if (Build.VERSION.SDK_INT >= 30) dev.alias ?: dev.name else dev.name
+    }.getOrNull()?.takeIf { it.isNotBlank() }
+
+    private fun foundFrom(dev: BluetoothDevice, rssi: Int, rec: android.bluetooth.le.ScanRecord?, bonded: Boolean): FoundDevice {
+        val ad = BleIdent.parse(rec?.bytes)
+        val adv = rec?.deviceName?.takeIf { it.isNotBlank() } ?: ad.name ?: systemName(dev)
+        val name = synchronized(nameCache) {
+            if (adv != null) { nameCache[dev.address] = adv; adv } else nameCache[dev.address] ?: ""
+        }
+        val kinds = mutableSetOf<SensorKind>()
+        rec?.serviceUuids?.forEach { u -> KIND_BY_SERVICE[u.uuid]?.let { kinds.add(it) } }
+        for (u16 in ad.services16) {
+            KIND_BY_SERVICE[UUID.fromString(String.format("%08x-0000-1000-8000-00805f9b34fb", u16))]?.let { kinds.add(it) }
+        }
+        val type = ad.appearance?.let { BleIdent.appearanceLabel(it) } ?: when {
+            SensorKind.HR in kinds -> "Czujnik tętna"
+            SensorKind.POWER in kinds -> "Miernik mocy"
+            SensorKind.CSC in kinds -> "Czujnik prędkości/kadencji"
+            SensorKind.RSC in kinds -> "Czujnik biegowy"
+            SensorKind.FTMS in kinds -> "Trenażer / bieżnia"
+            SensorKind.SPO2 in kinds -> "Pulsoksymetr"
+            else -> null
+        }
+        val maker = ad.companyId?.let { BleIdent.company(appCtx, it) }
+        return FoundDevice(
+            dev.address, name, rssi, kinds, maker, type,
+            bonded = bonded || runCatching { dev.bondState == BluetoothDevice.BOND_BONDED }.getOrDefault(false),
+            wearable = BleIdent.isWearableOrSport(ad.appearance) || kinds.isNotEmpty()
+        )
+    }
+
+    private fun addFound(item: FoundDevice) {
+        found.update { list ->
+            val old = list.firstOrNull { it.address == item.address }
+            // nie gubimy informacji z wcześniejszych ramek (nazwa, producent, rodzaj, usługi)
+            val merged = if (old == null) item else item.copy(
+                name = item.name.ifBlank { old.name },
+                maker = item.maker ?: old.maker,
+                type = item.type ?: old.type,
+                kinds = item.kinds + old.kinds,
+                bonded = item.bonded || old.bonded,
+                wearable = item.wearable || old.wearable,
+                rssi = if (item.rssi == Int.MIN_VALUE) old.rssi else item.rssi
+            )
+            (list.filter { it.address != item.address } + merged).sortedWith(
+                compareByDescending<FoundDevice> { it.kinds.isNotEmpty() }
+                    .thenByDescending { it.wearable }
+                    .thenByDescending { it.bonded }
+                    .thenByDescending { it.name.isNotBlank() }
+                    .thenByDescending { it.rssi }
+            )
+        }
+    }
+
     private val scanCb = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val dev = result.device ?: return
-            val name = result.scanRecord?.deviceName ?: runCatching { dev.name }.getOrNull() ?: ""
-            val kinds = mutableSetOf<SensorKind>()
-            result.scanRecord?.serviceUuids?.forEach { u -> KIND_BY_SERVICE[u.uuid]?.let { kinds.add(it) } }
-            val item = FoundDevice(dev.address, name.ifBlank { "Urządzenie BLE" }, result.rssi, kinds, KnownDevices.hintFor(name))
-            found.update { list ->
-                (list.filter { it.address != item.address } + item).sortedByDescending { it.rssi }
-            }
+            addFound(foundFrom(dev, result.rssi, result.scanRecord, false))
         }
 
         override fun onScanFailed(errorCode: Int) {
@@ -236,9 +283,22 @@ object SensorHub {
         }
     }
 
-    fun startScan(all: Boolean) {
+    /**
+     * Skanowanie: domyślnie WSZYSTKIE urządzenia BLE (zegarki i opaski rzadko ogłaszają usługi sportowe w reklamie);
+     * [sportOnly] = tylko urządzenia ogłaszające standardowe profile. Na liście są też urządzenia już sparowane
+     * w telefonie (zegarek połączony z aplikacją producenta często w ogóle się nie reklamuje).
+     */
+    fun startScan(sportOnly: Boolean) {
         val sc = adapter()?.bluetoothLeScanner ?: return
         found.value = emptyList()
+        runCatching {
+            adapter()?.bondedDevices?.forEach { d ->
+                if (d.type == BluetoothDevice.DEVICE_TYPE_LE || d.type == BluetoothDevice.DEVICE_TYPE_DUAL) {
+                    addFound(foundFrom(d, Int.MIN_VALUE, null, true))
+                }
+            }
+        }
+        val all = !sportOnly
         val filters = if (all) emptyList() else KIND_BY_SERVICE.keys.map {
             ScanFilter.Builder().setServiceUuid(ParcelUuid(it)).build()
         }
@@ -326,9 +386,7 @@ object SensorHub {
             SensorInfo(
                 it.address, it.name, it.connected, it.connecting, it.battery, it.kinds.toSet(),
                 listOf(it.maker, it.model).filter { m -> m.isNotBlank() }.joinToString(" "),
-                if (it.connected && it.discovered && it.kinds.isEmpty()) KnownDevices.hintFor(it.name)
-                    ?: "Urządzenie nie udostępnia żadnego standardowego profilu sportowego (tętno, moc, kadencja…)."
-                else if (!it.connected) KnownDevices.hintFor(it.name) else null
+                if (it.connected && it.discovered && it.kinds.isEmpty()) DeviceHints.NO_PROFILE else null
             )
         }
     }
@@ -371,6 +429,9 @@ object SensorHub {
         else sub(U_PLX, U_PLX_SPOT, SensorKind.SPO2)
         sub(U_TEMP, U_TEMP_M, SensorKind.TEMP)
         gatt.getService(U_BATT)?.getCharacteristic(U_BATT_L)?.let { ch ->
+            c.ops.addLast { g -> g.readCharacteristic(ch) }
+        }
+        gatt.getService(U_GAP)?.getCharacteristic(U_GAP_NAME)?.let { ch ->
             c.ops.addLast { g -> g.readCharacteristic(ch) }
         }
         gatt.getService(U_DIS)?.let { dis ->
@@ -477,6 +538,14 @@ object SensorHub {
         if (uuid == U_BATT_L && v.isNotEmpty()) {
             c.battery = u8(v, 0)
             publish()
+        }
+        if (uuid == U_GAP_NAME && v.isNotEmpty()) {
+            val n = String(v, Charsets.UTF_8).trim { it <= ' ' || it == '\u0000' }
+            if (n.isNotBlank() && (c.name.isBlank() || c.name.startsWith("Urządzenie") || c.name.contains("bez nazwy"))) {
+                c.name = n
+                persist()
+                publish()
+            }
         }
         if ((uuid == U_DIS_MAKER || uuid == U_DIS_MODEL) && v.isNotEmpty()) {
             val txt = String(v, Charsets.UTF_8).trim { it <= ' ' || it == '\u0000' }

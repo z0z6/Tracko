@@ -47,6 +47,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -187,9 +189,11 @@ private fun ActivityTile(
     modifier: Modifier, onToggle: () -> Unit, onClick: () -> Unit
 ) {
     val c = ios()
+    val sp = spec()
+    val nothing = sp.style == ThemeStyle.NOTHING
     val accent = sportAccent(sport)
     val haptic = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(26.dp)
+    val shape = RoundedCornerShape(if (nothing) 24.dp else 26.dp)
 
     // pointerInput(Unit) działa w jednej korutynie od pierwszej kompozycji – bez tego widziałby stary stan
     // (np. editing = false) i dotknięcie w trybie edycji nie przełączałoby kafelka
@@ -231,7 +235,7 @@ private fun ActivityTile(
         spring(stiffness = 300f), label = "rx"
     )
 
-    // „oddychanie” ikony i poświaty
+    // „oddychanie” ikony
     val inf = rememberInfiniteTransition(label = "idle")
     val bob by inf.animateFloat(
         0f, 1f, infiniteRepeatable(tween(2300 + index * 260, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "bob"
@@ -239,9 +243,6 @@ private fun ActivityTile(
     // tryb edycji: delikatne drżenie kafelków
     val wob by inf.animateFloat(
         -1.3f, 1.3f, infiniteRepeatable(tween(120 + (index % 3) * 18, easing = LinearEasing), RepeatMode.Reverse), label = "wob"
-    )
-    val glow by inf.animateFloat(
-        0.5f, 1f, infiniteRepeatable(tween(1900 + index * 210, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "glow"
     )
 
     Box(
@@ -260,8 +261,17 @@ private fun ActivityTile(
                 cameraDistance = 14f * density
             }
             .clip(shape)
-            .background(Brush.linearGradient(listOf(accent.copy(alpha = 0.26f), c.card, c.card)))
-            .border(1.5.dp, accent.copy(alpha = if (isLast || isChosen || (editing && !hidden)) 0.85f else 0.22f), shape)
+            // jednolite tło kafelka (bez poświat i szarych przejść); w innych stylach lekki kolorowy akcent w rogu
+            .background(if (nothing) SolidColor(c.card) else Brush.linearGradient(listOf(accent.copy(alpha = 0.20f), c.card, c.card)))
+            .border(
+                if (isLast || isChosen) 1.5.dp else 1.dp,
+                when {
+                    isLast || isChosen || (editing && !hidden) -> (if (nothing) c.label else accent).copy(alpha = 0.85f)
+                    nothing -> c.separator
+                    else -> accent.copy(alpha = 0.22f)
+                },
+                shape
+            )
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = { o ->
@@ -276,20 +286,12 @@ private fun ActivityTile(
                 )
             }
     ) {
-        // poświata + ikona
-        Box(Modifier.align(Alignment.Center).offset(y = (-14).dp), contentAlignment = Alignment.Center) {
-            Box(
-                Modifier.size(96.dp)
-                    .graphicsLayer { alpha = 0.55f * glow; val g = 0.9f + 0.1f * glow; scaleX = g; scaleY = g }
-                    .background(
-                        Brush.radialGradient(listOf(accent.copy(alpha = 0.55f), Color.Transparent)), CircleShape
-                    )
-            )
-            AppIconView(
-                sport.icon, accent,
-                Modifier.size(58.dp).graphicsLayer { translationY = (bob - 0.5f) * 7.dp.toPx() }
-            )
-        }
+        // sama ikona – bez kołowej poświaty
+        AppIconView(
+            sport.icon, accent,
+            Modifier.align(Alignment.Center).offset(y = (-14).dp).size(62.dp)
+                .graphicsLayer { translationY = (bob - 0.5f) * 6.dp.toPx() }
+        )
 
         // nazwa na dole
         Column(
@@ -300,7 +302,14 @@ private fun ActivityTile(
                 sport.label, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = c.label,
                 textAlign = TextAlign.Center, maxLines = 1
             )
-            Text(if (sport.gps) "GPS · mapa" else "bez GPS", fontSize = 11.sp, color = c.secondary)
+            if (nothing) {
+                Text(
+                    if (sport.gps) "GPS · MAPA" else "BEZ GPS", fontSize = 10.sp, color = c.secondary,
+                    fontFamily = sp.mono, letterSpacing = 1.sp, maxLines = 1
+                )
+            } else {
+                Text(if (sport.gps) "GPS · mapa" else "bez GPS", fontSize = 11.sp, color = c.secondary)
+            }
         }
 
         if (editing) {
@@ -313,10 +322,19 @@ private fun ActivityTile(
         }
 
         if (isLast && !editing) {
-            Box(
-                Modifier.align(Alignment.TopEnd).padding(10.dp).clip(RoundedCornerShape(50))
-                    .background(accent.copy(alpha = 0.18f)).padding(horizontal = 8.dp, vertical = 3.dp)
-            ) { Text("ostatnio", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = accent) }
+            if (nothing) {
+                // Nothing: czerwona kropka + etykieta mono
+                Row(Modifier.align(Alignment.TopEnd).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("OSTATNIO", fontSize = 9.sp, color = c.secondary, fontFamily = sp.mono, letterSpacing = 1.sp)
+                    Spacer(Modifier.width(5.dp))
+                    Box(Modifier.size(6.dp).clip(CircleShape).background(c.red))
+                }
+            } else {
+                Box(
+                    Modifier.align(Alignment.TopEnd).padding(10.dp).clip(RoundedCornerShape(50))
+                        .background(accent.copy(alpha = 0.18f)).padding(horizontal = 8.dp, vertical = 3.dp)
+                ) { Text("ostatnio", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = accent) }
+            }
         }
     }
 }

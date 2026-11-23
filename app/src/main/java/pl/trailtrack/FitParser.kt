@@ -1,6 +1,6 @@
 package pl.trailtrack
 
-/** Minimalny dekoder plików FIT (Garmin Edge/Forerunner): rekordy, okrążenia, zdarzenia timera. */
+/** Minimalny dekoder plików FIT (zegarki i komputery rowerowe dowolnej marki): rekordy, okrążenia, zdarzenia timera. */
 private const val FIT_EPOCH = 631065600L
 private const val NONE = Long.MIN_VALUE
 
